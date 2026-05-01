@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TSLA 장기 포트폴리오</title>
+<title>TSLA 포트폴리오 통합 대시보드</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -15,6 +15,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; backg
 
 #dashboard { display:none; padding:20px; max-width:1300px; margin:0 auto; }
 
+/* ── HEADER ── */
 .header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:10px; }
 .header h1 { font-size:22px; font-weight:700; }
 .header-sub { display:flex; align-items:center; gap:8px; margin-top:6px; }
@@ -32,321 +33,332 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; backg
 .btn-sm { background:transparent; border:1px solid #30363d; color:#8b949e; padding:6px 14px; border-radius:6px; font-size:12px; cursor:pointer; }
 .btn-sm:hover { border-color:#8b949e; color:#e6edf3; }
 
-.alert-banner { background:linear-gradient(135deg,#2d1b00,#3d2800); border:1px solid #d29922; border-radius:10px; padding:12px 18px; margin-bottom:16px; display:flex; align-items:center; gap:10px; font-size:14px; color:#d29922; }
+.pos { color:#3fb950 !important; }
+.neg { color:#f85149 !important; }
+.after-tag { font-size:10px; background:#2d1f00; color:#d29922; border:1px solid #9e6a03; border-radius:4px; padding:1px 6px; margin-left:5px; vertical-align:middle; }
 
-.metrics-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:16px; }
+/* ── PRICE ROW ── */
+.price-row { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:14px; }
 .metric-card { background:#161b22; border:1px solid #30363d; border-radius:12px; padding:16px 18px; }
 .metric-label { color:#8b949e; font-size:11px; font-weight:600; letter-spacing:.5px; text-transform:uppercase; margin-bottom:6px; }
 .metric-value { font-size:22px; font-weight:700; color:#e6edf3; line-height:1.2; }
 .metric-sub { font-size:12px; color:#8b949e; margin-top:4px; }
-.pos { color:#3fb950 !important; }
-.neg { color:#f85149 !important; }
-.metric-card.pnl-pos .metric-value { color:#3fb950; }
-.metric-card.pnl-neg .metric-value { color:#f85149; }
-.after-tag { font-size:10px; background:#2d1f00; color:#d29922; border:1px solid #9e6a03; border-radius:4px; padding:1px 6px; margin-left:5px; vertical-align:middle; }
 
+/* ── COMBINED TOTAL CARD ── */
+.combined-card { background:linear-gradient(135deg,#0f2027,#1a2a3a); border:1px solid #1f6feb; border-radius:14px; padding:20px 24px; margin-bottom:14px; display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:16px; align-items:center; }
+.combined-card .big-val { font-size:28px; font-weight:800; }
+.combined-card .lbl { font-size:10px; color:#8b949e; font-weight:600; letter-spacing:.5px; text-transform:uppercase; margin-bottom:4px; }
+.combined-total-label { font-size:13px; color:#58a6ff; font-weight:700; border-bottom:1px solid #1f3a5f; padding-bottom:10px; margin-bottom:4px; grid-column:1/-1; }
+
+/* ── ACCOUNT CARDS ── */
+.accounts-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+.account-card { background:#161b22; border:1px solid #30363d; border-radius:12px; padding:18px; }
+.account-card.kakao { border-color:#2ea043; }
+.account-card.fidelity { border-color:#1f6feb; }
+.account-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+.account-name { font-size:14px; font-weight:700; display:flex; align-items:center; gap:8px; }
+.account-badge { font-size:10px; padding:2px 8px; border-radius:10px; font-weight:600; }
+.badge-kakao { background:#1a3a2a; color:#3fb950; border:1px solid #2ea043; }
+.badge-fidelity { background:#1f3a5f; color:#58a6ff; border:1px solid #1f6feb; }
+.account-metrics { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.acc-metric { }
+.acc-label { font-size:10px; color:#8b949e; font-weight:600; letter-spacing:.4px; text-transform:uppercase; margin-bottom:3px; }
+.acc-value { font-size:16px; font-weight:700; color:#e6edf3; }
+.acc-sub { font-size:11px; color:#8b949e; margin-top:2px; }
+
+/* ── CHART ── */
 .chart-card { background:#161b22; border:1px solid #30363d; border-radius:12px; padding:18px; margin-bottom:14px; }
 .chart-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
 .chart-title { font-size:13px; font-weight:600; color:#8b949e; }
-.period-tabs { display:flex; gap:4px; }
-.p-btn { padding:4px 10px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer; background:transparent; border:1px solid #30363d; color:#8b949e; transition:all .15s; }
-.p-btn.active { background:#1f3a5f; color:#58a6ff; border-color:#1f6feb; }
-.p-btn:hover:not(.active) { border-color:#8b949e; color:#e6edf3; }
+.period-btns { display:flex; gap:4px; }
+.period-btn { background:transparent; border:1px solid #30363d; color:#8b949e; padding:4px 10px; border-radius:6px; font-size:11px; cursor:pointer; }
+.period-btn:hover { border-color:#8b949e; color:#e6edf3; }
+.period-btn.active { background:#1f6feb; border-color:#1f6feb; color:#fff; }
+.chart-wrap { position:relative; height:260px; }
 
-.mid-row { display:grid; grid-template-columns:1.8fr 1fr; gap:14px; margin-bottom:14px; }
-.card { background:#161b22; border:1px solid #30363d; border-radius:12px; padding:18px; }
-.card-title { font-size:13px; font-weight:600; color:#8b949e; margin-bottom:14px; }
-
-/* Strategy */
-.strategy-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:14px; }
-.s-item { background:#0d1117; border-radius:8px; padding:12px 14px; }
-.s-label { font-size:11px; color:#8b949e; margin-bottom:4px; }
-.s-val   { font-size:14px; font-weight:600; color:#e6edf3; }
-.s-sub   { font-size:11px; color:#484f58; margin-top:2px; }
-.horizon-row { display:flex; justify-content:space-between; font-size:11px; color:#8b949e; margin-bottom:5px; }
-.horizon-bar { height:6px; background:#21262d; border-radius:3px; overflow:hidden; }
-.horizon-fill { height:100%; border-radius:3px; background:linear-gradient(90deg,#1f6feb,#58a6ff,#3fb950,#d29922,#bc8cff); transition:width .4s; }
-
-/* Scenario table */
-.scenario-section { margin-bottom:14px; }
-.scenario-table { width:100%; border-collapse:collapse; }
-.scenario-table th { font-size:11px; font-weight:600; color:#8b949e; text-align:right; padding:8px 12px; border-bottom:1px solid #21262d; white-space:nowrap; }
+/* ── SCENARIO TABLE ── */
+.scenario-card { background:#161b22; border:1px solid #30363d; border-radius:12px; padding:18px; margin-bottom:14px; }
+.section-title { font-size:13px; font-weight:700; color:#e6edf3; margin-bottom:12px; }
+.scenario-table { width:100%; border-collapse:collapse; font-size:12px; }
+.scenario-table th { color:#8b949e; font-weight:600; font-size:10px; letter-spacing:.5px; text-transform:uppercase; padding:6px 8px; text-align:right; border-bottom:1px solid #30363d; }
 .scenario-table th:first-child { text-align:left; }
-.scenario-table td { font-size:13px; padding:10px 12px; border-bottom:1px solid #161b22; text-align:right; vertical-align:middle; }
-.scenario-table td:first-child { text-align:left; }
-.scenario-table tr:last-child td { border-bottom:none; }
-.scenario-table tr.current-row td { background:rgba(31,111,235,0.06); }
-.t-label { font-size:12px; font-weight:600; }
-.t-sub   { font-size:11px; color:#8b949e; margin-top:1px; }
-.dist-pill { display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:600; }
-.dist-pill.pos { background:rgba(63,185,80,0.12); color:#3fb950; }
-.dist-pill.neg { background:rgba(248,81,73,0.12); color:#f85149; }
+.scenario-table td { padding:7px 8px; text-align:right; border-bottom:1px solid #21262d; }
+.scenario-table td:first-child { text-align:left; font-weight:600; }
+.scenario-table tr.current-row { background:#1a2a1a; }
+.scenario-table tr.current-row td { border-color:#2ea043; }
+.scenario-table tr.stop-row td { color:#f85149; }
+.scenario-table .tag { font-size:9px; display:block; color:#8b949e; font-weight:400; margin-top:1px; }
+.progress-bar-wrap { margin-top:12px; }
+.progress-label { display:flex; justify-content:space-between; font-size:11px; color:#8b949e; margin-bottom:4px; }
+.progress-track { background:#21262d; border-radius:10px; height:8px; position:relative; }
+.progress-fill { height:8px; border-radius:10px; background:linear-gradient(90deg,#da3633,#d29922,#3fb950); transition:width .5s; }
+.progress-pin { position:absolute; top:-3px; width:14px; height:14px; border-radius:50%; background:#58a6ff; border:2px solid #0d1117; transition:left .5s; transform:translateX(-50%); }
 
-/* News */
-.bottom-row { display:grid; grid-template-columns:1fr 1.5fr; gap:14px; margin-bottom:14px; }
-.tab-row { display:flex; border-bottom:1px solid #30363d; margin-bottom:14px; }
-.tab-btn { padding:8px 18px; font-size:13px; font-weight:600; color:#8b949e; cursor:pointer; border-bottom:2px solid transparent; background:none; border-top:none; border-left:none; border-right:none; }
-.tab-btn.active { color:#58a6ff; border-bottom-color:#1f6feb; }
+/* ── NEWS/YOUTUBE ── */
+.tabs-card { background:#161b22; border:1px solid #30363d; border-radius:12px; padding:18px; margin-bottom:14px; }
+.tabs-header { display:flex; gap:8px; margin-bottom:14px; }
+.tab-btn { background:transparent; border:1px solid #30363d; color:#8b949e; padding:5px 14px; border-radius:6px; font-size:12px; cursor:pointer; }
+.tab-btn.active { background:#1f6feb22; border-color:#1f6feb; color:#58a6ff; }
 .tab-content { display:none; }
 .tab-content.active { display:block; }
-.news-list { display:grid; gap:8px; max-height:300px; overflow-y:auto; }
-.news-list::-webkit-scrollbar { width:4px; }
-.news-list::-webkit-scrollbar-thumb { background:#30363d; border-radius:2px; }
-a.news-item { padding:10px 14px; background:#0d1117; border-radius:8px; border-left:3px solid #1f6feb; text-decoration:none; display:block; transition:background .15s; }
-a.news-item:hover { background:#161b22; }
-.news-title { font-size:13px; color:#e6edf3; line-height:1.5; margin-bottom:3px; }
-.news-meta  { font-size:11px; color:#484f58; }
-a.yt-item { padding:10px 14px; background:#0d1117; border-radius:8px; border-left:3px solid #da3633; text-decoration:none; display:flex; align-items:center; gap:12px; transition:background .15s; }
-a.yt-item:hover { background:#161b22; }
-a.yt-item.search { border-left-color:#30363d; }
-.yt-thumb { width:80px; height:45px; border-radius:4px; background:#21262d; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:#f85149; font-size:20px; overflow:hidden; }
-.yt-thumb img { width:100%; height:100%; object-fit:cover; }
-.yt-info { flex:1; min-width:0; }
-.yt-title { font-size:13px; color:#e6edf3; line-height:1.4; margin-bottom:3px; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
-.yt-ch { font-size:11px; color:#8b949e; }
-
-.footer { display:flex; justify-content:center; align-items:center; gap:12px; padding:14px 0 8px; color:#484f58; font-size:11px; }
-.countdown { color:#1f6feb; font-weight:600; }
-
-@media(max-width:900px) {
-  .metrics-grid { grid-template-columns:repeat(2,1fr); }
-  .mid-row, .bottom-row { grid-template-columns:1fr; }
-  .strategy-grid { grid-template-columns:repeat(2,1fr); }
-}
+.news-list { display:flex; flex-direction:column; gap:8px; }
+.news-item { display:flex; gap:10px; padding:10px; background:#0d1117; border-radius:8px; border:1px solid #21262d; text-decoration:none; color:inherit; }
+.news-item:hover { border-color:#58a6ff; }
+.news-thumb { width:72px; height:48px; border-radius:6px; background:#21262d; flex-shrink:0; object-fit:cover; }
+.news-thumb-placeholder { width:72px; height:48px; border-radius:6px; background:#21262d; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:20px; }
+.news-body { flex:1; min-width:0; }
+.news-title { font-size:12px; font-weight:600; line-height:1.4; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.news-meta { font-size:10px; color:#8b949e; }
+.yt-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:10px; }
+.yt-item { display:flex; flex-direction:column; gap:6px; text-decoration:none; color:inherit; padding:10px; background:#0d1117; border-radius:8px; border:1px solid #21262d; }
+.yt-item:hover { border-color:#f85149; }
+.yt-thumb-wrap { width:100%; aspect-ratio:16/9; border-radius:6px; background:#21262d; overflow:hidden; display:flex; align-items:center; justify-content:center; font-size:28px; }
+.yt-thumb-wrap img { width:100%; height:100%; object-fit:cover; }
+.yt-title { font-size:11px; font-weight:600; line-height:1.4; }
+.yt-ch { font-size:10px; color:#8b949e; margin-top:2px; }
 </style>
 </head>
 <body>
 
 <div id="loading">
   <div class="spinner"></div>
-  <div style="color:#8b949e;font-size:14px">실시간 데이터 불러오는 중...</div>
+  <div style="color:#8b949e;font-size:13px">TSLA 포트폴리오 로딩 중...</div>
 </div>
 
 <div id="dashboard">
 
-  <!-- Header -->
+  <!-- HEADER -->
   <div class="header">
     <div>
-      <h1>📈 TSLA 장기 포트폴리오</h1>
+      <h1>🚗 TSLA 포트폴리오 통합 대시보드</h1>
       <div class="header-sub">
-        <span class="market-badge market-closed" id="marketBadge">⚫ 로딩 중</span>
-        <span class="last-update" id="lastUpdate">-</span>
+        <span id="marketBadge" class="market-badge market-closed">–</span>
+        <span id="lastUpdate" class="last-update">–</span>
+        <span id="countdown" style="color:#484f58;font-size:11px"></span>
       </div>
     </div>
     <div class="header-right">
-      <div class="signal-badge signal-hold" id="signalBadge">🏗 장기 보유</div>
+      <span id="signalBadge" class="signal-badge signal-hold">HOLD</span>
       <button class="btn-sm" onclick="loadAll()">↻ 새로고침</button>
     </div>
   </div>
 
-  <div class="alert-banner" id="alertBanner" style="display:none">
-    ⚡ <span id="alertText"></span>
-  </div>
-
-  <!-- Metrics -->
-  <div class="metrics-grid">
+  <!-- PRICE ROW -->
+  <div class="price-row">
     <div class="metric-card">
-      <div class="metric-label">📌 현재가 (TSLA)</div>
-      <div class="metric-value" id="m-price">-</div>
-      <div class="metric-sub" id="m-krw">₩-</div>
+      <div class="metric-label">TSLA 현재가</div>
+      <div class="metric-value" id="price">–</div>
+      <div class="metric-sub" id="priceChange">–</div>
     </div>
     <div class="metric-card">
-      <div class="metric-label">💼 평가금액</div>
-      <div class="metric-value" id="m-eval">-</div>
-      <div class="metric-sub">투자원금 ₩49,959,897</div>
-    </div>
-    <div class="metric-card" id="card-pnl">
-      <div class="metric-label">📊 총 손익</div>
-      <div class="metric-value" id="m-pnl">-</div>
-      <div class="metric-sub" id="m-pnlsub">-</div>
+      <div class="metric-label">USD/KRW 환율</div>
+      <div class="metric-value" id="fx">–</div>
+      <div class="metric-sub" id="fxSub">실시간 환율</div>
     </div>
     <div class="metric-card">
-      <div class="metric-label">💱 환율 (USD/KRW)</div>
-      <div class="metric-value" id="m-fx">-</div>
-      <div class="metric-sub" id="m-fxsub">-</div>
+      <div class="metric-label">총 보유 주수</div>
+      <div class="metric-value" id="totalShares">–</div>
+      <div class="metric-sub">카카오뱅크 + Fidelity</div>
     </div>
   </div>
 
-  <!-- Price chart -->
-  <div class="chart-card">
-    <div class="chart-header">
-      <div class="chart-title">📉 TSLA 주가 추이</div>
-      <div class="period-tabs">
-        <button class="p-btn" onclick="setPeriod('1mo','1d',this)">1개월</button>
-        <button class="p-btn" onclick="setPeriod('3mo','1d',this)">3개월</button>
-        <button class="p-btn" onclick="setPeriod('6mo','1d',this)">6개월</button>
-        <button class="p-btn active" onclick="setPeriod('1y','1wk',this)">1년</button>
-        <button class="p-btn" onclick="setPeriod('3y','1mo',this)">3년</button>
-        <button class="p-btn" onclick="setPeriod('5y','1mo',this)">5년</button>
+  <!-- COMBINED TOTAL -->
+  <div class="combined-card">
+    <div style="grid-column:1/-1; color:#58a6ff; font-size:12px; font-weight:700; border-bottom:1px solid #1f3a5f; padding-bottom:10px; margin-bottom:4px;">
+      💼 통합 포트폴리오 요약 (실시간)
+    </div>
+    <div>
+      <div class="lbl">총 평가금액</div>
+      <div class="big-val" id="combinedEval">–</div>
+    </div>
+    <div>
+      <div class="lbl">총 매수금액</div>
+      <div class="big-val" id="combinedCost">–</div>
+    </div>
+    <div>
+      <div class="lbl">총 손익</div>
+      <div class="big-val" id="combinedPnl">–</div>
+    </div>
+    <div>
+      <div class="lbl">총 수익률</div>
+      <div class="big-val" id="combinedRate">–</div>
+    </div>
+  </div>
+
+  <!-- ACCOUNT CARDS -->
+  <div class="accounts-grid">
+
+    <!-- KakaoBank -->
+    <div class="account-card kakao">
+      <div class="account-header">
+        <div class="account-name">
+          🏦 카카오뱅크 해외주식
+          <span class="account-badge badge-kakao">KRW</span>
+        </div>
+      </div>
+      <div class="account-metrics">
+        <div class="acc-metric">
+          <div class="acc-label">보유주수</div>
+          <div class="acc-value">88.502주</div>
+          <div class="acc-sub">평균단가 $377.64</div>
+        </div>
+        <div class="acc-metric">
+          <div class="acc-label">총 매수금액</div>
+          <div class="acc-value">₩49,959,897</div>
+          <div class="acc-sub">매수기준 환율 ₩1,494.86</div>
+        </div>
+        <div class="acc-metric">
+          <div class="acc-label">현재 평가금액</div>
+          <div class="acc-value" id="kbEval">–</div>
+          <div class="acc-sub" id="kbEvalUSD">–</div>
+        </div>
+        <div class="acc-metric">
+          <div class="acc-label">손익 / 수익률</div>
+          <div class="acc-value" id="kbPnl">–</div>
+          <div class="acc-sub" id="kbRate">–</div>
+        </div>
       </div>
     </div>
-    <div style="position:relative;height:240px">
+
+    <!-- Fidelity -->
+    <div class="account-card fidelity">
+      <div class="account-header">
+        <div class="account-name">
+          🇺🇸 Fidelity (미국 계좌)
+          <span class="account-badge badge-fidelity">USD</span>
+        </div>
+      </div>
+      <div class="account-metrics">
+        <div class="acc-metric">
+          <div class="acc-label">보유주수</div>
+          <div class="acc-value">78주</div>
+          <div class="acc-sub">평균단가 $246.41</div>
+        </div>
+        <div class="acc-metric">
+          <div class="acc-label">총 매수금액</div>
+          <div class="acc-value">$19,219.98</div>
+          <div class="acc-sub" id="fidCostKRW">–</div>
+        </div>
+        <div class="acc-metric">
+          <div class="acc-label">현재 평가금액</div>
+          <div class="acc-value" id="fidEvalUSD">–</div>
+          <div class="acc-sub" id="fidEvalKRW">–</div>
+        </div>
+        <div class="acc-metric">
+          <div class="acc-label">손익 / 수익률</div>
+          <div class="acc-value" id="fidPnl">–</div>
+          <div class="acc-sub" id="fidRate">–</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHART -->
+  <div class="chart-card">
+    <div class="chart-header">
+      <span class="chart-title">📈 TSLA 주가 추이</span>
+      <div class="period-btns">
+        <button class="period-btn" onclick="setPeriod('1mo','1d',this)">1M</button>
+        <button class="period-btn" onclick="setPeriod('3mo','1d',this)">3M</button>
+        <button class="period-btn" onclick="setPeriod('6mo','1d',this)">6M</button>
+        <button class="period-btn active" onclick="setPeriod('1y','1wk',this)">1Y</button>
+        <button class="period-btn" onclick="setPeriod('3y','1mo',this)">3Y</button>
+        <button class="period-btn" onclick="setPeriod('5y','1mo',this)">5Y</button>
+      </div>
+    </div>
+    <div class="chart-wrap">
       <canvas id="priceChart"></canvas>
     </div>
   </div>
 
-  <!-- Strategy + Donut -->
-  <div class="mid-row">
-    <div class="card">
-      <div class="card-title">🗓 장기 투자 전략 (보유 목표: 2030년)</div>
-      <div class="strategy-grid">
-        <div class="s-item">
-          <div class="s-label">매수 단가 (USD)</div>
-          <div class="s-val">$377.64</div>
-          <div class="s-sub">88.50주 보유</div>
-        </div>
-        <div class="s-item">
-          <div class="s-label">보유 기간</div>
-          <div class="s-val" id="holdDays">-</div>
-          <div class="s-sub">~2030년까지</div>
-        </div>
-        <div class="s-item">
-          <div class="s-label">추가 매수 기준</div>
-          <div class="s-val">$320 이하</div>
-          <div class="s-sub">매수 단가 대비 -15%</div>
-        </div>
-        <div class="s-item">
-          <div class="s-label">단기 차익실현</div>
-          <div class="s-val">$550+ 도달 시</div>
-          <div class="s-sub">일부(30%) 매도 검토</div>
-        </div>
-        <div class="s-item">
-          <div class="s-label">핵심 리스크</div>
-          <div class="s-val" style="font-size:13px;color:#d29922">머스크 리더십</div>
-          <div class="s-sub">FSD 규제 / 경쟁 심화</div>
-        </div>
-        <div class="s-item">
-          <div class="s-label">2030 시나리오</div>
-          <div class="s-val" style="font-size:13px;color:#3fb950">$800 ~ $1,500</div>
-          <div class="s-sub">로보택시·에너지 성장</div>
-        </div>
+  <!-- SCENARIO TABLE -->
+  <div class="scenario-card">
+    <div class="section-title">🎯 목표가 시나리오 (통합 포트폴리오 기준)</div>
+    <div style="font-size:11px;color:#8b949e;margin-bottom:10px;">총 166.502주 기준 | 현재 환율 실시간 반영</div>
+
+    <!-- Progress bar -->
+    <div class="progress-bar-wrap">
+      <div class="progress-label">
+        <span>🛑 손절 $357</span>
+        <span id="progressLabel">현재가: –</span>
+        <span>🌟 $1,000</span>
       </div>
-      <div class="horizon-row">
-        <span>현재 <span id="curPriceLabel">$395</span></span>
-        <span style="color:#d29922">$550 (1년)</span>
-        <span style="color:#3fb950">$750 (3년)</span>
-        <span style="color:#bc8cff">$1,000 (2030)</span>
-      </div>
-      <div class="horizon-bar">
-        <div class="horizon-fill" id="horizonFill" style="width:28%"></div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill" style="width:30%"></div>
+        <div class="progress-pin" id="progressPin" style="left:30%"></div>
       </div>
     </div>
-    <div class="card" style="display:flex;flex-direction:column">
-      <div class="card-title">🥧 손익 구성</div>
-      <div style="flex:1;display:flex;align-items:center;justify-content:center;min-height:180px">
-        <canvas id="donutChart" style="max-width:200px;max-height:200px"></canvas>
-      </div>
+    <br>
+
+    <table class="scenario-table">
+      <thead>
+        <tr>
+          <th>구분</th>
+          <th>USD 목표가</th>
+          <th>현재와 격차</th>
+          <th>카카오뱅크 평가금액</th>
+          <th>Fidelity 평가금액</th>
+          <th>통합 평가금액</th>
+          <th>통합 손익</th>
+          <th>수익률</th>
+        </tr>
+      </thead>
+      <tbody id="scenarioBody"></tbody>
+    </table>
+  </div>
+
+  <!-- NEWS / YOUTUBE -->
+  <div class="tabs-card">
+    <div class="tabs-header">
+      <button class="tab-btn active" onclick="switchTab('news')">📰 TSLA 뉴스</button>
+      <button class="tab-btn" onclick="switchTab('youtube')">▶ YouTube</button>
+    </div>
+    <div id="tab-news" class="tab-content active">
+      <div id="newsList" class="news-list"><div style="color:#8b949e;font-size:12px">뉴스 로딩 중...</div></div>
+    </div>
+    <div id="tab-youtube" class="tab-content">
+      <div id="ytList" class="yt-grid"><div style="color:#8b949e;font-size:12px">YouTube 로딩 중...</div></div>
     </div>
   </div>
 
-  <!-- Scenario table -->
-  <div class="scenario-section card">
-    <div class="card-title">📋 목표 달성 시나리오 — 단계별 수익 분석</div>
-    <div style="overflow-x:auto">
-      <table class="scenario-table">
-        <thead>
-          <tr>
-            <th>목표</th>
-            <th>목표가 (USD)</th>
-            <th>목표가 (KRW)</th>
-            <th>현재가 대비</th>
-            <th>예상 평가금액</th>
-            <th>예상 총 손익</th>
-            <th>예상 수익률</th>
-          </tr>
-        </thead>
-        <tbody id="scenarioBody">
-          <tr><td colspan="7" style="text-align:center;color:#484f58;padding:20px">데이터 로딩 중...</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- News + YouTube -->
-  <div class="bottom-row">
-    <div class="card">
-      <div class="tab-row">
-        <button class="tab-btn active" onclick="switchTab('news')">📰 최신 뉴스</button>
-        <button class="tab-btn" onclick="switchTab('youtube')">▶ 유튜브</button>
-      </div>
-      <div class="tab-content active" id="tab-news">
-        <div class="news-list" id="newsList">
-          <div style="color:#484f58;font-size:13px;text-align:center;padding:20px">뉴스 불러오는 중...</div>
-        </div>
-      </div>
-      <div class="tab-content" id="tab-youtube">
-        <div class="news-list" id="ytList"></div>
-      </div>
-    </div>
-
-    <!-- Donut moved to mid-row; reuse space for extra info -->
-    <div class="card">
-      <div class="card-title">📌 현재 포지션 요약</div>
-      <div id="positionSummary" style="display:grid;gap:10px">
-        <div class="s-item">
-          <div class="s-label">현재가 → 손절선까지</div>
-          <div class="s-val neg" id="ps-stop">-</div>
-        </div>
-        <div class="s-item">
-          <div class="s-label">현재가 → 단기목표까지</div>
-          <div class="s-val" id="ps-6m">-</div>
-        </div>
-        <div class="s-item">
-          <div class="s-label">현재가 → 중기목표까지</div>
-          <div class="s-val pos" id="ps-1y">-</div>
-        </div>
-        <div class="s-item">
-          <div class="s-label">현재가 → 2030 목표까지</div>
-          <div class="s-val pos" id="ps-2030">-</div>
-        </div>
-        <div class="s-item" style="border-left:3px solid #1f6feb">
-          <div class="s-label">손익분기점 (BEP)</div>
-          <div class="s-val" id="ps-bep">-</div>
-          <div class="s-sub" id="ps-bep-sub">-</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="footer">
-    <span id="footerTime">-</span>
-    <span>·</span>
-    <span class="countdown" id="countdown">10초 후 갱신</span>
-    <span>·</span>
-    <span>주가 10초 · 뉴스 30분 자동갱신</span>
-  </div>
-
-</div>
+</div><!-- /dashboard -->
 
 <script>
-// ── 상수 ──────────────────────────────────────
-const SHARES     = 88.502134;
-const AVG_USD    = 377.64;
-const BASE_FX    = 1494.86;
-const TOTAL_COST = 49959897;
-const BUY_DATE   = new Date('2025-01-01');
+// ── 계좌 상수 ─────────────────────────────────
+// 카카오뱅크 해외주식
+const KB_SHARES    = 88.502134;
+const KB_AVG_USD   = 377.64;
+const KB_COST_KRW  = 49959897;   // 총 매수금액 (원화)
+const KB_BASE_FX   = 1494.86;    // 매수 기준 환율
 
-// 장기 목표 (KRW)
-const SCENARIOS = [
-  { key:'stop',  emoji:'🛑', label:'손절선',           period:'절대 방어선',   krw:525003  },
-  { key:'cur',   emoji:'📍', label:'현재가',            period:'현재',         krw:0       }, // dynamic
-  { key:'s6m',   emoji:'⚡', label:'단기 목표',         period:'6~12개월',     krw:809050  },
-  { key:'s1y',   emoji:'🎯', label:'중기 목표 (일부매도)', period:'1~2년',     krw:1103250 },
-  { key:'s3y',   emoji:'🚀', label:'장기 목표',         period:'2~3년',       krw:1397000 },
-  { key:'s2030', emoji:'🌟', label:'2030 목표 (풀매도)', period:'~2030년',    krw:1471000 },
-];
+// Fidelity 미국 계좌
+const FID_SHARES   = 78;
+const FID_AVG_USD  = 246.41;
+const FID_COST_USD = 19219.98;   // 총 매수금액 (달러)
+
+// 통합
+const TOTAL_SHARES = KB_SHARES + FID_SHARES; // 166.502134
+
+// 장기 목표 (USD)
+const STOP_USD   = 357;
+const T_6M_USD   = 550;
+const T_1Y_USD   = 750;
+const T_3Y_USD   = 950;
+const T_2030_USD = 1000;
 
 const CORS = 'https://corsproxy.io/?url=';
-let priceChart = null, donutChart = null;
-let cdSec = 10, cdTimer = null, lastNewsAt = 0;
-let curPeriod = '1y', curInterval = '1wk', lastFX = BASE_FX;
+let priceChart = null;
+let curPeriod = '1y', curInterval = '1wk';
+let lastFX = 1400;
+let lastNewsAt = 0;
+let cdTimer = null, cdSec = 10;
 
-// ── fetch ─────────────────────────────────────
+// ── Yahoo Finance fetch ───────────────────────
 async function yfetch(path) {
-  // cache-bust with timestamp to get freshest data
   const sep = path.includes('?') ? '&' : '?';
   const url = `https://query1.finance.yahoo.com${path}${sep}_=${Date.now()}`;
-  const res = await fetch(CORS + encodeURIComponent(url), { headers:{ Accept:'application/json' }, cache:'no-store' });
+  const res = await fetch(CORS + encodeURIComponent(url),
+    { headers:{ Accept:'application/json' }, cache:'no-store' });
   if (!res.ok) throw new Error(res.status);
   return res.json();
 }
@@ -354,306 +366,311 @@ async function yfetch(path) {
 async function fetchTSLA() {
   const d = await yfetch('/v8/finance/chart/TSLA?interval=1m&range=1d&includePrePost=true');
   const m = d.chart.result[0].meta;
-  return { price:m.regularMarketPrice, postPrice:m.postMarketPrice||null,
-           prePrice:m.preMarketPrice||null, prevClose:m.previousClose,
-           state:m.marketState };
+  return {
+    price:     m.regularMarketPrice,
+    prevClose: m.previousClose || m.chartPreviousClose,
+    postPrice: m.postMarketPrice,
+    prePrice:  m.preMarketPrice,
+    state:     m.marketState,
+    symbol:    m.symbol
+  };
 }
 
 async function fetchFX() {
-  const d = await yfetch('/v8/finance/chart/USDKRW=X?interval=1m&range=1d');
+  const d = await yfetch('/v8/finance/chart/USDKRW%3DX?interval=1m&range=1d');
   return d.chart.result[0].meta.regularMarketPrice;
 }
 
 async function fetchHistory(range, interval) {
   const d = await yfetch(`/v8/finance/chart/TSLA?interval=${interval}&range=${range}`);
   const r = d.chart.result[0];
-  return (r.timestamp||[]).map((t,i)=>({
-    date:  new Date(t*1000),
-    price: (r.indicators.quote[0].close||[])[i]
-  })).filter(x=>x.price!=null);
+  return { timestamps: r.timestamps, closes: r.indicators.quote[0].close };
 }
 
-async function fetchNews() {
-  for (const host of ['query1','query2']) {
-    try {
-      const res = await fetch(CORS + encodeURIComponent(
-        `https://${host}.finance.yahoo.com/v1/finance/search?q=TSLA&newsCount=12&enableFuzzyQuery=false&quotesCount=0`),
-        { headers:{ Accept:'application/json' }, cache:'no-store' });
-      const d = await res.json();
-      const items = d?.finance?.result?.news || d?.news || [];
-      if (items.length) return items.slice(0,12).map(n=>({
-        title:  n.title,
-        link:   n.link,
-        source: n.publisher||'Yahoo Finance',
-        date:   n.providerPublishTime ? fmtDate(new Date(n.providerPublishTime*1000)) : ''
-      }));
-    } catch(e) {}
-  }
-  try {
-    const res = await fetch(CORS + encodeURIComponent(
-      'https://news.google.com/rss/search?q=Tesla+TSLA+stock&hl=en-US&gl=US&ceid=US:en'));
-    const text = await res.text();
-    const doc  = new DOMParser().parseFromString(text,'text/xml');
-    const out  = [];
-    doc.querySelectorAll('item').forEach(item=>{
-      const title = item.querySelector('title')?.textContent?.trim()||'';
-      if (!title) return;
-      let link='';
-      for (const n of item.childNodes) {
-        if (n.nodeName==='link') { link=n.textContent?.trim()||n.nextSibling?.nodeValue?.trim()||''; break; }
-      }
-      if (!link) link=item.querySelector('guid')?.textContent?.trim()||'';
-      const pub=item.querySelector('pubDate')?.textContent||'';
-      out.push({ title, link, source:'Google News', date:fmtDate(new Date(pub)) });
-    });
-    if (out.length) return out.slice(0,12);
-  } catch(e) {}
-  return [];
+// ── 숫자 포맷 ─────────────────────────────────
+function fmtUSD(v, digits=2) {
+  return '$' + v.toLocaleString('en-US', { minimumFractionDigits:digits, maximumFractionDigits:digits });
+}
+function fmtKRW(v) {
+  if (Math.abs(v) >= 1e8) return '₩' + (v/1e8).toFixed(2) + '억';
+  if (Math.abs(v) >= 1e6) return '₩' + (v/1e6).toFixed(1) + '백만';
+  return '₩' + Math.round(v).toLocaleString('ko-KR');
+}
+function fmtPct(v) {
+  return (v>=0?'+':'')+v.toFixed(2)+'%';
 }
 
-const YT_CH = [
-  { name:'Tesla Daily',        id:'UCkr0nBaxoLp5Bi0t0k2dNhQ' },
-  { name:'Sawyer Merritt',     id:'UCPj7vXuMqR5_xSbEdq3WTDA' },
-  { name:'Dave Lee Investing', id:'UCRiGHvJSGhpE-Gd9B8BhXpQ' },
-  { name:'Hyperchange',        id:'UCkJzKF7i5WEyYH6eDMbhiXQ' },
-];
-async function fetchYouTube() {
-  const vids = [];
-  await Promise.allSettled(YT_CH.map(async ch=>{
-    try {
-      const res  = await fetch(CORS+encodeURIComponent(`https://www.youtube.com/feeds/videos.xml?channel_id=${ch.id}`));
-      const text = await res.text();
-      const doc  = new DOMParser().parseFromString(text,'application/xml');
-      doc.querySelectorAll('entry').forEach((e,i)=>{
-        if(i>=2) return;
-        const title   = e.querySelector('title')?.textContent?.trim()||'';
-        const videoId = e.querySelector('videoId')?.textContent?.trim()||'';
-        const thumb   = e.querySelector('thumbnail')?.getAttribute('url')||'';
-        const pub     = e.querySelector('published')?.textContent?.trim()||'';
-        if(title&&videoId) vids.push({ title, link:`https://www.youtube.com/watch?v=${videoId}`,
-          channel:ch.name, thumb, date:fmtDate(new Date(pub)) });
-      });
-    } catch(e){}
-  }));
-  return vids;
-}
-
-// ── 렌더 ─────────────────────────────────────
-function fmt(n,d=0) {
-  if(n==null||isNaN(n)) return'-';
-  return n.toLocaleString('ko-KR',{maximumFractionDigits:d,minimumFractionDigits:d});
-}
-function fmtDate(d) {
-  if(!(d instanceof Date)||isNaN(d)) return'';
-  return d.toLocaleString('ko-KR',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
-}
-
+// ── 가격 렌더 ─────────────────────────────────
 function renderPrices(tsla, fx) {
-  const st       = tsla.state||'CLOSED';
-  const effPrice = (st==='POST'&&tsla.postPrice)?tsla.postPrice
-                 : (st==='PRE' &&tsla.prePrice) ?tsla.prePrice
+  const st = tsla.state;
+  const effPrice = (st==='POST' && tsla.postPrice) ? tsla.postPrice
+                 : (st==='PRE'  && tsla.prePrice)  ? tsla.prePrice
                  : tsla.price;
-  const priceKrw = effPrice * fx;
-  const stockPnl = (effPrice - AVG_USD) * SHARES * fx;
-  const fxPnl    = (fx - BASE_FX) * AVG_USD * SHARES;
-  const evalAmt  = SHARES * priceKrw;
-  const totalPnl = evalAmt - TOTAL_COST;
-  const pnlPct   = totalPnl / TOTAL_COST * 100;
+  const isExtended = (st==='POST'||st==='PRE');
 
   // Market badge
-  const mEl=document.getElementById('marketBadge');
-  const mMap={REGULAR:'🟢 정규장',PRE:'🟡 프리마켓',POST:'🟠 애프터마켓',CLOSED:'⚫ 장 마감'};
-  const cMap={REGULAR:'market-regular',PRE:'market-pre',POST:'market-post',CLOSED:'market-closed'};
-  mEl.textContent=mMap[st]||'⚫ 장 마감'; mEl.className='market-badge '+(cMap[st]||'market-closed');
+  const mb = document.getElementById('marketBadge');
+  if (st==='REGULAR') { mb.className='market-badge market-regular'; mb.textContent='정규장 거래중'; }
+  else if (st==='POST') { mb.className='market-badge market-post'; mb.textContent='애프터마켓'; }
+  else if (st==='PRE')  { mb.className='market-badge market-pre';  mb.textContent='프리마켓'; }
+  else { mb.className='market-badge market-closed'; mb.textContent='장 마감'; }
 
   // Price
-  const chg=effPrice-tsla.prevClose, chgPct=chg/tsla.prevClose*100;
-  let ph=`$${fmt(effPrice,2)}`;
-  if(st==='POST'&&tsla.postPrice) ph+='<span class="after-tag">AFTER</span>';
-  if(st==='PRE' &&tsla.prePrice)  ph+='<span class="after-tag">PRE</span>';
-  document.getElementById('m-price').innerHTML=ph;
-  document.getElementById('m-krw').innerHTML=
-    `₩${fmt(priceKrw)} <span class="${chg>=0?'pos':'neg'}">${chg>=0?'+':''}$${fmt(chg,2)} (${chgPct>=0?'+':''}${chgPct.toFixed(2)}%)</span>`;
+  const chg = effPrice - tsla.prevClose;
+  const chgPct = (chg / tsla.prevClose) * 100;
+  document.getElementById('price').innerHTML =
+    fmtUSD(effPrice) + (isExtended ? `<span class="after-tag">${st==='POST'?'AfterHrs':'PreMkt'}</span>` : '');
+  document.getElementById('priceChange').innerHTML =
+    `<span class="${chg>=0?'pos':'neg'}">${chg>=0?'+':''}${fmtUSD(chg)} (${fmtPct(chgPct)})</span>`;
 
-  document.getElementById('m-eval').textContent=`₩${fmt(evalAmt)}`;
-  document.getElementById('card-pnl').className='metric-card '+(totalPnl>=0?'pnl-pos':'pnl-neg');
-  document.getElementById('m-pnl').textContent=`${totalPnl>=0?'+':''}₩${fmt(totalPnl)}`;
-  document.getElementById('m-pnlsub').innerHTML=
-    `수익률 <span class="${pnlPct>=0?'pos':'neg'}">${pnlPct>=0?'+':''}${pnlPct.toFixed(2)}%</span>` +
-    ` · 주식 <span class="${stockPnl>=0?'pos':'neg'}">${stockPnl>=0?'+':''}₩${fmt(stockPnl)}</span>` +
-    ` / 환차 <span class="${fxPnl>=0?'pos':'neg'}">${fxPnl>=0?'+':''}₩${fmt(fxPnl)}</span>`;
+  // FX
+  document.getElementById('fx').textContent = '₩' + fx.toFixed(0);
+  document.getElementById('fxSub').textContent = `전일比 실시간`;
 
-  const fxD=fx-BASE_FX;
-  document.getElementById('m-fx').textContent=`₩${fmt(fx,2)}`;
-  document.getElementById('m-fxsub').innerHTML=
-    `기준(₩${fmt(BASE_FX)}) 대비 <span class="${fxD>=0?'pos':'neg'}">${fxD>=0?'+':''}${fmt(fxD,2)}</span>`;
+  // Total shares
+  document.getElementById('totalShares').textContent = TOTAL_SHARES.toFixed(3) + '주';
 
-  // Signal
-  const sEl=document.getElementById('signalBadge');
-  if(priceKrw<525003)       { sEl.textContent='⚠️ 손절 검토'; sEl.className='signal-badge signal-sell'; }
-  else if(effPrice<=320)    { sEl.textContent='💎 추가 매수 기회'; sEl.className='signal-badge signal-buy'; }
-  else if(priceKrw>=1103250){ sEl.textContent='💰 일부 차익실현'; sEl.className='signal-badge signal-sell'; }
-  else                      { sEl.textContent='🏗 장기 보유'; sEl.className='signal-badge signal-hold'; }
+  // ── 카카오뱅크 계산 ──
+  const kbEvalUSD = KB_SHARES * effPrice;
+  const kbEvalKRW = kbEvalUSD * fx;
+  const kbPnlKRW  = kbEvalKRW - KB_COST_KRW;
+  const kbRate    = (kbPnlKRW / KB_COST_KRW) * 100;
 
-  // Alert
-  const distS=(809050-priceKrw)/priceKrw*100;
-  document.getElementById('alertBanner').style.display=(distS>0&&distS<=5)?'flex':'none';
-  if(distS>0&&distS<=5)
-    document.getElementById('alertText').textContent=
-      `단기 목표(₩${fmt(809050)})까지 ${distS.toFixed(1)}% 남았습니다!`;
+  document.getElementById('kbEval').textContent = fmtKRW(kbEvalKRW);
+  document.getElementById('kbEval').className = 'acc-value';
+  document.getElementById('kbEvalUSD').textContent = fmtUSD(kbEvalUSD) + ' (환율 ₩' + fx.toFixed(0) + ')';
+  document.getElementById('kbPnl').innerHTML = `<span class="${kbPnlKRW>=0?'pos':'neg'}">${kbPnlKRW>=0?'+':''}${fmtKRW(kbPnlKRW)}</span>`;
+  document.getElementById('kbRate').innerHTML = `<span class="${kbRate>=0?'pos':'neg'}">${fmtPct(kbRate)}</span>`;
 
-  // Strategy horizon
-  document.getElementById('curPriceLabel').textContent=`$${fmt(effPrice,2)}`;
-  const pct=Math.min(100,Math.max(0,(effPrice-AVG_USD)/(1000-AVG_USD)*100));
-  document.getElementById('horizonFill').style.width=pct+'%';
-  const days=Math.floor((Date.now()-BUY_DATE)/86400000);
-  document.getElementById('holdDays').textContent=`${days}일 보유 중`;
+  // ── Fidelity 계산 ──
+  const fidEvalUSD = FID_SHARES * effPrice;
+  const fidEvalKRW = fidEvalUSD * fx;
+  const fidCostKRW = FID_COST_USD * fx;
+  const fidPnlUSD  = fidEvalUSD - FID_COST_USD;
+  const fidRate    = (fidPnlUSD / FID_COST_USD) * 100;
 
-  // Donut
-  if(donutChart) donutChart.destroy();
-  donutChart=new Chart(document.getElementById('donutChart').getContext('2d'),{
-    type:'doughnut',
-    data:{ labels:['주식 손익','환차 손익','원금'],
-           datasets:[{data:[Math.max(0,stockPnl),Math.max(0,fxPnl),TOTAL_COST],
-                      backgroundColor:['#3fb950','#d29922','#21262d'],
-                      borderColor:'#161b22',borderWidth:2}]},
-    options:{ responsive:true, maintainAspectRatio:false,
-              plugins:{ legend:{ position:'bottom', labels:{color:'#8b949e',font:{size:11},padding:8} } } }
-  });
+  document.getElementById('fidCostKRW').textContent = fmtKRW(fidCostKRW) + ' (환산)';
+  document.getElementById('fidEvalUSD').textContent = fmtUSD(fidEvalUSD);
+  document.getElementById('fidEvalKRW').textContent = fmtKRW(fidEvalKRW) + ' (환산)';
+  document.getElementById('fidPnl').innerHTML = `<span class="${fidPnlUSD>=0?'pos':'neg'}">${fidPnlUSD>=0?'+':''}${fmtUSD(fidPnlUSD)}</span>`;
+  document.getElementById('fidRate').innerHTML = `<span class="${fidRate>=0?'pos':'neg'}">${fmtPct(fidRate)}</span>`;
 
-  // Scenario table
-  renderScenario(priceKrw, fx, effPrice);
+  // ── 통합 계산 ──
+  const combinedEvalKRW = kbEvalKRW + fidEvalKRW;
+  const combinedCostKRW = KB_COST_KRW + FID_COST_USD * fx;
+  const combinedPnlKRW  = combinedEvalKRW - combinedCostKRW;
+  const combinedRate    = (combinedPnlKRW / combinedCostKRW) * 100;
 
-  // Position summary
-  const targets609=[525003,809050,1103250,1471000];
-  const ids=['stop','6m','1y','2030'];
-  const labels2=['손절선','단기목표','중기목표','2030목표'];
-  targets609.forEach((krw,i)=>{
-    const dist=(krw-priceKrw)/priceKrw*100;
-    document.getElementById('ps-'+ids[i]).innerHTML=
-      `<span class="${dist>=0?'pos':'neg'}">${dist>=0?'+':''}${dist.toFixed(1)}%</span> · ₩${fmt(krw)} ($${fmt(krw/fx,2)})`;
-  });
-  // BEP
-  const bepKrw = TOTAL_COST / SHARES;
-  const bepUsd = bepKrw / fx;
-  const bepDist= (bepKrw-priceKrw)/priceKrw*100;
-  document.getElementById('ps-bep').textContent=`₩${fmt(bepKrw,0)} ($${fmt(bepUsd,2)})`;
-  document.getElementById('ps-bep-sub').innerHTML=
-    `현재가 대비 <span class="${bepDist>=0?'pos':'neg'}">${bepDist>=0?'+':''}${bepDist.toFixed(1)}%</span>`;
+  document.getElementById('combinedEval').textContent = fmtKRW(combinedEvalKRW);
+  document.getElementById('combinedCost').textContent = fmtKRW(combinedCostKRW);
+  document.getElementById('combinedPnl').innerHTML = `<span class="${combinedPnlKRW>=0?'pos':'neg'}">${combinedPnlKRW>=0?'+':''}${fmtKRW(combinedPnlKRW)}</span>`;
+  document.getElementById('combinedRate').innerHTML = `<span class="${combinedRate>=0?'pos':'neg'}">${fmtPct(combinedRate)}</span>`;
 
-  document.getElementById('lastUpdate').textContent='업데이트: '+new Date().toLocaleTimeString('ko-KR');
-  document.getElementById('footerTime').textContent=new Date().toLocaleString('ko-KR');
+  // ── Signal ──
+  const sb = document.getElementById('signalBadge');
+  if (effPrice < STOP_USD)        { sb.className='signal-badge signal-sell'; sb.textContent='⚠ 손절 검토'; }
+  else if (effPrice < KB_AVG_USD) { sb.className='signal-badge signal-sell'; sb.textContent='주의'; }
+  else if (effPrice < T_6M_USD)   { sb.className='signal-badge signal-hold'; sb.textContent='HOLD'; }
+  else                             { sb.className='signal-badge signal-buy';  sb.textContent='목표 달성 중 🎯'; }
+
+  document.getElementById('lastUpdate').textContent = '업데이트: ' + new Date().toLocaleTimeString('ko-KR');
+
+  // Scenario
+  renderScenario(effPrice, fx);
 }
 
-function renderScenario(priceKrw, fx, effPrice) {
-  const tbody = document.getElementById('scenarioBody');
+// ── 시나리오 테이블 ───────────────────────────
+function renderScenario(curPrice, fx) {
   const rows = [
-    { emoji:'🛑', label:'손절선',          period:'절대 방어선',   krw:525003,   isCur:false },
-    { emoji:'📍', label:'현재가',           period:'현재',         krw:priceKrw, isCur:true  },
-    { emoji:'⚡', label:'단기 목표',        period:'6~12개월',     krw:809050,   isCur:false },
-    { emoji:'🎯', label:'중기 목표 (30%↓)', period:'1~2년',       krw:1103250,  isCur:false },
-    { emoji:'🚀', label:'장기 목표',        period:'2~3년',       krw:1397000,  isCur:false },
-    { emoji:'🌟', label:'2030 목표 (전량↓)', period:'~2030년',    krw:1471000,  isCur:false },
+    { icon:'🛑', label:'손절선',       tag:'~$357',     usd:STOP_USD },
+    { icon:'📍', label:'현재가',       tag:'실시간',     usd:curPrice, isCurrent:true },
+    { icon:'⚡', label:'단기 (6~12M)', tag:'~$550',     usd:T_6M_USD },
+    { icon:'🎯', label:'중기 (1~2Y)',  tag:'~$750',     usd:T_1Y_USD },
+    { icon:'🚀', label:'장기 (2~3Y)',  tag:'~$950',     usd:T_3Y_USD },
+    { icon:'🌟', label:'2030 목표',    tag:'~$1,000',   usd:T_2030_USD },
   ];
 
-  tbody.innerHTML = rows.map(r => {
-    const usd      = r.krw / fx;
-    const evalAmt  = SHARES * r.krw;
-    const pnl      = evalAmt - TOTAL_COST;
-    const pnlPct   = pnl / TOTAL_COST * 100;
-    const dist     = (r.krw - priceKrw) / priceKrw * 100;
-    const isCur    = r.isCur;
-    const pnlCls   = pnl >= 0 ? 'pos' : 'neg';
-    const distCls  = dist >= 0 ? 'pos' : 'neg';
+  const totalCostKRW = KB_COST_KRW + FID_COST_USD * fx;
 
-    return `<tr${isCur?' class="current-row"':''}>
-      <td>
-        <div class="t-label">${r.emoji} ${r.label}</div>
-        <div class="t-sub">${r.period}</div>
-      </td>
-      <td><strong>$${fmt(usd,2)}</strong></td>
-      <td>₩${fmt(r.krw)}</td>
-      <td>${isCur ? '<span style="color:#58a6ff">— 현재</span>'
-                  : `<span class="dist-pill ${distCls}">${dist>=0?'+':''}${dist.toFixed(1)}%</span>`}</td>
-      <td><strong>₩${fmt(evalAmt)}</strong></td>
-      <td class="${pnlCls}"><strong>${pnl>=0?'+':''}₩${fmt(pnl)}</strong></td>
-      <td class="${pnlCls}"><strong>${pnlPct>=0?'+':''}${pnlPct.toFixed(2)}%</strong></td>
+  let html = '';
+  rows.forEach(r => {
+    const kbEvalKRW  = KB_SHARES  * r.usd * fx;
+    const fidEvalKRW = FID_SHARES * r.usd * fx;
+    const combEvalKRW = kbEvalKRW + fidEvalKRW;
+    const combPnlKRW  = combEvalKRW - totalCostKRW;
+    const combRate    = (combPnlKRW / totalCostKRW) * 100;
+    const gap         = r.usd - curPrice;
+    const gapPct      = (gap / curPrice) * 100;
+
+    const rowClass = r.isCurrent ? 'current-row' : r.usd === STOP_USD ? 'stop-row' : '';
+    const pnlColor = combPnlKRW >= 0 ? '#3fb950' : '#f85149';
+
+    html += `<tr class="${rowClass}">
+      <td>${r.icon} ${r.label}<span class="tag">${r.tag}</span></td>
+      <td>${r.isCurrent ? fmtUSD(r.usd) : fmtUSD(r.usd, 0)}</td>
+      <td><span style="color:${gap>=0?'#3fb950':'#f85149'}">${r.isCurrent ? '—' : (gap>=0?'+':'')+fmtUSD(gap,0)+' ('+fmtPct(gapPct)+')'}</span></td>
+      <td>${fmtKRW(kbEvalKRW)}</td>
+      <td>${fmtUSD(FID_SHARES * r.usd)} <span style="font-size:10px;color:#8b949e">(${fmtKRW(fidEvalKRW)})</span></td>
+      <td><strong>${fmtKRW(combEvalKRW)}</strong></td>
+      <td style="color:${pnlColor}">${combPnlKRW>=0?'+':''}${fmtKRW(combPnlKRW)}</td>
+      <td style="color:${pnlColor};font-weight:700">${fmtPct(combRate)}</td>
     </tr>`;
-  }).join('');
+  });
+  document.getElementById('scenarioBody').innerHTML = html;
+
+  // Progress bar
+  const minP = STOP_USD, maxP = T_2030_USD;
+  const pct = Math.max(0, Math.min(100, (curPrice - minP) / (maxP - minP) * 100));
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPin').style.left  = pct + '%';
+  document.getElementById('progressLabel').textContent = '현재가: ' + fmtUSD(curPrice);
 }
 
-function renderHistory(hist, fx) {
-  if(!hist?.length) return;
-  const labels = hist.map(d=>{
-    if(['1mo','3mo','6mo'].includes(curPeriod))
-      return ('0'+(d.date.getMonth()+1)).slice(-2)+'-'+('0'+d.date.getDate()).slice(-2);
-    return d.date.getFullYear()+'/'+(d.date.getMonth()+1);
+// ── 차트 ──────────────────────────────────────
+function renderHistory(data, fx) {
+  const labels = data.timestamps.map(t => {
+    const d = new Date(t * 1000);
+    return d.toLocaleDateString('ko-KR', { month:'short', day:'numeric' });
   });
-  const prices  = hist.map(d=>d.price);
-  const stopUSD = 525003/fx;
-  const datasets=[
-    { label:'TSLA', data:prices, borderColor:'#58a6ff', backgroundColor:'rgba(88,166,255,0.07)',
-      borderWidth:2, pointRadius:curPeriod==='1mo'?3:1, fill:true, tension:0.3 },
-    { label:`평균단가 $${AVG_USD}`, data:Array(labels.length).fill(AVG_USD),
-      borderColor:'#d29922', borderWidth:1.5, borderDash:[5,5], pointRadius:0 },
-    { label:`손절 $${stopUSD.toFixed(0)}`, data:Array(labels.length).fill(stopUSD),
-      borderColor:'#f85149', borderWidth:1.5, borderDash:[3,3], pointRadius:0 },
-  ];
-  if(['3y','5y'].includes(curPeriod)) {
-    datasets.push(
-      { label:`단기 $${(809050/fx).toFixed(0)}`,  data:Array(labels.length).fill(809050/fx),  borderColor:'#d29922', borderWidth:1, borderDash:[2,5], pointRadius:0 },
-      { label:`중기 $${(1103250/fx).toFixed(0)}`, data:Array(labels.length).fill(1103250/fx), borderColor:'#3fb950', borderWidth:1, borderDash:[2,5], pointRadius:0 },
-      { label:`2030 $${(1471000/fx).toFixed(0)}`, data:Array(labels.length).fill(1471000/fx), borderColor:'#bc8cff', borderWidth:1, borderDash:[2,5], pointRadius:0 }
-    );
-  }
-  if(priceChart) priceChart.destroy();
-  priceChart=new Chart(document.getElementById('priceChart').getContext('2d'),{
-    type:'line', data:{ labels, datasets },
+  const closes = data.closes.map(c => c ? +c.toFixed(2) : null);
+
+  if (priceChart) { priceChart.destroy(); priceChart = null; }
+  const ctx = document.getElementById('priceChart').getContext('2d');
+  const grad = ctx.createLinearGradient(0,0,0,260);
+  grad.addColorStop(0,'rgba(31,111,235,.3)');
+  grad.addColorStop(1,'rgba(31,111,235,.0)');
+
+  priceChart = new Chart(ctx, {
+    type:'line',
+    data:{ labels, datasets:[{
+      data:closes, borderColor:'#1f6feb', backgroundColor:grad,
+      borderWidth:2, pointRadius:0, tension:.3, fill:true,
+      spanGaps:true
+    }]},
     options:{
       responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{ labels:{ color:'#8b949e',font:{size:10},boxWidth:14 } } },
+      plugins:{ legend:{display:false}, tooltip:{
+        callbacks:{ label: ctx => fmtUSD(ctx.parsed.y) }
+      }},
       scales:{
-        x:{ ticks:{ color:'#8b949e',font:{size:9},maxTicksLimit:10 }, grid:{ color:'#21262d' } },
-        y:{ ticks:{ color:'#8b949e',font:{size:10} }, grid:{ color:'#21262d' } }
+        x:{ grid:{color:'#21262d'}, ticks:{color:'#8b949e',maxTicksLimit:8,font:{size:10}} },
+        y:{ grid:{color:'#21262d'}, ticks:{color:'#8b949e',font:{size:10},callback:v=>fmtUSD(v,0)} }
       }
     }
   });
 }
 
-async function setPeriod(range, interval, btn) {
+function setPeriod(range, interval, btn) {
   curPeriod=range; curInterval=interval;
-  document.querySelectorAll('.p-btn').forEach(b=>b.classList.remove('active'));
-  if(btn) btn.classList.add('active');
-  try { renderHistory(await fetchHistory(range,interval), lastFX); } catch(e){}
+  document.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  fetchHistory(range, interval).then(d=>renderHistory(d,lastFX)).catch(()=>{});
+}
+
+// ── NEWS ──────────────────────────────────────
+async function fetchNews() {
+  // Method 1: Yahoo Finance v1 JSON
+  try {
+    const url = 'https://query1.finance.yahoo.com/v1/finance/search?q=TSLA&newsCount=12&_=' + Date.now();
+    const res = await fetch(CORS + encodeURIComponent(url), { cache:'no-store' });
+    const d = await res.json();
+    const items = d.news || [];
+    if (items.length) return items.map(n => ({
+      title:   n.title,
+      link:    n.link,
+      source:  n.publisher,
+      pubDate: n.providerPublishTime
+        ? new Date(n.providerPublishTime*1000).toLocaleString('ko-KR')
+        : '',
+      thumb:   n.thumbnail?.resolutions?.[0]?.url || null
+    }));
+  } catch(e){}
+  // Method 2: Google News RSS fallback
+  try {
+    const rssUrl = 'https://news.google.com/rss/search?q=Tesla+TSLA+stock&hl=en-US&gl=US&ceid=US:en';
+    const res = await fetch(CORS + encodeURIComponent(rssUrl), { cache:'no-store' });
+    const txt = await res.text();
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(txt, 'text/xml');
+    const items = [...xml.querySelectorAll('item')].slice(0,10);
+    return items.map(i => ({
+      title:   i.querySelector('title')?.textContent || '',
+      link:    i.querySelector('link')?.textContent  || '#',
+      source:  i.querySelector('source')?.textContent || 'Google News',
+      pubDate: i.querySelector('pubDate')?.textContent || '',
+      thumb:   null
+    }));
+  } catch(e){}
+  return [];
 }
 
 function renderNews(items) {
-  const el=document.getElementById('newsList');
-  if(!items?.length){ el.innerHTML='<div style="color:#484f58;font-size:13px;text-align:center;padding:20px">뉴스를 불러올 수 없습니다.</div>'; return; }
-  el.innerHTML=items.map(n=>`
-    <a class="news-item" href="${n.link||'#'}" target="_blank" rel="noopener">
-      <div class="news-title">${n.title}</div>
-      <div class="news-meta">${n.source} · ${n.date}</div>
+  const el = document.getElementById('newsList');
+  if (!items.length) {
+    el.innerHTML = '<div style="color:#8b949e;font-size:12px">뉴스를 불러올 수 없습니다. 잠시 후 재시도합니다.</div>';
+    return;
+  }
+  el.innerHTML = items.map(n => `
+    <a class="news-item" href="${n.link}" target="_blank" rel="noopener">
+      ${n.thumb
+        ? `<img class="news-thumb" src="${n.thumb}" onerror="this.style.display='none'" loading="lazy">`
+        : `<div class="news-thumb-placeholder">📰</div>`}
+      <div class="news-body">
+        <div class="news-title">${n.title}</div>
+        <div class="news-meta">${n.source || ''} ${n.pubDate ? '· '+n.pubDate : ''}</div>
+      </div>
     </a>`).join('');
 }
 
+// ── YOUTUBE ──────────────────────────────────
+async function fetchYouTube() {
+  const channels = [
+    { name:'Tesla Daily',        id:'UCkr0nBaxoLp5Bi0t0k2dNhQ' },
+    { name:'Sawyer Merritt',     id:'UCPj7vXuMqR5_xSbEdq3WTDA' },
+    { name:'Dave Lee Investing', id:'UCRiGHvJSGhpE-Gd9B8BhXpQ' },
+    { name:'Hyperchange',        id:'UCkJzKF7i5WEyYH6eDMbhiXQ' },
+  ];
+  const results = [];
+  for (const ch of channels) {
+    try {
+      const url = `https://www.youtube.com/feeds/videos.xml?channel_id=${ch.id}`;
+      const res = await fetch(CORS + encodeURIComponent(url), { cache:'no-store' });
+      const txt = await res.text();
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(txt, 'application/xml');
+      const entry = xml.querySelector('entry');
+      if (!entry) continue;
+      const vid = entry.querySelector('videoId')?.textContent || entry.querySelector('id')?.textContent?.split(':').pop();
+      const title = entry.querySelector('title')?.textContent || '';
+      results.push({ ch:ch.name, title, vid,
+        thumb: vid ? `https://img.youtube.com/vi/${vid}/mqdefault.jpg` : null });
+    } catch(e){}
+  }
+  return results;
+}
+
 function renderYouTube(vids) {
-  const el=document.getElementById('ytList');
-  let html=(vids||[]).map(v=>`
-    <a class="yt-item" href="${v.link}" target="_blank" rel="noopener">
-      <div class="yt-thumb">${v.thumb?`<img src="${v.thumb}" onerror="this.parentElement.innerHTML='▶'">`:'▶'}</div>
-      <div class="yt-info"><div class="yt-title">${v.title}</div><div class="yt-ch">${v.channel} · ${v.date}</div></div>
+  const el = document.getElementById('ytList');
+  if (!vids.length) {
+    el.innerHTML = `
+      <a class="yt-item search" href="https://www.youtube.com/results?search_query=TSLA+stock+2026" target="_blank" rel="noopener">
+        <div class="yt-thumb-wrap">🔍</div>
+        <div class="yt-title">YouTube: "TSLA stock 2026" 검색</div><div class="yt-ch">최신 분석 영상 →</div>
+      </a>
+      <a class="yt-item search" href="https://www.youtube.com/results?search_query=Tesla+long+term+investing+2030" target="_blank" rel="noopener">
+        <div class="yt-thumb-wrap">🔍</div>
+        <div class="yt-title">YouTube: Tesla long term 2030</div><div class="yt-ch">장기투자 분석 →</div>
+      </a>`;
+    return;
+  }
+  el.innerHTML = vids.map(v => `
+    <a class="yt-item" href="https://www.youtube.com/watch?v=${v.vid}" target="_blank" rel="noopener">
+      <div class="yt-thumb-wrap">
+        ${v.thumb ? `<img src="${v.thumb}" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:6px">` : '▶'}
+      </div>
+      <div class="yt-title">${v.title}</div>
+      <div class="yt-ch">${v.ch}</div>
     </a>`).join('');
-  html+=`
-    <a class="yt-item search" href="https://www.youtube.com/results?search_query=Tesla+TSLA+long+term+2026" target="_blank" rel="noopener">
-      <div class="yt-thumb" style="color:#8b949e;font-size:18px">🔍</div>
-      <div class="yt-info"><div class="yt-title">YouTube: "Tesla TSLA long term 2026"</div><div class="yt-ch">최신 분석 영상 →</div></div>
-    </a>
-    <a class="yt-item search" href="https://www.youtube.com/results?search_query=%ED%85%8C%EC%8A%AC%EB%9D%BC+%EC%9E%A5%EA%B8%B0%ED%88%AC%EC%9E%90+2030" target="_blank" rel="noopener">
-      <div class="yt-thumb" style="color:#8b949e;font-size:18px">🔍</div>
-      <div class="yt-info"><div class="yt-title">YouTube: 테슬라 장기투자 2030</div><div class="yt-ch">한국어 분석 영상 →</div></div>
-    </a>`;
-  el.innerHTML=html;
 }
 
 function switchTab(t) {
@@ -663,17 +680,19 @@ function switchTab(t) {
   document.getElementById('tab-youtube').classList.toggle('active',t==='youtube');
 }
 
-// ── 메인 ─────────────────────────────────────
+// ── MAIN ──────────────────────────────────────
 async function loadPrices() {
   try {
     const [tsla,fx] = await Promise.all([fetchTSLA(),fetchFX()]);
     lastFX=fx; renderPrices(tsla,fx);
-  } catch(e){ document.getElementById('lastUpdate').textContent='가격 로드 실패 — 재시도 중...'; }
+  } catch(e){
+    document.getElementById('lastUpdate').textContent='가격 로드 실패 — 재시도 중...';
+  }
 }
 
 async function loadNews() {
-  if(Date.now()-lastNewsAt<30*60*1000) return;
-  lastNewsAt=Date.now();
+  if(Date.now()-lastNewsAt < 30*60*1000) return;
+  lastNewsAt = Date.now();
   renderYouTube([]);
   fetchNews().then(renderNews).catch(()=>renderNews([]));
   fetchYouTube().then(v=>{ if(v.length) renderYouTube(v); }).catch(()=>{});
@@ -685,7 +704,7 @@ async function loadAll() {
   try {
     const [tsla,fx,hist] = await Promise.all([fetchTSLA(),fetchFX(),fetchHistory(curPeriod,curInterval)]);
     lastFX=fx; renderPrices(tsla,fx); renderHistory(hist,fx);
-  } catch(e){
+  } catch(e) {
     document.getElementById('loading').innerHTML=
       '<div style="color:#f85149;text-align:center">데이터 로드 실패<br><small style="color:#8b949e">잠시 후 재시도...</small></div>';
     setTimeout(loadAll,5000); return;
@@ -705,7 +724,7 @@ function startTimer() {
   },1000);
 }
 
-window.addEventListener('load',async()=>{ await loadAll(); startTimer(); });
+window.addEventListener('load', async()=>{ await loadAll(); startTimer(); });
 </script>
 </body>
 </html>
