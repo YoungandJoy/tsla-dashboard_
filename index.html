@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD: 2026-05-02-v6 -->
+<!-- BUILD: 2026-05-02-v7 -->
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -106,6 +106,46 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .yt2 img{width:100%;height:100%;object-fit:cover}
 .ytt{font-size:10px;font-weight:600;line-height:1.4}
 .ytc{font-size:9px;color:#8b949e}
+/* roadmap */
+.rmc{background:#161b22;border:1px solid #30363d;border-radius:11px;padding:18px;margin-bottom:11px}
+.rmh{font-size:13px;font-weight:700;margin-bottom:14px;color:#e6edf3}
+.rmh span{font-size:10px;color:#8b949e;font-weight:400;margin-left:8px}
+.rmsec{margin-bottom:18px}
+.rmsec-t{font-size:11px;font-weight:700;color:#58a6ff;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #21262d}
+.rmtbl{width:100%;border-collapse:collapse;font-size:10px;margin-bottom:8px}
+.rmtbl th{color:#8b949e;font-weight:600;font-size:9px;letter-spacing:.4px;text-transform:uppercase;padding:5px 8px;text-align:right;border-bottom:1px solid #30363d}
+.rmtbl th:first-child{text-align:left}
+.rmtbl td{padding:5px 8px;text-align:right;border-bottom:1px solid #21262d;font-size:10px}
+.rmtbl td:first-child{text-align:left;font-weight:600}
+.rmgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px}
+.rmcard{background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:12px}
+.rmcard.atk{border-color:#da3633}.rmcard.neu{border-color:#1f6feb}.rmcard.stb{border-color:#2ea043}
+.rmcard-t{font-size:10px;font-weight:700;margin-bottom:8px}
+.rmcard-t.atk{color:#f85149}.rmcard-t.neu{color:#58a6ff}.rmcard-t.stb{color:#3fb950}
+.rmcard-sub{font-size:9px;color:#8b949e;margin-bottom:6px}
+.rmrow{display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid #21262d;font-size:9px}
+.rmrow:last-child{border:none}
+.rmrow-l{color:#8b949e}
+.rmrow-r{font-weight:600}
+.rmrisks{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rmrisk{background:#0d1117;border-radius:8px;padding:11px;border-left:3px solid}
+.rmrisk.r1{border-color:#da3633}.rmrisk.r2{border-color:#d29922}.rmrisk.r3{border-color:#d29922}.rmrisk.r4{border-color:#8b949e}
+.rmrisk-t{font-size:10px;font-weight:700;margin-bottom:4px}
+.rmrisk-t.r1{color:#f85149}.rmrisk-t.r2{color:#d29922}.rmrisk-t.r3{color:#d29922}.rmrisk-t.r4{color:#8b949e}
+.rmrisk-b{font-size:9px;color:#8b949e;line-height:1.5}
+.rmrisk-fix{font-size:9px;color:#3fb950;margin-top:4px}
+.rmtl{display:flex;flex-direction:column;gap:6px}
+.rmtl-item{display:flex;gap:10px;align-items:flex-start}
+.rmtl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.rmtl-line{display:flex;flex-direction:column;gap:0}
+.rmtl-yr{font-size:11px;font-weight:700;color:#e6edf3}
+.rmtl-tgt{font-size:10px;color:#58a6ff;font-weight:600}
+.rmtl-desc{font-size:9px;color:#8b949e;line-height:1.6;margin-top:2px}
+.rmwarn{background:#1a1200;border:1px solid #9e6a03;border-radius:8px;padding:10px 13px;font-size:10px;color:#d29922;line-height:1.6}
+.rmimprove{display:flex;flex-direction:column;gap:7px}
+.rmimp{background:#0d1117;border-radius:8px;padding:10px 12px;border-left:3px solid #1f6feb}
+.rmimp-t{font-size:10px;font-weight:700;color:#58a6ff;margin-bottom:3px}
+.rmimp-b{font-size:9px;color:#8b949e;line-height:1.5}
 </style>
 </head>
 <body>
@@ -200,6 +240,119 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div id="TN" class="tp on"><div id="NL" class="nl"><div style="color:#8b949e;font-size:11px">뉴스 로딩 중...</div></div></div>
     <div id="TY" class="tp"><div id="YL" class="yg"><div style="color:#8b949e;font-size:11px">YouTube 로딩 중...</div></div></div>
   </div>
+
+  <!-- ── 로드맵 섹션 ── -->
+  <div class="rmc">
+    <div class="rmh">📋 자산 목표 로드맵 &amp; 전략 분석 <span>20년 경력 자산관리사 관점 · 2026.05 기준</span></div>
+
+    <!-- 목표 설정 -->
+    <div class="rmsec">
+      <div class="rmsec-t">1️⃣ 목표 설정 — 필요 저축액 &amp; 수익률 역산</div>
+      <table class="rmtbl">
+        <thead><tr><th>TSLA 목표가</th><th>포트폴리오 예상가</th><th>부족분 (5억 기준)</th><th>월 추가 저축 필요액</th></tr></thead>
+        <tbody>
+          <tr><td>⚡ $550 (단기)</td><td>≈ ₩134M</td><td>₩366M</td><td style="color:#f85149;font-weight:700">≈ ₩1,181만/월</td></tr>
+          <tr><td>🎯 $750 (중기)</td><td>≈ ₩184M</td><td>₩316M</td><td style="color:#d29922;font-weight:700">≈ ₩1,019만/월</td></tr>
+          <tr><td>🌟 $1,000</td><td>≈ ₩245M</td><td>₩255M</td><td style="color:#3fb950;font-weight:700">≈ ₩823만/월</td></tr>
+        </tbody>
+      </table>
+      <div class="rmwarn">⚠️ <strong>핵심</strong>: TSLA 단독으로는 5억 달성 불가능. TSLA $1,000 달성 시에도 ₩255M 부족 — 매월 823만원 이상 추가 저축/투자가 반드시 병행되어야 합니다. 2030년 10억 목표는 월 ₩1,200만 + 연 20% 복리 조건 필요.</div>
+    </div>
+
+    <!-- 투자 전략 -->
+    <div class="rmsec">
+      <div class="rmsec-t">2️⃣ 투자 전략 — 포트폴리오 시나리오</div>
+      <div class="rmgrid">
+        <div class="rmcard atk">
+          <div class="rmcard-t atk">🔴 공격형 — 연 25~30% 목표</div>
+          <div class="rmcard-sub">리스크 높음 · TSLA 집중 유지</div>
+          <div class="rmrow"><span class="rmrow-l">TSLA (현 보유)</span><span class="rmrow-r" style="color:#f85149">40%</span></div>
+          <div class="rmrow"><span class="rmrow-l">기술주 ETF (QQQ/VGT)</span><span class="rmrow-r">25%</span></div>
+          <div class="rmrow"><span class="rmrow-l">성장주 (NVDA·AMZN)</span><span class="rmrow-r">20%</span></div>
+          <div class="rmrow"><span class="rmrow-l">현금/단기채</span><span class="rmrow-r">15%</span></div>
+        </div>
+        <div class="rmcard neu">
+          <div class="rmcard-t neu">🟡 중립형 — 연 15~20% 목표 ★권장</div>
+          <div class="rmcard-sub">균형 잡힌 분산 · 현실적 목표</div>
+          <div class="rmrow"><span class="rmrow-l">TSLA (현 보유)</span><span class="rmrow-r" style="color:#58a6ff">30%</span></div>
+          <div class="rmrow"><span class="rmrow-l">S&amp;P500 ETF (VOO/SPY)</span><span class="rmrow-r">30%</span></div>
+          <div class="rmrow"><span class="rmrow-l">나스닥 ETF (QQQ)</span><span class="rmrow-r">20%</span></div>
+          <div class="rmrow"><span class="rmrow-l">채권/현금성 자산</span><span class="rmrow-r">20%</span></div>
+        </div>
+        <div class="rmcard stb">
+          <div class="rmcard-t stb">🟢 안정형 — 연 8~12% 목표</div>
+          <div class="rmcard-sub">자본 보전 우선 · 장기 안정</div>
+          <div class="rmrow"><span class="rmrow-l">TSLA</span><span class="rmrow-r" style="color:#3fb950">20%</span></div>
+          <div class="rmrow"><span class="rmrow-l">글로벌 분산 ETF</span><span class="rmrow-r">40%</span></div>
+          <div class="rmrow"><span class="rmrow-l">미국 국채/리츠</span><span class="rmrow-r">25%</span></div>
+          <div class="rmrow"><span class="rmrow-l">현금</span><span class="rmrow-r">15%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 리스크 관리 -->
+    <div class="rmsec">
+      <div class="rmsec-t">3️⃣ 리스크 관리</div>
+      <div class="rmrisks">
+        <div class="rmrisk r1">
+          <div class="rmrisk-t r1">🚨 TSLA 단일 종목 집중 (최고 심각)</div>
+          <div class="rmrisk-b">전 재산이 테슬라 한 종목. 2022년 -65% 폭락 전례. 머스크 발언 하나에 -15% 급락하는 고변동성 종목.</div>
+          <div class="rmrisk-fix">→ 신규 자금 TSLA 추가 매수 중단 · 분산 전환</div>
+        </div>
+        <div class="rmrisk r2">
+          <div class="rmrisk-t r2">💱 환율 리스크</div>
+          <div class="rmrisk-b">USD/KRW ₩1,471 → ₩1,200대 하락 시 Fidelity 평가액 KRW 기준 -18% 손실 발생.</div>
+          <div class="rmrisk-fix">→ KRW 자산 비중 확대 · 환헤지 ETF 활용</div>
+        </div>
+        <div class="rmrisk r3">
+          <div class="rmrisk-t r3">📉 카카오뱅크 고가 매수</div>
+          <div class="rmrisk-b">평균단가 $377.64 vs Fidelity $246.41. 같은 종목을 두 계좌에서 전혀 다른 타이밍 매수 — 수익률 격차 +1.86% vs +58.61%.</div>
+          <div class="rmrisk-fix">→ 카카오뱅크 추가 매수 중단 · Fidelity 일원화 검토</div>
+        </div>
+        <div class="rmrisk r4">
+          <div class="rmrisk-t r4">📊 목표 과대 설정</div>
+          <div class="rmrisk-b">₩9,570만 → 2028년 5억 = 31개월 내 5.2배 요구. 주가 상승만으로는 수학적 달성 불가.</div>
+          <div class="rmrisk-fix">→ 현실적 중간 목표 설정 + 수입 증대 계획 병행</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 개선 제안 -->
+    <div class="rmsec">
+      <div class="rmsec-t">4️⃣ 날카로운 개선 제안</div>
+      <div class="rmimprove">
+        <div class="rmimp">
+          <div class="rmimp-t">① 달걀을 한 바구니에 — 분산투자 즉시 시작</div>
+          <div class="rmimp-b">현재 구조는 투자가 아니라 테슬라에 베팅. 신규 자금부터 ETF 분산 시작. TSLA 비중을 점진적으로 30% 이하로 낮출 것.</div>
+        </div>
+        <div class="rmimp">
+          <div class="rmimp-t">② 카카오뱅크 계좌 전략 수정 필요</div>
+          <div class="rmimp-b">Fidelity +58.61% vs 카카오뱅크 +1.86%. 두 계좌의 매수 단가 격차가 너무 큼. 카카오뱅크 추가 매수 즉시 중단, 환율 유리 시 Fidelity로 일원화 검토.</div>
+        </div>
+        <div class="rmimp">
+          <div class="rmimp-t">③ 출구 전략(Exit Strategy) 수립 필요</div>
+          <div class="rmimp-b">$750 도달 시 Fidelity 분 30% 익절 → 분산 투자 재원 확보. $1,000 도달 시 전체 포트폴리오 리밸런싱. 지금 계획을 세워야 감정적 매도를 방지할 수 있음.</div>
+        </div>
+        <div class="rmimp">
+          <div class="rmimp-t">④ 월 저축액이 수익률보다 더 중요</div>
+          <div class="rmimp-b">투자 수익만으로 10억 달성은 현실적으로 어려움. 월 소득 → 저축 → 투자의 선순환 구조 구축이 핵심. 현재 월 저축 가능 금액 파악이 먼저.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 타임라인 -->
+    <div class="rmsec" style="margin-bottom:0">
+      <div class="rmsec-t">📅 단계별 타임라인</div>
+      <div class="rmtl">
+        <div class="rmtl-item"><div class="rmtl-dot" style="background:#58a6ff"></div><div><div class="rmtl-yr">2026 (현재) — ₩95.7M</div><div class="rmtl-desc">분산투자 시작 · 월 저축 극대화 · TSLA 추가 매수 중단</div></div></div>
+        <div class="rmtl-item"><div class="rmtl-dot" style="background:#d29922"></div><div><div class="rmtl-yr">2027 <span class="rmtl-tgt">목표 ₩200~230M</span></div><div class="rmtl-desc">ETF 비중 30%까지 확대 · TSLA $550 도달 시 Fidelity 일부 익절</div></div></div>
+        <div class="rmtl-item"><div class="rmtl-dot" style="background:#3fb950"></div><div><div class="rmtl-yr">2028 <span class="rmtl-tgt">목표 ₩350~500M (5억)</span></div><div class="rmtl-desc">TSLA $750 목표 · 분산 포트폴리오 리밸런싱 · (5억은 TSLA $1,000 + 월 ₩1,000만 저축 조건)</div></div></div>
+        <div class="rmtl-item"><div class="rmtl-dot" style="background:#f85149"></div><div><div class="rmtl-yr">2029~2030 <span class="rmtl-tgt">목표 ₩700M~1B (10억)</span></div><div class="rmtl-desc">복리 효과 극대화 · TSLA 비중 20% 이하로 낮추고 수익 실현분 안정 자산 전환</div></div></div>
+      </div>
+      <div class="rmwarn" style="margin-top:12px">💡 <strong>한 줄 요약</strong>: 현재 포트폴리오는 TSLA가 오르면 대박, 내리면 쪽박인 구조. 10억 목표 달성을 위해서는 <strong>① 분산투자 즉시 시작 ② 월 800만원 이상 추가 저축 ③ 카카오뱅크 고점 물량 전략 수정</strong> — 이 세 가지가 반드시 전제되어야 합니다.</div>
+    </div>
+  </div>
+
 </div>
 <script>
 // ── 상수 ─────────────────────────────────────────────
@@ -208,8 +361,6 @@ var FD_SH = 78, FD_AV = 246.41, FD_COST = 19219.98;
 var STOP=357, T1=550, T2=750, T3=950, T4=1000;
 
 // ── CORS 프록시 ───────────────────────────────────────
-// 1순위: corsproxy.io (구버전에서 작동 확인)
-// 2순위: allorigins.win
 var PROXY1 = 'https://corsproxy.io/?url=';
 var PROXY2 = 'https://api.allorigins.win/get?url=';
 var YFH    = ['query1.finance.yahoo.com', 'query2.finance.yahoo.com'];
@@ -223,7 +374,6 @@ async function yf(path) {
   var bust = '_='+Date.now();
 
   for (var hi=0; hi<YFH.length; hi++) {
-    // 1차: corsproxy.io
     try {
       var url1 = 'https://'+YFH[hi]+path+sep+bust;
       var res1 = await fetch(PROXY1+encodeURIComponent(url1), {cache:'no-store'});
@@ -235,7 +385,6 @@ async function yf(path) {
       }
     } catch(e1) {}
 
-    // 2차: allorigins.win
     try {
       var url2 = 'https://'+YFH[hi]+path+sep+bust;
       var res2 = await fetch(PROXY2+encodeURIComponent(url2), {cache:'no-store'});
@@ -271,12 +420,9 @@ async function getFX() {
   return parseFloat(d.chart.result[0].meta.regularMarketPrice)||1400;
 }
 
-// 차트 전용 fetch — 가격 로딩과 완전 분리
 async function getHist(range, interval) {
   var d = await yf('/v8/finance/chart/TSLA?interval='+interval+'&range='+range);
   var r = d.chart.result[0];
-  // Yahoo Finance는 "timestamp"(단수)를 반환. "timestamps"(복수)는 없음.
-  // 방어적으로 둘 다 체크.
   var tsList = r['timestamp'] || r['timestamps'] || null;
   if (!tsList || tsList.length === 0) throw new Error('timestamp 데이터 없음');
   var closeList = (r.indicators && r.indicators.quote && r.indicators.quote[0] && r.indicators.quote[0].close) || [];
@@ -308,14 +454,12 @@ function render(tsla, fx) {
   document.getElementById('FX').textContent='₩'+fx.toFixed(0);
   document.getElementById('UPD').textContent='업데이트: '+new Date().toLocaleTimeString('ko-KR');
 
-  // KakaoBank
   var ke=KB_SH*eff, kk=ke*fx, kp=kk-KB_COST, kr=(kp/KB_COST)*100;
   document.getElementById('KE').textContent=krw(kk);
   document.getElementById('KU').textContent=u$(ke)+' (₩'+fx.toFixed(0)+')';
   document.getElementById('KP').innerHTML=sp(kp,(kp>=0?'+':'')+krw(kp));
   document.getElementById('KR').innerHTML=sp(kr,pct(kr));
 
-  // Fidelity
   var fe=FD_SH*eff, fk=fe*fx, fck=FD_COST*fx, fp=fe-FD_COST, fr=(fp/FD_COST)*100;
   document.getElementById('FC').textContent=krw(fck)+' (환산)';
   document.getElementById('FE').textContent=u$(fe);
@@ -323,7 +467,6 @@ function render(tsla, fx) {
   document.getElementById('FP').innerHTML=sp(fp,(fp>=0?'+':'')+u$(fp));
   document.getElementById('FR').innerHTML=sp(fr,pct(fr));
 
-  // Combined
   var te=kk+fk, tc=KB_COST+FD_COST*fx, tp=te-tc, tr2=(tp/tc)*100;
   var teU=te/fx, tcU=tc/fx, tpU=tp/fx;
   document.getElementById('CE').textContent=krw(te);
@@ -334,7 +477,6 @@ function render(tsla, fx) {
   document.getElementById('CP2').innerHTML=sp(tpU,'≈ '+(tpU>=0?'+':'')+u$(tpU,0));
   document.getElementById('CR').innerHTML=sp(tr2,pct(tr2));
 
-  // Signal
   var sg=document.getElementById('SIG');
   if(eff<STOP){sg.className='sig ss';sg.textContent='⚠ 손절 검토';}
   else if(eff<KB_AV){sg.className='sig ss';sg.textContent='주의';}
@@ -376,7 +518,7 @@ function renderScenario(cur,fx) {
   document.getElementById('PL').textContent='현재가: '+u$(cur);
 }
 
-// ── 차트 (완전 독립 실행) ─────────────────────────────
+// ── 차트 ─────────────────────────────────────────────
 function loadChart(range, interval, btn) {
   _curRange=range; _curInt=interval;
   document.querySelectorAll('.pb').forEach(function(b){b.classList.remove('on')});
@@ -387,8 +529,6 @@ function loadChart(range, interval, btn) {
   msg.style.display='none'; cvs.style.display='block';
 
   getHist(range,interval).then(function(data){
-    // data.tsList  = timestamp 배열
-    // data.closeList = close 가격 배열
     drawChart(data.tsList, data.closeList);
   }).catch(function(err){
     cvs.style.display='none';
@@ -511,7 +651,6 @@ async function init(){
   document.getElementById('app').style.display='none';
   document.getElementById('lmsg').textContent='데이터 로딩 중...';
 
-  // ① 가격 먼저 로드 (차트와 분리)
   var tsla, fx;
   try{
     var res=await Promise.all([getTSLA(),getFX()]);
@@ -522,18 +661,14 @@ async function init(){
     return;
   }
 
-  // ② 대시보드 즉시 표시
   render(tsla,fx);
   document.getElementById('loading').style.display='none';
   document.getElementById('app').style.display='block';
 
-  // ③ 차트 비동기 로드 (실패해도 대시보드 영향 없음)
   loadChart(_curRange, _curInt, document.querySelector('.pb.on'));
 
-  // ④ 뉴스/유튜브 비동기
   _newsTs=0; refreshMedia();
 
-  // ⑤ 10초 타이머
   clearInterval(_timer); _tick=10;
   _timer=setInterval(function(){
     _tick--;
