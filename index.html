@@ -1,684 +1,698 @@
 <!DOCTYPE html>
-<!-- BUILD: 2026-05-02-v7 -->
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<title>TSLA 통합 대시보드 v5</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<title>TSLA 수익 극대화 전략 대시보드 v8</title>
+<!-- BUILD: 2026-05-04-v8 -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={theme:{extend:{colors:{tsla:{'red':'#E31937'}}}}}</script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0d1117;color:#e6edf3;min-height:100vh}
-#loading{display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:14px}
-.spin{width:44px;height:44px;border:3px solid #30363d;border-top-color:#1f6feb;border-radius:50%;animation:r .8s linear infinite}
-@keyframes r{to{transform:rotate(360deg)}}
-#app{display:none;padding:18px;max-width:1280px;margin:0 auto}
-/* header */
-.hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:13px;flex-wrap:wrap;gap:8px}
-.hdr h1{font-size:19px;font-weight:700}
-.sub{display:flex;align-items:center;gap:7px;margin-top:5px;flex-wrap:wrap}
-.mb{padding:2px 9px;border-radius:20px;font-size:10px;font-weight:600}
-.reg{background:#1a3a2a;color:#3fb950;border:1px solid #2ea043}
-.pre{background:#1f2d00;color:#7ee787;border:1px solid #56d364}
-.pst{background:#2d1f00;color:#d29922;border:1px solid #9e6a03}
-.cls{background:#21262d;color:#8b949e;border:1px solid #30363d}
-.ts{color:#484f58;font-size:10px}
-.sig{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700}
-.sh{background:#1f3a5f;color:#58a6ff;border:1px solid #1f6feb}
-.sb{background:#1a3a2a;color:#3fb950;border:1px solid #2ea043}
-.ss{background:#3a1a1a;color:#f85149;border:1px solid #da3633}
-.btn{background:transparent;border:1px solid #30363d;color:#8b949e;padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer}
-.btn:hover{border-color:#8b949e;color:#e6edf3}
-.g{color:#3fb950!important}.r{color:#f85149!important}
-.xt{font-size:9px;background:#2d1f00;color:#d29922;border:1px solid #9e6a03;border-radius:3px;padding:1px 4px;margin-left:3px}
-/* cards */
-.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:11px}
-.card{background:#161b22;border:1px solid #30363d;border-radius:11px;padding:13px 15px}
-.lbl{color:#8b949e;font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px}
-.val{font-size:20px;font-weight:700;line-height:1.2}
-.sub2{font-size:11px;color:#8b949e;margin-top:3px}
-/* combined */
-.combo{background:linear-gradient(135deg,#0f2027,#192a3a);border:1px solid #1f6feb;border-radius:12px;padding:15px 19px;margin-bottom:11px}
-.combo-t{color:#58a6ff;font-size:11px;font-weight:700;border-bottom:1px solid #1f3a5f;padding-bottom:7px;margin-bottom:12px}
-.combo-g{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.ci .cl{font-size:9px;color:#8b949e;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:3px}
-.ci .cv{font-size:22px;font-weight:800}
-.ci .cs{font-size:11px;color:#8b949e;margin-top:3px;font-weight:500}
-/* accounts */
-.acc2{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:11px}
-.ac{background:#161b22;border:1px solid #30363d;border-radius:11px;padding:14px}
-.ac.ka{border-color:#2ea043}.ac.fi{border-color:#1f6feb}
-.ah{display:flex;align-items:center;gap:7px;margin-bottom:11px;font-size:12px;font-weight:700}
-.ak{font-size:9px;padding:2px 6px;border-radius:9px;font-weight:600}
-.kk{background:#1a3a2a;color:#3fb950;border:1px solid #2ea043}
-.kf{background:#1f3a5f;color:#58a6ff;border:1px solid #1f6feb}
-.ag{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.al{font-size:9px;color:#8b949e;font-weight:600;letter-spacing:.4px;text-transform:uppercase;margin-bottom:2px}
-.av{font-size:14px;font-weight:700}
-.as{font-size:10px;color:#8b949e;margin-top:1px}
-/* chart */
-.chc{background:#161b22;border:1px solid #30363d;border-radius:11px;padding:14px;margin-bottom:11px}
-.chh{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;flex-wrap:wrap;gap:6px}
-.cht{font-size:11px;font-weight:600;color:#8b949e}
-.pbs{display:flex;gap:3px}
-.pb{background:transparent;border:1px solid #30363d;color:#8b949e;padding:3px 8px;border-radius:5px;font-size:10px;cursor:pointer}
-.pb:hover{border-color:#8b949e;color:#e6edf3}
-.pb.on{background:#1f6feb;border-color:#1f6feb;color:#fff}
-.chw{position:relative;height:230px;display:flex;align-items:center;justify-content:center}
-#chartEl{position:absolute;top:0;left:0;width:100%;height:100%}
-#chartMsg{color:#8b949e;font-size:12px;text-align:center;display:none}
-/* scenario */
-.scc{background:#161b22;border:1px solid #30363d;border-radius:11px;padding:14px;margin-bottom:11px}
-.sct2{font-size:12px;font-weight:700;margin-bottom:8px}
-.st{width:100%;border-collapse:collapse;font-size:10px}
-.st th{color:#8b949e;font-weight:600;font-size:9px;letter-spacing:.4px;text-transform:uppercase;padding:4px 6px;text-align:right;border-bottom:1px solid #30363d}
-.st th:first-child{text-align:left}
-.st td{padding:5px 6px;text-align:right;border-bottom:1px solid #21262d}
-.st td:first-child{text-align:left;font-weight:600}
-.st tr.cr{background:#0d2a0d}
-.stg{font-size:8px;display:block;color:#8b949e;font-weight:400;margin-top:1px}
-/* progress */
-.pw{margin-top:9px}
-.pl{display:flex;justify-content:space-between;font-size:9px;color:#8b949e;margin-bottom:3px}
-.pt{background:#21262d;border-radius:10px;height:6px;position:relative}
-.pf{height:6px;border-radius:10px;background:linear-gradient(90deg,#da3633,#d29922,#3fb950);transition:width .5s}
-.pp{position:absolute;top:-4px;width:13px;height:13px;border-radius:50%;background:#58a6ff;border:2px solid #0d1117;transition:left .5s;transform:translateX(-50%)}
-/* news */
-.tc2{background:#161b22;border:1px solid #30363d;border-radius:11px;padding:14px;margin-bottom:11px}
-.tbh{display:flex;gap:7px;margin-bottom:11px}
-.tb{background:transparent;border:1px solid #30363d;color:#8b949e;padding:4px 11px;border-radius:6px;font-size:11px;cursor:pointer}
-.tb.on{background:#1f6feb22;border-color:#1f6feb;color:#58a6ff}
-.tp{display:none}.tp.on{display:block}
-.nl{display:flex;flex-direction:column;gap:6px}
-.ni{display:flex;gap:8px;padding:8px;background:#0d1117;border-radius:7px;border:1px solid #21262d;text-decoration:none;color:inherit}
-.ni:hover{border-color:#58a6ff}
-.nth{width:64px;height:42px;border-radius:5px;background:#21262d;flex-shrink:0;object-fit:cover}
-.nph{width:64px;height:42px;border-radius:5px;background:#21262d;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px}
-.nb{flex:1;min-width:0}
-.nt{font-size:11px;font-weight:600;line-height:1.4;margin-bottom:2px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.nm{font-size:9px;color:#8b949e}
-.yg{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:8px}
-.yi{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:inherit;padding:8px;background:#0d1117;border-radius:7px;border:1px solid #21262d}
-.yi:hover{border-color:#f85149}
-.yt2{width:100%;aspect-ratio:16/9;border-radius:5px;background:#21262d;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:22px}
-.yt2 img{width:100%;height:100%;object-fit:cover}
-.ytt{font-size:10px;font-weight:600;line-height:1.4}
-.ytc{font-size:9px;color:#8b949e}
-/* roadmap */
-.rmc{background:#161b22;border:1px solid #30363d;border-radius:11px;padding:18px;margin-bottom:11px}
-.rmh{font-size:13px;font-weight:700;margin-bottom:14px;color:#e6edf3}
-.rmh span{font-size:10px;color:#8b949e;font-weight:400;margin-left:8px}
-.rmsec{margin-bottom:18px}
-.rmsec-t{font-size:11px;font-weight:700;color:#58a6ff;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #21262d}
-.rmtbl{width:100%;border-collapse:collapse;font-size:10px;margin-bottom:8px}
-.rmtbl th{color:#8b949e;font-weight:600;font-size:9px;letter-spacing:.4px;text-transform:uppercase;padding:5px 8px;text-align:right;border-bottom:1px solid #30363d}
-.rmtbl th:first-child{text-align:left}
-.rmtbl td{padding:5px 8px;text-align:right;border-bottom:1px solid #21262d;font-size:10px}
-.rmtbl td:first-child{text-align:left;font-weight:600}
-.rmgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px}
-.rmcard{background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:12px}
-.rmcard.atk{border-color:#da3633}.rmcard.neu{border-color:#1f6feb}.rmcard.stb{border-color:#2ea043}
-.rmcard-t{font-size:10px;font-weight:700;margin-bottom:8px}
-.rmcard-t.atk{color:#f85149}.rmcard-t.neu{color:#58a6ff}.rmcard-t.stb{color:#3fb950}
-.rmcard-sub{font-size:9px;color:#8b949e;margin-bottom:6px}
-.rmrow{display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid #21262d;font-size:9px}
-.rmrow:last-child{border:none}
-.rmrow-l{color:#8b949e}
-.rmrow-r{font-weight:600}
-.rmrisks{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.rmrisk{background:#0d1117;border-radius:8px;padding:11px;border-left:3px solid}
-.rmrisk.r1{border-color:#da3633}.rmrisk.r2{border-color:#d29922}.rmrisk.r3{border-color:#d29922}.rmrisk.r4{border-color:#8b949e}
-.rmrisk-t{font-size:10px;font-weight:700;margin-bottom:4px}
-.rmrisk-t.r1{color:#f85149}.rmrisk-t.r2{color:#d29922}.rmrisk-t.r3{color:#d29922}.rmrisk-t.r4{color:#8b949e}
-.rmrisk-b{font-size:9px;color:#8b949e;line-height:1.5}
-.rmrisk-fix{font-size:9px;color:#3fb950;margin-top:4px}
-.rmtl{display:flex;flex-direction:column;gap:6px}
-.rmtl-item{display:flex;gap:10px;align-items:flex-start}
-.rmtl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px}
-.rmtl-line{display:flex;flex-direction:column;gap:0}
-.rmtl-yr{font-size:11px;font-weight:700;color:#e6edf3}
-.rmtl-tgt{font-size:10px;color:#58a6ff;font-weight:600}
-.rmtl-desc{font-size:9px;color:#8b949e;line-height:1.6;margin-top:2px}
-.rmwarn{background:#1a1200;border:1px solid #9e6a03;border-radius:8px;padding:10px 13px;font-size:10px;color:#d29922;line-height:1.6}
-.rmimprove{display:flex;flex-direction:column;gap:7px}
-.rmimp{background:#0d1117;border-radius:8px;padding:10px 12px;border-left:3px solid #1f6feb}
-.rmimp-t{font-size:10px;font-weight:700;color:#58a6ff;margin-bottom:3px}
-.rmimp-b{font-size:9px;color:#8b949e;line-height:1.5}
+*{font-family:'Inter',system-ui,-apple-system,sans-serif}
+body{background:#020817}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:#0f172a}
+::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
+.card{background:#0f172a;border:1px solid #1e293b;border-radius:12px}
+.card2{background:#111827;border:1px solid #1f2937;border-radius:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.4}}
+.spin{animation:spin 1s linear infinite}
+.pulse-dot{animation:pulse-dot 1.5s ease-in-out infinite}
+.g-blue{background:linear-gradient(135deg,#1e3a5f,#0c1a2e)}
+.g-green{background:linear-gradient(135deg,#064e3b,#022c22)}
+.g-gold{background:linear-gradient(135deg,#3a2400,#1f1200)}
+.g-purple{background:linear-gradient(135deg,#1a1040,#0f0826)}
+.g-amber{background:linear-gradient(135deg,#1a1200,#120d00)}
 </style>
 </head>
-<body>
-<div id="loading"><div class="spin"></div><div id="lmsg" style="color:#8b949e;font-size:12px">데이터 연결 중...</div></div>
-<div id="app">
-  <div class="hdr">
-    <div>
-      <h1>🚗 TSLA 포트폴리오 통합 대시보드</h1>
-      <div class="sub">
-        <span id="MKT" class="mb cls">–</span>
-        <span id="UPD" class="ts">–</span>
-        <span id="CD" style="color:#484f58;font-size:10px"></span>
+<body class="text-slate-100 min-h-screen">
+
+<!-- HEADER -->
+<header class="sticky top-0 z-50 border-b border-slate-800" style="background:#020817ee;backdrop-filter:blur(12px)">
+  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+    <div class="flex items-center gap-3 min-w-0">
+      <div class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-white font-black text-sm flex-shrink-0">T</div>
+      <div class="min-w-0">
+        <div class="text-white font-bold text-sm truncate">TSLA 수익 극대화 전략 대시보드</div>
+        <div class="text-slate-400 text-xs">v8 · 166.502주 보유 · 평단 $316.12</div>
       </div>
     </div>
-    <div style="display:flex;align-items:center;gap:7px">
-      <span id="SIG" class="sig sh">HOLD</span>
-      <button class="btn" onclick="init()">↻ 새로고침</button>
-    </div>
-  </div>
-  <div class="row3">
-    <div class="card"><div class="lbl">TSLA 현재가</div><div class="val" id="PRC">–</div><div class="sub2" id="CHG">–</div></div>
-    <div class="card"><div class="lbl">USD/KRW 환율</div><div class="val" id="FX">–</div><div class="sub2">실시간</div></div>
-    <div class="card"><div class="lbl">총 보유 주수</div><div class="val">166.502<span style="font-size:13px">주</span></div><div class="sub2">카카오뱅크 88.502 + Fidelity 78</div></div>
-  </div>
-  <div class="combo">
-    <div class="combo-t">💼 통합 포트폴리오 실시간 요약</div>
-    <div class="combo-g">
-      <div class="ci"><div class="cl">총 평가금액</div><div class="cv" id="CE">–</div><div class="cs" id="CE2">–</div></div>
-      <div class="ci"><div class="cl">총 매수금액</div><div class="cv" id="CC">–</div><div class="cs" id="CC2">–</div></div>
-      <div class="ci"><div class="cl">총 손익</div><div class="cv" id="CP">–</div><div class="cs" id="CP2">–</div></div>
-      <div class="ci"><div class="cl">총 수익률</div><div class="cv" id="CR">–</div></div>
-    </div>
-  </div>
-  <div class="acc2">
-    <div class="ac ka">
-      <div class="ah">🏦 카카오뱅크 해외주식 <span class="ak kk">KRW</span></div>
-      <div class="ag">
-        <div><div class="al">보유주수</div><div class="av">88.502주</div><div class="as">평균단가 $377.64</div></div>
-        <div><div class="al">총 매수금액</div><div class="av">₩49,959,897</div><div class="as">매수환율 ₩1,494.86</div></div>
-        <div><div class="al">현재 평가금액</div><div class="av" id="KE">–</div><div class="as" id="KU">–</div></div>
-        <div><div class="al">손익 / 수익률</div><div class="av" id="KP">–</div><div class="as" id="KR">–</div></div>
+    <div class="flex items-center gap-3 flex-shrink-0">
+      <div class="hidden sm:flex items-center gap-1.5">
+        <div class="w-2 h-2 rounded-full bg-slate-500" id="mkt-dot"></div>
+        <span class="text-slate-400 text-xs" id="mkt-label">로딩중</span>
       </div>
-    </div>
-    <div class="ac fi">
-      <div class="ah">🇺🇸 Fidelity (미국 계좌) <span class="ak kf">USD</span></div>
-      <div class="ag">
-        <div><div class="al">보유주수</div><div class="av">78주</div><div class="as">평균단가 $246.41</div></div>
-        <div><div class="al">총 매수금액</div><div class="av">$19,219.98</div><div class="as" id="FC">–</div></div>
-        <div><div class="al">현재 평가금액</div><div class="av" id="FE">–</div><div class="as" id="FK">–</div></div>
-        <div><div class="al">손익 / 수익률</div><div class="av" id="FP">–</div><div class="as" id="FR">–</div></div>
+      <div class="text-right">
+        <div class="text-xl sm:text-2xl font-black text-white" id="h-price">$---.--</div>
+        <div class="text-xs" id="h-chg">--</div>
       </div>
+      <button onclick="refreshAll()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors">
+        <i data-lucide="refresh-cw" class="w-4 h-4 text-slate-400" id="refresh-icon"></i>
+      </button>
     </div>
   </div>
-  <div class="chc">
-    <div class="chh">
-      <span class="cht">📈 TSLA 주가 추이</span>
-      <div class="pbs">
-        <button class="pb" onclick="loadChart('1mo','1d',this)">1M</button>
-        <button class="pb" onclick="loadChart('3mo','1d',this)">3M</button>
-        <button class="pb" onclick="loadChart('6mo','1d',this)">6M</button>
-        <button class="pb on" onclick="loadChart('1y','1wk',this)">1Y</button>
-        <button class="pb" onclick="loadChart('3y','1mo',this)">3Y</button>
-        <button class="pb" onclick="loadChart('5y','1mo',this)">5Y</button>
-      </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 py-5 space-y-5">
+
+  <!-- PORTFOLIO SUMMARY CARDS -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+    <div class="card p-4">
+      <div class="text-slate-400 text-xs mb-1.5 flex items-center gap-1"><i data-lucide="wallet" class="w-3 h-3"></i>현재 자산가치</div>
+      <div class="text-xl font-black text-white" id="pf-val">$--,---</div>
+      <div class="text-xs mt-1" id="pf-pnl-pct">수익률: --%</div>
     </div>
-    <div class="chw">
-      <canvas id="chartEl"></canvas>
-      <div id="chartMsg"></div>
+    <div class="card p-4">
+      <div class="text-slate-400 text-xs mb-1.5 flex items-center gap-1"><i data-lucide="trending-up" class="w-3 h-3"></i>총 평가손익</div>
+      <div class="text-xl font-black" id="pf-gain">$--,---</div>
+      <div class="text-xs mt-1 text-slate-400" id="pf-cost">원금: $--,---</div>
     </div>
-  </div>
-  <div class="scc">
-    <div class="sct2">🎯 목표가 시나리오 — 통합 166.502주 기준</div>
-    <div class="pw">
-      <div class="pl"><span>🛑 손절 $357</span><span id="PL">–</span><span>🌟 $1,000</span></div>
-      <div class="pt"><div class="pf" id="PF" style="width:30%"></div><div class="pp" id="PP" style="left:30%"></div></div>
+    <div class="card p-4">
+      <div class="text-slate-400 text-xs mb-1.5 flex items-center gap-1"><i data-lucide="target" class="w-3 h-3"></i>평단 대비</div>
+      <div class="text-xl font-black" id="pf-vs-avg">+--.-%</div>
+      <div class="text-xs mt-1 text-slate-400">평단가: $316.12</div>
     </div>
-    <br>
-    <table class="st">
-      <thead><tr>
-        <th>구분</th><th>목표가 USD</th><th>현재 대비</th>
-        <th>카카오뱅크 평가</th><th>Fidelity (USD)</th>
-        <th>통합 평가 (KRW)</th><th>통합 손익</th><th>수익률</th>
-      </tr></thead>
-      <tbody id="SB"></tbody>
-    </table>
-  </div>
-  <div class="tc2">
-    <div class="tbh">
-      <button class="tb on" onclick="tab('news')">📰 TSLA 뉴스</button>
-      <button class="tb" onclick="tab('yt')">▶ YouTube</button>
+    <div class="card p-4">
+      <div class="text-slate-400 text-xs mb-1.5 flex items-center gap-1"><i data-lucide="activity" class="w-3 h-3"></i>오늘 손익</div>
+      <div class="text-xl font-black" id="pf-today">$---</div>
+      <div class="text-xs mt-1 text-slate-400" id="pf-today-pct">166.502주 기준</div>
     </div>
-    <div id="TN" class="tp on"><div id="NL" class="nl"><div style="color:#8b949e;font-size:11px">뉴스 로딩 중...</div></div></div>
-    <div id="TY" class="tp"><div id="YL" class="yg"><div style="color:#8b949e;font-size:11px">YouTube 로딩 중...</div></div></div>
   </div>
 
-  <!-- ── 로드맵 섹션 ── -->
-  <div class="rmc">
-    <div class="rmh">📋 자산 목표 로드맵 &amp; 전략 분석 <span>20년 경력 자산관리사 관점 · 2026.05 기준</span></div>
+  <!-- ROW 1: FEAR & GREED + DCA -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
-    <!-- 목표 설정 -->
-    <div class="rmsec">
-      <div class="rmsec-t">1️⃣ 목표 설정 — 필요 저축액 &amp; 수익률 역산</div>
-      <table class="rmtbl">
-        <thead><tr><th>TSLA 목표가</th><th>포트폴리오 예상가</th><th>부족분 (5억 기준)</th><th>월 추가 저축 필요액</th></tr></thead>
-        <tbody>
-          <tr><td>⚡ $550 (단기)</td><td>≈ ₩134M</td><td>₩366M</td><td style="color:#f85149;font-weight:700">≈ ₩1,181만/월</td></tr>
-          <tr><td>🎯 $750 (중기)</td><td>≈ ₩184M</td><td>₩316M</td><td style="color:#d29922;font-weight:700">≈ ₩1,019만/월</td></tr>
-          <tr><td>🌟 $1,000</td><td>≈ ₩245M</td><td>₩255M</td><td style="color:#3fb950;font-weight:700">≈ ₩823만/월</td></tr>
-        </tbody>
+    <!-- Fear & Greed Gauge -->
+    <div class="card p-5">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-white font-bold flex items-center gap-2 text-sm">
+            <i data-lucide="gauge" class="w-4 h-4 text-orange-400"></i>TSLA Fear &amp; Greed 인덱스
+          </h2>
+          <p class="text-slate-400 text-xs mt-0.5">RSI · MA50/200 · MACD · 모멘텀 종합</p>
+        </div>
+        <span class="text-slate-500 text-xs" id="fg-time">--</span>
+      </div>
+      <div class="flex flex-col items-center">
+        <div class="relative w-56 h-32">
+          <svg viewBox="0 0 200 115" class="w-full h-full">
+            <path d="M20,100 A80,80 0 0,1 52.9,34.1" fill="none" stroke="#dc2626" stroke-width="12" stroke-linecap="round" opacity="0.25"/>
+            <path d="M52.9,34.1 A80,80 0 0,1 100,20" fill="none" stroke="#f97316" stroke-width="12" stroke-linecap="round" opacity="0.25"/>
+            <path d="M100,20 A80,80 0 0,1 147.1,34.1" fill="none" stroke="#eab308" stroke-width="12" stroke-linecap="round" opacity="0.25"/>
+            <path d="M147.1,34.1 A80,80 0 0,1 180,100" fill="none" stroke="#22c55e" stroke-width="12" stroke-linecap="round" opacity="0.25"/>
+            <path id="g-arc" d="M20,100 L20,100" fill="none" stroke="#6b7280" stroke-width="12" stroke-linecap="round"/>
+            <g id="g-needle" transform="rotate(-90,100,100)">
+              <line x1="100" y1="100" x2="100" y2="30" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+              <circle cx="100" cy="100" r="5" fill="white"/>
+              <circle cx="100" cy="100" r="3" fill="#020817"/>
+            </g>
+            <text id="g-score" x="100" y="92" text-anchor="middle" fill="white" font-size="24" font-weight="900">--</text>
+            <text id="g-label" x="100" y="108" text-anchor="middle" fill="#94a3b8" font-size="9">분석중...</text>
+          </svg>
+        </div>
+        <div class="grid grid-cols-3 gap-2 w-full mt-1">
+          <div class="card2 p-2 text-center"><div class="text-slate-400 text-xs">RSI(14)</div><div class="font-bold text-xs mt-0.5" id="i-rsi">--</div></div>
+          <div class="card2 p-2 text-center"><div class="text-slate-400 text-xs">MA50</div><div class="font-bold text-xs mt-0.5" id="i-ma50">--</div></div>
+          <div class="card2 p-2 text-center"><div class="text-slate-400 text-xs">MA200</div><div class="font-bold text-xs mt-0.5" id="i-ma200">--</div></div>
+          <div class="card2 p-2 text-center"><div class="text-slate-400 text-xs">MACD</div><div class="font-bold text-xs mt-0.5" id="i-macd">--</div></div>
+          <div class="card2 p-2 text-center"><div class="text-slate-400 text-xs">HV30</div><div class="font-bold text-xs mt-0.5" id="i-hv30">--</div></div>
+          <div class="card2 p-2 text-center"><div class="text-slate-400 text-xs">모멘텀(1M)</div><div class="font-bold text-xs mt-0.5" id="i-mom">--</div></div>
+        </div>
+        <div class="mt-3 p-3 rounded-lg w-full text-xs text-center" style="background:#1e293b" id="fg-rec">시그널 분석중...</div>
+      </div>
+    </div>
+
+    <!-- DCA Optimizer -->
+    <div class="card p-5">
+      <h2 class="text-white font-bold flex items-center gap-2 mb-4 text-sm">
+        <i data-lucide="calculator" class="w-4 h-4 text-blue-400"></i>DCA 최적화 &amp; 매수 권장
+      </h2>
+      <div class="space-y-3">
+        <div class="card2 p-3">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-slate-400 text-xs">평단($316.12) 대비</span>
+            <span class="font-bold text-sm" id="dca-avg-pct">--</span>
+          </div>
+          <div class="w-full bg-slate-800 rounded-full h-2">
+            <div class="h-2 rounded-full transition-all duration-700" id="dca-avg-bar" style="width:50%;background:#6b7280"></div>
+          </div>
+        </div>
+        <div class="card2 p-3">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-slate-400 text-xs">52주 범위 내 위치</span>
+            <span class="font-bold text-sm" id="dca-52w-pct">--</span>
+          </div>
+          <div class="w-full bg-slate-800 rounded-full h-2">
+            <div class="h-2 rounded-full bg-blue-500 transition-all duration-700" id="dca-52w-bar" style="width:50%"></div>
+          </div>
+          <div class="flex justify-between mt-1">
+            <span class="text-slate-500 text-xs" id="d-low">저: --</span>
+            <span class="text-slate-500 text-xs" id="d-high">고: --</span>
+          </div>
+        </div>
+        <div class="card2 p-3">
+          <div class="text-slate-400 text-xs mb-1.5 flex items-center gap-1"><i data-lucide="lightbulb" class="w-3 h-3 text-yellow-400"></i>오늘의 DCA 추천</div>
+          <div class="text-sm font-bold" id="dca-sig">분석중...</div>
+          <div class="text-xs text-slate-400 mt-1" id="dca-det">--</div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div class="card2 p-3">
+            <div class="text-slate-500 text-xs">KB증권 88.502주</div>
+            <div class="text-xs mt-1">평단 <span class="text-white font-bold">$377.64</span></div>
+            <div class="text-xs mt-0.5" id="kb-pnl">--</div>
+          </div>
+          <div class="card2 p-3">
+            <div class="text-slate-500 text-xs">Fidelity 78주</div>
+            <div class="text-xs mt-1">평단 <span class="text-white font-bold">$246.41</span></div>
+            <div class="text-xs mt-0.5" id="fd-pnl">--</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 2: OPTIONS + CALL WALL + IV -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+    <!-- Options Flow -->
+    <div class="card p-5">
+      <h2 class="text-white font-bold flex items-center gap-2 mb-4 text-sm">
+        <i data-lucide="bar-chart-2" class="w-4 h-4 text-purple-400"></i>옵션 플로우
+      </h2>
+      <div class="space-y-3">
+        <div>
+          <div class="flex justify-between text-xs mb-1"><span class="text-green-400 font-medium">콜 (Call)</span><span class="text-green-400 font-bold" id="call-pct">--</span></div>
+          <div class="w-full bg-slate-800 rounded-full h-2.5"><div class="h-2.5 rounded-full bg-green-500 transition-all duration-700" id="call-bar" style="width:50%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-xs mb-1"><span class="text-red-400 font-medium">풋 (Put)</span><span class="text-red-400 font-bold" id="put-pct">--</span></div>
+          <div class="w-full bg-slate-800 rounded-full h-2.5"><div class="h-2.5 rounded-full bg-red-500 transition-all duration-700" id="put-bar" style="width:50%"></div></div>
+        </div>
+        <div class="card2 p-2.5 flex justify-between"><span class="text-slate-400 text-xs">Put/Call Ratio</span><span class="font-bold text-sm" id="pcr">--</span></div>
+        <div class="card2 p-2.5 flex justify-between"><span class="text-slate-400 text-xs">옵션 심리</span><span class="font-bold text-xs" id="opt-sent">--</span></div>
+        <div class="card2 p-2.5 flex justify-between"><span class="text-slate-400 text-xs">총 미결제약정</span><span class="font-medium text-xs" id="total-oi">--</span></div>
+        <div class="text-xs text-slate-500 text-center" id="opt-note">--</div>
+      </div>
+    </div>
+
+    <!-- Call Wall -->
+    <div class="card p-5">
+      <h2 class="text-white font-bold flex items-center gap-2 mb-4 text-sm">
+        <i data-lucide="layers" class="w-4 h-4 text-yellow-400"></i>콜 월 &amp; 지지/저항
+      </h2>
+      <div id="call-wall" class="space-y-1.5">
+        <div class="text-slate-500 text-xs text-center py-6">옵션 데이터 로딩중...</div>
+      </div>
+    </div>
+
+    <!-- IV Tracker -->
+    <div class="card p-5">
+      <h2 class="text-white font-bold flex items-center gap-2 mb-4 text-sm">
+        <i data-lucide="zap" class="w-4 h-4 text-cyan-400"></i>IV 변동성 트래커
+      </h2>
+      <div class="space-y-3">
+        <div class="text-center py-2">
+          <div class="text-5xl font-black" id="iv-val">--</div>
+          <div class="text-slate-400 text-xs mt-1">ATM 내재변동성 (연간화)</div>
+        </div>
+        <div class="card2 p-3">
+          <div class="flex justify-between text-xs mb-2"><span class="text-slate-400">IV 퍼센타일</span><span class="font-bold" id="iv-pctile">--</span></div>
+          <div class="w-full bg-slate-800 rounded-full h-2">
+            <div class="h-2 rounded-full transition-all duration-700" id="iv-bar" style="width:50%;background:#6b7280"></div>
+          </div>
+          <div class="flex justify-between mt-1 text-slate-500 text-xs"><span>저 (매수기회)</span><span>고 (주의)</span></div>
+        </div>
+        <div class="card2 p-2.5 flex justify-between"><span class="text-slate-400 text-xs">HV30 역사적변동성</span><span class="font-medium text-xs" id="iv-hv">--</span></div>
+        <div class="card2 p-2.5 flex justify-between"><span class="text-slate-400 text-xs">IV-HV 스프레드</span><span class="font-medium text-xs" id="iv-spread">--</span></div>
+        <div class="p-2.5 rounded-lg text-xs text-center" style="background:#1e293b" id="iv-sig">분석중...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 3: MACRO + EVENTS -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+    <div class="card p-5">
+      <h2 class="text-white font-bold flex items-center gap-2 mb-4 text-sm">
+        <i data-lucide="globe" class="w-4 h-4 text-emerald-400"></i>매크로 지표
+      </h2>
+      <div class="space-y-3">
+        <div class="grid grid-cols-2 gap-3">
+          <div class="card2 p-3">
+            <div class="text-slate-400 text-xs mb-1 flex items-center gap-1"><i data-lucide="percent" class="w-3 h-3"></i>미 국채 10Y</div>
+            <div class="text-xl font-black text-white" id="tnx">--</div>
+            <div class="text-xs mt-0.5" id="tnx-chg">--</div>
+            <div class="text-slate-500 text-xs mt-1" id="tnx-imp">--</div>
+          </div>
+          <div class="card2 p-3">
+            <div class="text-slate-400 text-xs mb-1 flex items-center gap-1"><i data-lucide="dollar-sign" class="w-3 h-3"></i>달러 인덱스</div>
+            <div class="text-xl font-black text-white" id="dxy">--</div>
+            <div class="text-xs mt-0.5" id="dxy-chg">--</div>
+            <div class="text-slate-500 text-xs mt-1" id="dxy-imp">--</div>
+          </div>
+        </div>
+        <div class="card2 p-3">
+          <div class="text-slate-400 text-xs mb-2 flex items-center gap-1"><i data-lucide="info" class="w-3 h-3"></i>TSLA 상관관계 분석</div>
+          <div class="text-xs text-slate-300 leading-relaxed" id="macro-ana">분석중...</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card p-5">
+      <h2 class="text-white font-bold flex items-center gap-2 mb-4 text-sm">
+        <i data-lucide="calendar-clock" class="w-4 h-4 text-pink-400"></i>이벤트 카운트다운
+      </h2>
+      <div class="space-y-3" id="events">
+        <div class="text-slate-500 text-xs text-center py-6">로딩중...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 4: ASSET ROADMAP -->
+  <div class="card p-5">
+    <h2 class="text-white font-bold flex items-center gap-2 mb-5 text-sm">
+      <i data-lucide="map" class="w-4 h-4 text-amber-400"></i>자산 목표 로드맵 2.0
+      <span class="text-slate-500 font-normal text-xs">— 166.502주 기준</span>
+    </h2>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
+      <div class="rounded-xl p-4 g-blue border border-blue-900">
+        <div class="text-blue-300 text-sm font-bold mb-1">🎯 목표1: $500</div>
+        <div class="text-2xl font-black text-white" id="t500">$--,---</div>
+        <div class="text-blue-300 text-sm mt-1" id="t500g">+$--,--- (+---%)</div>
+        <div class="text-slate-400 text-xs mt-2" id="t500f">현재가 대비 +--% 필요</div>
+      </div>
+      <div class="rounded-xl p-4 g-green border border-green-900">
+        <div class="text-green-300 text-sm font-bold mb-1">🚀 목표2: $800</div>
+        <div class="text-2xl font-black text-white" id="t800">$--,---</div>
+        <div class="text-green-300 text-sm mt-1" id="t800g">+$--,--- (+---%)</div>
+        <div class="text-slate-400 text-xs mt-2" id="t800f">현재가 대비 +--% 필요</div>
+      </div>
+      <div class="rounded-xl p-4 g-gold border border-amber-900">
+        <div class="text-amber-300 text-sm font-bold mb-1">💎 목표3: $1,000</div>
+        <div class="text-2xl font-black text-white" id="t1000">$--,---</div>
+        <div class="text-amber-300 text-sm mt-1" id="t1000g">+$--,--- (+---%)</div>
+        <div class="text-slate-400 text-xs mt-2" id="t1000f">현재가 대비 +--% 필요</div>
+      </div>
+    </div>
+    <div class="text-slate-400 text-xs mb-2">📊 복리 수익률 시뮬레이션 (연 CAGR별 포트폴리오 가치)</div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-xs">
+        <thead>
+          <tr class="text-slate-400 border-b border-slate-800">
+            <th class="text-left py-2 pr-4">CAGR</th>
+            <th class="text-right py-2 px-3">1년</th>
+            <th class="text-right py-2 px-3">2년</th>
+            <th class="text-right py-2 px-3 text-blue-300">3년</th>
+            <th class="text-right py-2 px-3 text-green-300">4년</th>
+            <th class="text-right py-2 px-3 text-amber-300">5년</th>
+          </tr>
+        </thead>
+        <tbody id="ctable"></tbody>
       </table>
-      <div class="rmwarn">⚠️ <strong>핵심</strong>: TSLA 단독으로는 5억 달성 불가능. TSLA $1,000 달성 시에도 ₩255M 부족 — 매월 823만원 이상 추가 저축/투자가 반드시 병행되어야 합니다. 2030년 10억 목표는 월 ₩1,200만 + 연 20% 복리 조건 필요.</div>
-    </div>
-
-    <!-- 투자 전략 -->
-    <div class="rmsec">
-      <div class="rmsec-t">2️⃣ 투자 전략 — 포트폴리오 시나리오</div>
-      <div class="rmgrid">
-        <div class="rmcard atk">
-          <div class="rmcard-t atk">🔴 공격형 — 연 25~30% 목표</div>
-          <div class="rmcard-sub">리스크 높음 · TSLA 집중 유지</div>
-          <div class="rmrow"><span class="rmrow-l">TSLA (현 보유)</span><span class="rmrow-r" style="color:#f85149">40%</span></div>
-          <div class="rmrow"><span class="rmrow-l">기술주 ETF (QQQ/VGT)</span><span class="rmrow-r">25%</span></div>
-          <div class="rmrow"><span class="rmrow-l">성장주 (NVDA·AMZN)</span><span class="rmrow-r">20%</span></div>
-          <div class="rmrow"><span class="rmrow-l">현금/단기채</span><span class="rmrow-r">15%</span></div>
-        </div>
-        <div class="rmcard neu">
-          <div class="rmcard-t neu">🟡 중립형 — 연 15~20% 목표 ★권장</div>
-          <div class="rmcard-sub">균형 잡힌 분산 · 현실적 목표</div>
-          <div class="rmrow"><span class="rmrow-l">TSLA (현 보유)</span><span class="rmrow-r" style="color:#58a6ff">30%</span></div>
-          <div class="rmrow"><span class="rmrow-l">S&amp;P500 ETF (VOO/SPY)</span><span class="rmrow-r">30%</span></div>
-          <div class="rmrow"><span class="rmrow-l">나스닥 ETF (QQQ)</span><span class="rmrow-r">20%</span></div>
-          <div class="rmrow"><span class="rmrow-l">채권/현금성 자산</span><span class="rmrow-r">20%</span></div>
-        </div>
-        <div class="rmcard stb">
-          <div class="rmcard-t stb">🟢 안정형 — 연 8~12% 목표</div>
-          <div class="rmcard-sub">자본 보전 우선 · 장기 안정</div>
-          <div class="rmrow"><span class="rmrow-l">TSLA</span><span class="rmrow-r" style="color:#3fb950">20%</span></div>
-          <div class="rmrow"><span class="rmrow-l">글로벌 분산 ETF</span><span class="rmrow-r">40%</span></div>
-          <div class="rmrow"><span class="rmrow-l">미국 국채/리츠</span><span class="rmrow-r">25%</span></div>
-          <div class="rmrow"><span class="rmrow-l">현금</span><span class="rmrow-r">15%</span></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 리스크 관리 -->
-    <div class="rmsec">
-      <div class="rmsec-t">3️⃣ 리스크 관리</div>
-      <div class="rmrisks">
-        <div class="rmrisk r1">
-          <div class="rmrisk-t r1">🚨 TSLA 단일 종목 집중 (최고 심각)</div>
-          <div class="rmrisk-b">전 재산이 테슬라 한 종목. 2022년 -65% 폭락 전례. 머스크 발언 하나에 -15% 급락하는 고변동성 종목.</div>
-          <div class="rmrisk-fix">→ 신규 자금 TSLA 추가 매수 중단 · 분산 전환</div>
-        </div>
-        <div class="rmrisk r2">
-          <div class="rmrisk-t r2">💱 환율 리스크</div>
-          <div class="rmrisk-b">USD/KRW ₩1,471 → ₩1,200대 하락 시 Fidelity 평가액 KRW 기준 -18% 손실 발생.</div>
-          <div class="rmrisk-fix">→ KRW 자산 비중 확대 · 환헤지 ETF 활용</div>
-        </div>
-        <div class="rmrisk r3">
-          <div class="rmrisk-t r3">📉 카카오뱅크 고가 매수</div>
-          <div class="rmrisk-b">평균단가 $377.64 vs Fidelity $246.41. 같은 종목을 두 계좌에서 전혀 다른 타이밍 매수 — 수익률 격차 +1.86% vs +58.61%.</div>
-          <div class="rmrisk-fix">→ 카카오뱅크 추가 매수 중단 · Fidelity 일원화 검토</div>
-        </div>
-        <div class="rmrisk r4">
-          <div class="rmrisk-t r4">📊 목표 과대 설정</div>
-          <div class="rmrisk-b">₩9,570만 → 2028년 5억 = 31개월 내 5.2배 요구. 주가 상승만으로는 수학적 달성 불가.</div>
-          <div class="rmrisk-fix">→ 현실적 중간 목표 설정 + 수입 증대 계획 병행</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 개선 제안 -->
-    <div class="rmsec">
-      <div class="rmsec-t">4️⃣ 날카로운 개선 제안</div>
-      <div class="rmimprove">
-        <div class="rmimp">
-          <div class="rmimp-t">① 달걀을 한 바구니에 — 분산투자 즉시 시작</div>
-          <div class="rmimp-b">현재 구조는 투자가 아니라 테슬라에 베팅. 신규 자금부터 ETF 분산 시작. TSLA 비중을 점진적으로 30% 이하로 낮출 것.</div>
-        </div>
-        <div class="rmimp">
-          <div class="rmimp-t">② 카카오뱅크 계좌 전략 수정 필요</div>
-          <div class="rmimp-b">Fidelity +58.61% vs 카카오뱅크 +1.86%. 두 계좌의 매수 단가 격차가 너무 큼. 카카오뱅크 추가 매수 즉시 중단, 환율 유리 시 Fidelity로 일원화 검토.</div>
-        </div>
-        <div class="rmimp">
-          <div class="rmimp-t">③ 출구 전략(Exit Strategy) 수립 필요</div>
-          <div class="rmimp-b">$750 도달 시 Fidelity 분 30% 익절 → 분산 투자 재원 확보. $1,000 도달 시 전체 포트폴리오 리밸런싱. 지금 계획을 세워야 감정적 매도를 방지할 수 있음.</div>
-        </div>
-        <div class="rmimp">
-          <div class="rmimp-t">④ 월 저축액이 수익률보다 더 중요</div>
-          <div class="rmimp-b">투자 수익만으로 10억 달성은 현실적으로 어려움. 월 소득 → 저축 → 투자의 선순환 구조 구축이 핵심. 현재 월 저축 가능 금액 파악이 먼저.</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 타임라인 -->
-    <div class="rmsec" style="margin-bottom:0">
-      <div class="rmsec-t">📅 단계별 타임라인</div>
-      <div class="rmtl">
-        <div class="rmtl-item"><div class="rmtl-dot" style="background:#58a6ff"></div><div><div class="rmtl-yr">2026 (현재) — ₩95.7M</div><div class="rmtl-desc">분산투자 시작 · 월 저축 극대화 · TSLA 추가 매수 중단</div></div></div>
-        <div class="rmtl-item"><div class="rmtl-dot" style="background:#d29922"></div><div><div class="rmtl-yr">2027 <span class="rmtl-tgt">목표 ₩200~230M</span></div><div class="rmtl-desc">ETF 비중 30%까지 확대 · TSLA $550 도달 시 Fidelity 일부 익절</div></div></div>
-        <div class="rmtl-item"><div class="rmtl-dot" style="background:#3fb950"></div><div><div class="rmtl-yr">2028 <span class="rmtl-tgt">목표 ₩350~500M (5억)</span></div><div class="rmtl-desc">TSLA $750 목표 · 분산 포트폴리오 리밸런싱 · (5억은 TSLA $1,000 + 월 ₩1,000만 저축 조건)</div></div></div>
-        <div class="rmtl-item"><div class="rmtl-dot" style="background:#f85149"></div><div><div class="rmtl-yr">2029~2030 <span class="rmtl-tgt">목표 ₩700M~1B (10억)</span></div><div class="rmtl-desc">복리 효과 극대화 · TSLA 비중 20% 이하로 낮추고 수익 실현분 안정 자산 전환</div></div></div>
-      </div>
-      <div class="rmwarn" style="margin-top:12px">💡 <strong>한 줄 요약</strong>: 현재 포트폴리오는 TSLA가 오르면 대박, 내리면 쪽박인 구조. 10억 목표 달성을 위해서는 <strong>① 분산투자 즉시 시작 ② 월 800만원 이상 추가 저축 ③ 카카오뱅크 고점 물량 전략 수정</strong> — 이 세 가지가 반드시 전제되어야 합니다.</div>
     </div>
   </div>
 
-</div>
+  <!-- ROW 5: AI PREDICTIONS -->
+  <div class="card p-5">
+    <div class="flex items-center gap-2 mb-1">
+      <i data-lucide="brain" class="w-4 h-4 text-violet-400"></i>
+      <h2 class="text-white font-bold text-sm">AI 주가 예측 — 헤지펀드 20년+ 관점</h2>
+      <span class="text-xs bg-violet-900 text-violet-300 px-2 py-0.5 rounded-full font-medium">LIVE</span>
+    </div>
+    <p class="text-slate-400 text-xs mb-5">Fundamental · Macro · Industry Dynamics · Historical Patterns 종합 분석</p>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div class="rounded-xl p-4 g-purple border border-violet-900">
+        <div class="flex justify-between items-start mb-3">
+          <div><div class="text-violet-300 font-black text-lg">2028년 전망</div><div class="text-slate-400 text-xs">~3년 후 · 자율주행 상용화 초기</div></div>
+          <div class="text-right"><div class="text-2xl font-black text-white">$680</div><div class="text-violet-300 text-xs">베이스케이스</div></div>
+        </div>
+        <div class="space-y-1.5 mb-3 text-xs">
+          <div class="flex items-start gap-2"><span class="text-green-400 font-bold whitespace-nowrap">🐂 Bull $900-1,200</span><span class="text-slate-400">FSD v5 로보택시 대규모 수익화 달성</span></div>
+          <div class="flex items-start gap-2"><span class="text-blue-400 font-bold whitespace-nowrap">📊 Base $580-780</span><span class="text-slate-400">EV 30%+ 점유 + 에너지 연 50% 성장</span></div>
+          <div class="flex items-start gap-2"><span class="text-red-400 font-bold whitespace-nowrap">🐻 Bear $250-400</span><span class="text-slate-400">중국 경쟁 심화 + 마진 압박 지속</span></div>
+        </div>
+        <div class="border-t border-violet-900 pt-3 text-xs text-slate-300 leading-relaxed">
+          <strong class="text-violet-300">핵심 드라이버:</strong> FSD 완전 자율주행 상용화 여부가 최대 변수. 로보택시 서비스 스케일업 시 P/E 재평가 기대. Megapack 에너지 사업 연 50%+ 성장 지속 여부 핵심.
+        </div>
+        <div class="mt-3 p-2.5 rounded-lg bg-violet-950 border border-violet-800">
+          <div class="text-xs text-violet-300 font-bold">포트폴리오 영향 (166.502주)</div>
+          <div class="text-sm text-white mt-0.5" id="ai-2028">베이스 $680 → <span class="font-black text-violet-200">$113,221</span></div>
+        </div>
+      </div>
+      <div class="rounded-xl p-4 g-amber border border-amber-900">
+        <div class="flex justify-between items-start mb-3">
+          <div><div class="text-amber-300 font-black text-lg">2030년 전망</div><div class="text-slate-400 text-xs">~5년 후 · AI/로봇 성숙기</div></div>
+          <div class="text-right"><div class="text-2xl font-black text-white">$1,200</div><div class="text-amber-300 text-xs">베이스케이스</div></div>
+        </div>
+        <div class="space-y-1.5 mb-3 text-xs">
+          <div class="flex items-start gap-2"><span class="text-green-400 font-bold whitespace-nowrap">🐂 Bull $2,000-3,500</span><span class="text-slate-400">Optimus 로봇 + 완전자율주행 시장 지배</span></div>
+          <div class="flex items-start gap-2"><span class="text-blue-400 font-bold whitespace-nowrap">📊 Base $1,000-1,500</span><span class="text-slate-400">EV+에너지+AI 복합 성장 실현</span></div>
+          <div class="flex items-start gap-2"><span class="text-red-400 font-bold whitespace-nowrap">🐻 Bear $400-650</span><span class="text-slate-400">기술 지연 + 경쟁 심화 + 거시 악화</span></div>
+        </div>
+        <div class="border-t border-amber-900 pt-3 text-xs text-slate-300 leading-relaxed">
+          <strong class="text-amber-300">핵심 드라이버:</strong> Optimus 휴머노이드 로봇 상용화가 2030년 게임체인저. 로보택시 수익 $50B+ 달성 시 시가총액 $3T 가능. 글로벌 에너지저장 시장 50GWh+ 점유가 베이스케이스 핵심.
+        </div>
+        <div class="mt-3 p-2.5 rounded-lg bg-amber-950 border border-amber-800">
+          <div class="text-xs text-amber-300 font-bold">포트폴리오 영향 (166.502주)</div>
+          <div class="text-sm text-white mt-0.5" id="ai-2030">베이스 $1,200 → <span class="font-black text-amber-200">$199,802</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="mt-4 p-3 rounded-lg bg-slate-900 border border-slate-800 text-xs text-slate-400">
+      ⚠️ 본 예측은 AI 분석 모델의 추정치이며 투자 권유가 아닙니다. 실제 주가는 예측과 크게 다를 수 있으며, 모든 투자 결정의 책임은 본인에게 있습니다.
+    </div>
+  </div>
+
+</main>
+
+<footer class="border-t border-slate-800 mt-6 py-4 text-center text-slate-500 text-xs">
+  <div>TSLA 수익 극대화 전략 대시보드 · BUILD: 2026-05-04-v8</div>
+  <div class="mt-1">데이터: Yahoo Finance · 투자 결정의 책임은 본인에게 있습니다</div>
+</footer>
+
 <script>
-// ── 상수 ─────────────────────────────────────────────
-var KB_SH = 88.502134, KB_AV = 377.64, KB_COST = 49959897;
-var FD_SH = 78, FD_AV = 246.41, FD_COST = 19219.98;
-var STOP=357, T1=550, T2=750, T3=950, T4=1000;
+// ==================== CONSTANTS ====================
+const KB={shares:88.502,avg:377.64},FD={shares:78,avg:246.41};
+const TOTAL=166.502,AVG=316.12,COST=TOTAL*AVG;
 
-// ── CORS 프록시 ───────────────────────────────────────
-var PROXY1 = 'https://corsproxy.io/?url=';
-var PROXY2 = 'https://api.allorigins.win/get?url=';
-var YFH    = ['query1.finance.yahoo.com', 'query2.finance.yahoo.com'];
-
-var _fx=1400, _myChart=null, _newsTs=0, _timer=null, _tick=10;
-var _curRange='1y', _curInt='1wk';
-
-// ── 핵심 fetch 함수 ───────────────────────────────────
-async function yf(path) {
-  var sep = path.indexOf('?')>-1 ? '&' : '?';
-  var bust = '_='+Date.now();
-
-  for (var hi=0; hi<YFH.length; hi++) {
-    try {
-      var url1 = 'https://'+YFH[hi]+path+sep+bust;
-      var res1 = await fetch(PROXY1+encodeURIComponent(url1), {cache:'no-store'});
-      if (res1.ok) {
-        var d1 = await res1.json();
-        if (d1 && d1.chart && !d1.chart.error && d1.chart.result && d1.chart.result[0]) {
-          return d1;
-        }
-      }
-    } catch(e1) {}
-
-    try {
-      var url2 = 'https://'+YFH[hi]+path+sep+bust;
-      var res2 = await fetch(PROXY2+encodeURIComponent(url2), {cache:'no-store'});
-      if (res2.ok) {
-        var w = await res2.json();
-        if (w && w.contents) {
-          var d2 = JSON.parse(w.contents);
-          if (d2 && d2.chart && !d2.chart.error && d2.chart.result && d2.chart.result[0]) {
-            return d2;
-          }
-        }
-      }
-    } catch(e2) {}
-  }
-  throw new Error('모든 Yahoo Finance 엔드포인트 응답 없음');
-}
-
-// ── 데이터 파싱 ───────────────────────────────────────
-async function getTSLA() {
-  var d = await yf('/v8/finance/chart/TSLA?interval=1m&range=1d&includePrePost=true');
-  var m = d.chart.result[0].meta;
-  return {
-    price:    parseFloat(m.regularMarketPrice)||0,
-    prev:     parseFloat(m.chartPreviousClose||m.previousClose||m.regularMarketPrice)||0,
-    post:     m.postMarketPrice  ? parseFloat(m.postMarketPrice)  : null,
-    pre:      m.preMarketPrice   ? parseFloat(m.preMarketPrice)   : null,
-    state:    m.marketState||'CLOSED'
-  };
-}
-
-async function getFX() {
-  var d = await yf('/v8/finance/chart/USDKRW%3DX?interval=1m&range=1d');
-  return parseFloat(d.chart.result[0].meta.regularMarketPrice)||1400;
-}
-
-async function getHist(range, interval) {
-  var d = await yf('/v8/finance/chart/TSLA?interval='+interval+'&range='+range);
-  var r = d.chart.result[0];
-  var tsList = r['timestamp'] || r['timestamps'] || null;
-  if (!tsList || tsList.length === 0) throw new Error('timestamp 데이터 없음');
-  var closeList = (r.indicators && r.indicators.quote && r.indicators.quote[0] && r.indicators.quote[0].close) || [];
-  return { tsList: tsList, closeList: closeList };
-}
-
-// ── 포맷 ────────────────────────────────────────────
-function u$(v,d){d=d||2;return '$'+v.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d})}
-function krw(v){var a=Math.abs(v);if(a>=1e8)return(v<0?'-':'')+'₩'+(a/1e8).toFixed(2)+'억';if(a>=1e6)return(v<0?'-':'')+'₩'+(a/1e6).toFixed(1)+'백만';return'₩'+Math.round(v).toLocaleString('ko-KR')}
-function pct(v){return(v>=0?'+':'')+v.toFixed(2)+'%'}
-function gc(v){return v>=0?'#3fb950':'#f85149'}
-function sp(v,t){return'<span style="color:'+gc(v)+'">'+t+'</span>'}
-
-// ── 렌더링 ───────────────────────────────────────────
-function render(tsla, fx) {
-  var st=tsla.state;
-  var eff=(st==='POST'&&tsla.post)?tsla.post:(st==='PRE'&&tsla.pre)?tsla.pre:tsla.price;
-  var ext=(st==='POST'||st==='PRE');
-
-  var mk=document.getElementById('MKT');
-  if(st==='REGULAR'){mk.className='mb reg';mk.textContent='정규장 거래중';}
-  else if(st==='POST'){mk.className='mb pst';mk.textContent='애프터마켓';}
-  else if(st==='PRE'){mk.className='mb pre';mk.textContent='프리마켓';}
-  else{mk.className='mb cls';mk.textContent='장 마감';}
-
-  var chg=eff-tsla.prev, cp=(chg/tsla.prev)*100;
-  document.getElementById('PRC').innerHTML=u$(eff)+(ext?'<span class="xt">'+(st==='POST'?'After':'Pre')+'</span>':'');
-  document.getElementById('CHG').innerHTML=sp(chg,(chg>=0?'+':'')+u$(chg)+' ('+pct(cp)+')');
-  document.getElementById('FX').textContent='₩'+fx.toFixed(0);
-  document.getElementById('UPD').textContent='업데이트: '+new Date().toLocaleTimeString('ko-KR');
-
-  var ke=KB_SH*eff, kk=ke*fx, kp=kk-KB_COST, kr=(kp/KB_COST)*100;
-  document.getElementById('KE').textContent=krw(kk);
-  document.getElementById('KU').textContent=u$(ke)+' (₩'+fx.toFixed(0)+')';
-  document.getElementById('KP').innerHTML=sp(kp,(kp>=0?'+':'')+krw(kp));
-  document.getElementById('KR').innerHTML=sp(kr,pct(kr));
-
-  var fe=FD_SH*eff, fk=fe*fx, fck=FD_COST*fx, fp=fe-FD_COST, fr=(fp/FD_COST)*100;
-  document.getElementById('FC').textContent=krw(fck)+' (환산)';
-  document.getElementById('FE').textContent=u$(fe);
-  document.getElementById('FK').textContent=krw(fk)+' (환산)';
-  document.getElementById('FP').innerHTML=sp(fp,(fp>=0?'+':'')+u$(fp));
-  document.getElementById('FR').innerHTML=sp(fr,pct(fr));
-
-  var te=kk+fk, tc=KB_COST+FD_COST*fx, tp=te-tc, tr2=(tp/tc)*100;
-  var teU=te/fx, tcU=tc/fx, tpU=tp/fx;
-  document.getElementById('CE').textContent=krw(te);
-  document.getElementById('CE2').textContent='≈ '+u$(teU,0);
-  document.getElementById('CC').textContent=krw(tc);
-  document.getElementById('CC2').textContent='≈ '+u$(tcU,0);
-  document.getElementById('CP').innerHTML=sp(tp,(tp>=0?'+':'')+krw(tp));
-  document.getElementById('CP2').innerHTML=sp(tpU,'≈ '+(tpU>=0?'+':'')+u$(tpU,0));
-  document.getElementById('CR').innerHTML=sp(tr2,pct(tr2));
-
-  var sg=document.getElementById('SIG');
-  if(eff<STOP){sg.className='sig ss';sg.textContent='⚠ 손절 검토';}
-  else if(eff<KB_AV){sg.className='sig ss';sg.textContent='주의';}
-  else if(eff<T1){sg.className='sig sh';sg.textContent='HOLD';}
-  else{sg.className='sig sb';sg.textContent='목표 달성 중 🎯';}
-
-  renderScenario(eff,fx);
-}
-
-function renderScenario(cur,fx) {
-  var tc=KB_COST+FD_COST*fx;
-  var rows=[
-    {ic:'🛑',lb:'손절선',tg:'~$357',usd:STOP},
-    {ic:'📍',lb:'현재가',tg:'실시간',usd:cur,now:true},
-    {ic:'⚡',lb:'단기 6~12M',tg:'~$550',usd:T1},
-    {ic:'🎯',lb:'중기 1~2Y',tg:'~$750',usd:T2},
-    {ic:'🚀',lb:'장기 2~3Y',tg:'~$950',usd:T3},
-    {ic:'🌟',lb:'2030 목표',tg:'~$1,000',usd:T4}
-  ];
-  var html='';
-  rows.forEach(function(row){
-    var kb=KB_SH*row.usd*fx, fd=FD_SH*row.usd*fx, tot=kb+fd;
-    var pnl=tot-tc, rate=(pnl/tc)*100;
-    var gap=row.usd-cur, gp=(gap/cur)*100;
-    var c=gc(pnl);
-    html+='<tr class="'+(row.now?'cr':'')+'"><td>'+row.ic+' '+row.lb+'<span class="stg">'+row.tg+'</span></td>';
-    html+='<td>'+(row.now?u$(row.usd):u$(row.usd,0))+'</td>';
-    html+='<td><span style="color:'+gc(gap)+'">'+(row.now?'—':(gap>=0?'+':'')+u$(gap,0)+' ('+pct(gp)+')')+'</span></td>';
-    html+='<td>'+krw(kb)+'</td>';
-    html+='<td>'+u$(FD_SH*row.usd,0)+' <span style="font-size:8px;color:#8b949e">('+krw(fd)+')</span></td>';
-    html+='<td><strong>'+krw(tot)+'</strong></td>';
-    html+='<td style="color:'+c+'">'+(pnl>=0?'+':'')+krw(pnl)+'</td>';
-    html+='<td style="color:'+c+';font-weight:700">'+pct(rate)+'</td></tr>';
-  });
-  document.getElementById('SB').innerHTML=html;
-  var p=Math.max(0,Math.min(100,(cur-STOP)/(T4-STOP)*100));
-  document.getElementById('PF').style.width=p+'%';
-  document.getElementById('PP').style.left=p+'%';
-  document.getElementById('PL').textContent='현재가: '+u$(cur);
-}
-
-// ── 차트 ─────────────────────────────────────────────
-function loadChart(range, interval, btn) {
-  _curRange=range; _curInt=interval;
-  document.querySelectorAll('.pb').forEach(function(b){b.classList.remove('on')});
-  if(btn) btn.classList.add('on');
-
-  var msg=document.getElementById('chartMsg');
-  var cvs=document.getElementById('chartEl');
-  msg.style.display='none'; cvs.style.display='block';
-
-  getHist(range,interval).then(function(data){
-    drawChart(data.tsList, data.closeList);
-  }).catch(function(err){
-    cvs.style.display='none';
-    msg.style.display='block';
-    msg.innerHTML='차트 로드 실패<br><span style="font-size:10px;color:#484f58">'+err.message+'</span><br><button class="btn" style="margin-top:6px" onclick="loadChart(\''+range+'\',\''+interval+'\',document.querySelector(\'.pb.on\'))">재시도</button>';
-  });
-}
-
-function drawChart(tsList, closeList) {
-  var labels=tsList.map(function(t){
-    var d=new Date(t*1000);
-    return d.toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
-  });
-  var closes=closeList.map(function(v){return (v!=null)?parseFloat(v.toFixed(2)):null;});
-
-  if(_myChart){_myChart.destroy();_myChart=null;}
-  var ctx=document.getElementById('chartEl').getContext('2d');
-  var g=ctx.createLinearGradient(0,0,0,230);
-  g.addColorStop(0,'rgba(31,111,235,.28)');
-  g.addColorStop(1,'rgba(31,111,235,0)');
-  _myChart=new Chart(ctx,{
-    type:'line',
-    data:{labels:labels,datasets:[{data:closes,borderColor:'#1f6feb',backgroundColor:g,borderWidth:2,pointRadius:0,tension:.3,fill:true,spanGaps:true}]},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return u$(c.parsed.y);}}}},
-      scales:{
-        x:{grid:{color:'#21262d'},ticks:{color:'#8b949e',maxTicksLimit:8,font:{size:9}}},
-        y:{grid:{color:'#21262d'},ticks:{color:'#8b949e',font:{size:9},callback:function(v){return u$(v,0);}}}
-      }
-    }
-  });
-}
-
-// ── 뉴스 ─────────────────────────────────────────────
-async function getNews() {
-  try {
-    var sep='?_='+Date.now();
-    var url='https://query1.finance.yahoo.com/v1/finance/search?q=TSLA&newsCount=12'+sep;
-    var res=await fetch(PROXY1+encodeURIComponent(url),{cache:'no-store'});
-    if(res.ok){
-      var d=await res.json();
-      if(d&&d.news&&d.news.length){
-        return d.news.map(function(n){return{title:n.title,link:n.link,src:n.publisher,date:n.providerPublishTime?new Date(n.providerPublishTime*1000).toLocaleString('ko-KR'):'',thumb:(n.thumbnail&&n.thumbnail.resolutions&&n.thumbnail.resolutions[0])?n.thumbnail.resolutions[0].url:null};});
-      }
-    }
-  } catch(e){}
-  try {
-    var rss='https://news.google.com/rss/search?q=Tesla+TSLA+stock&hl=en-US&gl=US&ceid=US:en';
-    var r2=await fetch(PROXY1+encodeURIComponent(rss),{cache:'no-store'});
-    if(r2.ok){
-      var txt=await r2.text();
-      var xml=new DOMParser().parseFromString(txt,'text/xml');
-      return Array.from(xml.querySelectorAll('item')).slice(0,10).map(function(i){return{title:i.querySelector('title')?i.querySelector('title').textContent:'',link:i.querySelector('link')?i.querySelector('link').textContent:'#',src:i.querySelector('source')?i.querySelector('source').textContent:'Google News',date:i.querySelector('pubDate')?i.querySelector('pubDate').textContent:'',thumb:null};});
-    }
-  } catch(e){}
-  return [];
-}
-
-function showNews(items){
-  var el=document.getElementById('NL');
-  if(!items.length){el.innerHTML='<div style="color:#8b949e;font-size:11px">뉴스를 불러올 수 없습니다.</div>';return;}
-  el.innerHTML=items.map(function(n){return'<a class="ni" href="'+n.link+'" target="_blank" rel="noopener">'+(n.thumb?'<img class="nth" src="'+n.thumb+'" loading="lazy" onerror="this.style.display=\'none\'">':'<div class="nph">📰</div>')+'<div class="nb"><div class="nt">'+n.title+'</div><div class="nm">'+n.src+(n.date?' · '+n.date:'')+'</div></div></a>';}).join('');
-}
-
-async function getYT(){
-  var chs=[{n:'오늘의 테슬라 뉴스',id:'UCXq7NNALDnqafn3KFvIyJKA'},{n:'준이츠 JOONITS',id:'UCXHqMzeT6P3_pH2U2ftXNzA'},{n:'Tesla Daily',id:'UCkr0nBaxoLp5Bi0t0k2dNhQ'},{n:'Sawyer Merritt',id:'UCPj7vXuMqR5_xSbEdq3WTDA'}];
-  var out=[];
-  for(var i=0;i<chs.length;i++){
+// ==================== PROXIES ====================
+const PROXIES=[
+  u=>`https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+  u=>`https://corsproxy.io/?${encodeURIComponent(u)}`,
+  u=>`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`
+];
+async function px(url){
+  for(const p of PROXIES){
     try{
-      var url='https://www.youtube.com/feeds/videos.xml?channel_id='+chs[i].id;
-      var res=await fetch(PROXY1+encodeURIComponent(url),{cache:'no-store'});
-      if(!res.ok) continue;
-      var txt=await res.text();
-      var xml=new DOMParser().parseFromString(txt,'application/xml');
-      var e=xml.querySelector('entry');
-      if(!e) continue;
-      var vid=e.querySelector('videoId')?e.querySelector('videoId').textContent:(e.querySelector('id')?e.querySelector('id').textContent.split(':').pop():'');
-      var ttl=e.querySelector('title')?e.querySelector('title').textContent:'';
-      if(vid) out.push({n:chs[i].n,title:ttl,vid:vid});
-    }catch(e2){}
+      const r=await fetch(p(url),{signal:AbortSignal.timeout(8000)});
+      if(r.ok)return await r.json();
+    }catch(e){continue;}
   }
-  return out;
+  throw new Error('proxies failed');
 }
 
-function showYT(vids){
-  var el=document.getElementById('YL');
-  if(!vids.length){
-    el.innerHTML='<a class="yi" href="https://www.youtube.com/results?search_query=TSLA+stock+2026" target="_blank" rel="noopener"><div class="yt2">🔍</div><div class="ytt">YouTube: TSLA stock 2026</div><div class="ytc">최신 분석 →</div></a><a class="yi" href="https://www.youtube.com/results?search_query=Tesla+long+term+2030" target="_blank" rel="noopener"><div class="yt2">🔍</div><div class="ytt">Tesla long term 2030</div><div class="ytc">장기투자 분석 →</div></a>';
-    return;
+// ==================== MATH ====================
+function calcRSI(c,n=14){
+  if(c.length<n+1)return null;
+  const d=c.slice(1).map((v,i)=>v-c[i]);
+  const g=d.map(v=>Math.max(v,0)),l=d.map(v=>Math.max(-v,0));
+  let ag=g.slice(0,n).reduce((a,b)=>a+b)/n,al=l.slice(0,n).reduce((a,b)=>a+b)/n;
+  for(let i=n;i<g.length;i++){ag=(ag*(n-1)+g[i])/n;al=(al*(n-1)+l[i])/n;}
+  return al===0?100:+(100-100/(1+ag/al)).toFixed(1);
+}
+function calcEMA(c,n){
+  if(c.length<n)return null;
+  const k=2/(n+1);let e=c.slice(0,n).reduce((a,b)=>a+b)/n;
+  for(let i=n;i<c.length;i++)e=c[i]*k+e*(1-k);
+  return +e.toFixed(2);
+}
+function calcMA(c,n){return c.length<n?null:+(c.slice(-n).reduce((a,b)=>a+b)/n).toFixed(2);}
+function calcHV30(c){
+  if(c.length<31)return null;
+  const s=c.slice(-31),r=s.slice(1).map((v,i)=>Math.log(v/s[i]));
+  const m=r.reduce((a,b)=>a+b)/r.length;
+  const v=r.reduce((a,b)=>a+(b-m)**2,0)/(r.length-1);
+  return +(Math.sqrt(v*252)*100).toFixed(1);
+}
+function calcMACD(c){
+  const e12=calcEMA(c,12),e26=calcEMA(c,26);
+  if(!e12||!e26)return null;
+  return{line:+(e12-e26).toFixed(2),e12,e26};
+}
+function calcFGI(rsi14,ma50p,ma200p,macdH,momP){
+  const rs=Math.max(0,Math.min(100,rsi14));
+  const m5=Math.max(0,Math.min(100,50+ma50p*2));
+  const m2=Math.max(0,Math.min(100,50+ma200p*1.5));
+  const mc=macdH>0?Math.min(100,50+Math.abs(macdH)/3*10):Math.max(0,50-Math.abs(macdH)/3*10);
+  const mo=Math.max(0,Math.min(100,50+momP*2));
+  return Math.round(rs*.30+m5*.20+m2*.20+mc*.15+mo*.15);
+}
+
+// ==================== HELPERS ====================
+const f$=(v,d=0)=>v==null||isNaN(v)?'$--':'$'+v.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+const fp=(v,d=1)=>v==null||isNaN(v)?'--%':(v>=0?'+':'')+v.toFixed(d)+'%';
+const cc=v=>v>=0?'text-green-400':'text-red-400';
+const el=id=>document.getElementById(id);
+function st(id,txt,cls){const e=el(id);if(!e)return;e.textContent=txt;if(cls!==undefined)e.className=cls;}
+function sh(id,html,cls){const e=el(id);if(!e)return;e.innerHTML=html;if(cls!==undefined)e.className=cls;}
+
+// ==================== GAUGE ====================
+function drawGauge(score){
+  score=Math.max(0,Math.min(100,score));
+  const p=score/100,ang=Math.PI-p*Math.PI;
+  const ex=+(100+80*Math.cos(ang)).toFixed(2),ey=+(100-80*Math.sin(ang)).toFixed(2);
+  const arc=el('g-arc');
+  if(arc){
+    if(score<=0)arc.setAttribute('d','M20,100 L20,100');
+    else if(score>=100)arc.setAttribute('d','M20,100 A80,80 0 1 0 180,100');
+    else arc.setAttribute('d',`M20,100 A80,80 0 ${score>50?1:0} 0 ${ex},${ey}`);
+    const col=score<=20?'#dc2626':score<=40?'#f97316':score<=60?'#eab308':score<=80?'#84cc16':'#22c55e';
+    arc.setAttribute('stroke',col);
+    el('g-score').style.fill=col;
   }
-  el.innerHTML=vids.map(function(v){return'<a class="yi" href="https://www.youtube.com/watch?v='+v.vid+'" target="_blank" rel="noopener"><div class="yt2"><img src="https://img.youtube.com/vi/'+v.vid+'/mqdefault.jpg" loading="lazy"></div><div class="ytt">'+v.title+'</div><div class="ytc">'+v.n+'</div></a>';}).join('');
+  const nd=el('g-needle');
+  if(nd)nd.setAttribute('transform',`rotate(${-90+p*180},100,100)`);
+  st('g-score',score.toString());
+  const lbl=score<=20?'극도의 공포':score<=40?'공포':score<=60?'중립':score<=80?'탐욕':'극도의 탐욕';
+  st('g-label',lbl);
+  const rec=score<=20?'📢 <strong class="text-green-400">강력 매수 시그널</strong> — 극도 공포는 역사적 최적 매수 시점':
+    score<=40?'📈 <strong class="text-green-400">매수 권장</strong> — 공포 구간, 분할 매수 전략 실행':
+    score<=60?'⚖️ <strong class="text-yellow-400">관망/홀딩</strong> — 중립 구간, 현 포지션 유지':
+    score<=80?'⚠️ <strong class="text-orange-400">부분 익절 고려</strong> — 탐욕 구간, 일부 이익 실현 검토':
+    '🔴 <strong class="text-red-400">분할 매도 시그널</strong> — 극도 탐욕, 고점 근접 가능성';
+  sh('fg-rec',rec);
+  st('fg-time','업데이트: '+new Date().toLocaleTimeString('ko-KR'));
 }
 
-function tab(t){
-  document.querySelectorAll('.tb').forEach(function(b,i){b.classList.toggle('on',(i===0&&t==='news')||(i===1&&t==='yt'));});
-  document.getElementById('TN').classList.toggle('on',t==='news');
-  document.getElementById('TY').classList.toggle('on',t==='yt');
+// ==================== PRICE UI ====================
+function updatePriceUI(price,chg,chgP,h52,l52){
+  st('h-price',f$(price,2));
+  sh('h-chg',(chg>=0?'+':'')+Math.abs(chg).toFixed(2)+'  ('+fp(chgP)+')','text-xs '+(chg>=0?'text-green-400':'text-red-400'));
+  const pv=TOTAL*price,pnl=pv-COST,pnlP=pnl/COST*100,td=TOTAL*chg;
+  st('pf-val',f$(pv,0));
+  sh('pf-pnl-pct','수익률: '+fp(pnlP),'text-xs mt-1 '+cc(pnl));
+  sh('pf-gain',(pnl>=0?'+':'')+f$(pnl,0),'text-xl font-black '+cc(pnl));
+  st('pf-cost','원금: '+f$(COST,0));
+  const vsA=(price-AVG)/AVG*100;
+  sh('pf-vs-avg',fp(vsA),'text-xl font-black '+cc(vsA));
+  sh('pf-today',(td>=0?'+':'')+f$(td,0),'text-xl font-black '+cc(td));
+  sh('pf-today-pct',fp(chgP)+' · 166.502주','text-xs mt-1 '+cc(td));
+  // DCA bars
+  const barA=Math.max(2,Math.min(98,50+vsA));
+  st('dca-avg-pct',fp(vsA));
+  el('dca-avg-pct').className='font-bold text-sm '+cc(vsA);
+  el('dca-avg-bar').style.width=barA+'%';
+  el('dca-avg-bar').style.background=vsA<0?'#22c55e':'#f97316';
+  if(h52&&l52){
+    const pos=((price-l52)/(h52-l52)*100);
+    st('dca-52w-pct',pos.toFixed(0)+'%');
+    el('dca-52w-bar').style.width=Math.max(2,Math.min(98,pos))+'%';
+    st('d-low','저: '+f$(l52,0));st('d-high','고: '+f$(h52,0));
+  }
+  // DCA signal
+  let sig,det;
+  if(price<AVG*.85){sig='🟢 강력 매수 추천';det=`평단 대비 ${Math.abs(vsA).toFixed(1)}% 하락. 적극적 추가 매수 최적 시점.`;}
+  else if(price<AVG){sig='🔵 매수 권장';det=`평단($${AVG}) 아래. DCA 매수로 평단 낮추기 적합.`;}
+  else if(price<AVG*1.2){sig='🟡 소량 매수 가능';det='평단 소폭 상회. 하락 시 추가 매수 대기 권장.';}
+  else if(price<AVG*1.6){sig='🟠 홀딩 권장';det=`평단 대비 ${vsA.toFixed(1)}% 수익중. 현 포지션 유지.`;}
+  else{sig='🔴 부분 익절 고려';det=`${vsA.toFixed(1)}% 수익. 목표가 점검 및 분할 익절 전략 검토.`;}
+  st('dca-sig',sig);st('dca-det',det);
+  // Account P&L
+  const kp=KB.shares*(price-KB.avg),fdp=FD.shares*(price-FD.avg);
+  sh('kb-pnl',(kp>=0?'+':'')+f$(kp,0)+' ('+fp((price-KB.avg)/KB.avg*100)+')','text-xs mt-0.5 '+cc(kp));
+  sh('fd-pnl',(fdp>=0?'+':'')+f$(fdp,0)+' ('+fp((price-FD.avg)/FD.avg*100)+')','text-xs mt-0.5 '+cc(fdp));
+  // Price targets
+  [[500,'t500','text-blue-300'],[800,'t800','text-green-300'],[1000,'t1000','text-amber-300']].forEach(([t,pfx,tc])=>{
+    const tv=TOTAL*t,g=tv-COST,gp=g/COST*100,fc=(t-price)/price*100;
+    st(pfx,f$(tv,0));
+    sh(pfx+'g','+'+f$(g,0)+' (+'+gp.toFixed(0)+'%)',tc+' text-sm mt-1');
+    st(pfx+'f','현재가 대비 '+(fc>0?'+':'')+fc.toFixed(1)+'% '+(fc>0?'상승 필요':'이미 달성! 🎉'));
+  });
+  // Compound table
+  const cagrs=[20,30,40,50,60,80,100];
+  const rows=cagrs.map(c=>{
+    const cells=[1,2,3,4,5].map(y=>{
+      const fv=TOTAL*price*Math.pow(1+c/100,y);
+      const tc2=y===3?'text-blue-300':y===4?'text-green-300':y===5?'text-amber-300':'';
+      return `<td class="text-right py-1.5 px-3 ${tc2}">${f$(fv,0)}</td>`;
+    }).join('');
+    return`<tr class="border-b border-slate-900 hover:bg-slate-900/50 transition-colors"><td class="py-1.5 pr-4 font-bold text-slate-300">${c}%</td>${cells}</tr>`;
+  });
+  sh('ctable',rows.join(''));
+  st('ai-2028',`베이스 $680 → ${f$(TOTAL*680,0)}`);
+  st('ai-2030',`베이스 $1,200 → ${f$(TOTAL*1200,0)}`);
 }
 
-// ── 메인 ─────────────────────────────────────────────
-async function refreshPrice(){
+// ==================== TECHNICALS ====================
+function updateTechs(closes,price){
+  const r14=calcRSI(closes),m50=calcMA(closes,50),m200=calcMA(closes,200);
+  const mc=calcMACD(closes),hv=calcHV30(closes);
+  const mom=closes.length>=22?(price-closes[closes.length-22])/closes[closes.length-22]*100:null;
+  if(r14!==null){const rc=r14<30?'text-green-400':r14>70?'text-red-400':'text-yellow-400';st('i-rsi',r14.toString(),'font-bold text-xs '+rc);}
+  if(m50){const d=(price-m50)/m50*100;sh('i-ma50',fp(d),'font-bold text-xs '+cc(d));}
+  if(m200){const d=(price-m200)/m200*100;sh('i-ma200',fp(d),'font-bold text-xs '+cc(d));}
+  if(mc){sh('i-macd',(mc.line>=0?'+':'')+mc.line,'font-bold text-xs '+cc(mc.line));}
+  if(hv){st('i-hv30',hv+'%','font-bold text-xs text-slate-300');st('iv-hv',hv+'%');}
+  if(mom!==null){sh('i-mom',fp(mom),'font-bold text-xs '+cc(mom));}
+  const score=calcFGI(r14||50,m50?(price-m50)/m50*100:0,m200?(price-m200)/m200*100:0,mc?mc.line:0,mom||0);
+  drawGauge(score);
+  // IV-HV spread (only if IV loaded)
+  const ivEl=el('iv-val');
+  if(ivEl&&hv&&ivEl.textContent!=='--'){
+    const ivN=parseFloat(ivEl.textContent);
+    if(!isNaN(ivN)){
+      const sp=(ivN-hv).toFixed(1);
+      sh('iv-spread',(sp>0?'+':'')+sp+'%','font-medium text-xs '+(sp>10?'text-red-400':sp<0?'text-green-400':'text-yellow-400'));
+    }
+  }
+}
+
+// ==================== OPTIONS ====================
+async function fetchOpts(){
   try{
-    var r=await Promise.all([getTSLA(),getFX()]);
-    _fx=r[1]; render(r[0],r[1]);
+    const d=await px('https://query1.finance.yahoo.com/v7/finance/options/TSLA');
+    const res=d?.optionChain?.result?.[0];if(!res)throw new Error();
+    const cp=res.quote?.regularMarketPrice||0;
+    const calls=res.options?.[0]?.calls||[],puts=res.options?.[0]?.puts||[];
+    const coi=calls.reduce((a,c)=>a+(c.openInterest||0),0);
+    const poi=puts.reduce((a,c)=>a+(c.openInterest||0),0);
+    const tot=coi+poi;
+    const cpct=tot>0?(coi/tot*100).toFixed(1):'50',ppct=tot>0?(poi/tot*100).toFixed(1):'50';
+    const pcr2=coi>0?(poi/coi).toFixed(2):'--';
+    st('call-pct',cpct+'% ('+Math.round(coi/1000)+'K)');
+    st('put-pct',ppct+'% ('+Math.round(poi/1000)+'K)');
+    el('call-bar').style.width=cpct+'%';
+    el('put-bar').style.width=ppct+'%';
+    st('pcr',pcr2);
+    st('total-oi',Math.round(tot/1000)+'K');
+    const pcrN=parseFloat(pcr2);
+    const sent=pcrN<0.7?'🐂 강세 (콜 우세)':pcrN<1.0?'📊 약간 강세':pcrN<1.3?'⚖️ 중립':'🐻 약세 (풋 우세)';
+    const sentC=pcrN<0.7?'text-green-400':pcrN<1.0?'text-lime-400':pcrN<1.3?'text-yellow-400':'text-red-400';
+    sh('opt-sent',sent,'font-bold text-xs '+sentC);
+    const exp=res.options?.[0]?.expirationDate;
+    st('opt-note',exp?'만기: '+new Date(exp*1000).toLocaleDateString('ko-KR'):'');
+    // Call Wall
+    const near=calls.filter(c=>c.strike>=cp*.8&&c.strike<=cp*1.6).sort((a,b)=>(b.openInterest||0)-(a.openInterest||0)).slice(0,9);
+    const maxOI=near[0]?.openInterest||1;
+    sh('call-wall',near.map(c=>{
+      const oi=c.openInterest||0,bw=(oi/maxOI*100).toFixed(0);
+      const isATM=Math.abs(c.strike-cp)<cp*.025,above=c.strike>cp;
+      const bc=isATM?'#f59e0b':above?'#ef4444':'#22c55e';
+      const tag=isATM?'<span class="text-amber-400 font-bold text-xs">ATM</span>':above?'<span class="text-red-400 text-xs">저항</span>':'<span class="text-green-400 text-xs">지지</span>';
+      return`<div class="flex items-center gap-2"><span class="text-xs w-14 text-right ${isATM?'text-amber-400 font-bold':'text-slate-400'}">${f$(c.strike,0)}</span><div class="flex-1 bg-slate-800 rounded-full h-1.5"><div class="h-1.5 rounded-full" style="width:${bw}%;background:${bc}"></div></div><span class="text-slate-400 text-xs w-10 text-right">${(oi/1000).toFixed(1)}K</span>${tag}</div>`;
+    }).join('')||'<div class="text-slate-500 text-xs text-center py-2">데이터 없음</div>');
+    // IV from ATM call
+    const atm=calls.find(c=>Math.abs(c.strike-cp)<cp*.05);
+    if(atm?.impliedVolatility){
+      const ivN=+(atm.impliedVolatility*100).toFixed(1);
+      sh('iv-val',ivN+'%','text-5xl font-black '+(ivN>80?'text-red-400':ivN<50?'text-green-400':'text-white'));
+      const pct=Math.max(0,Math.min(100,(ivN-40)/80*100));
+      st('iv-pctile',pct.toFixed(0)+'%ile','font-bold '+(pct>70?'text-red-400':pct<30?'text-green-400':'text-yellow-400'));
+      el('iv-bar').style.width=pct+'%';
+      el('iv-bar').style.background=pct>70?'#ef4444':pct<30?'#22c55e':'#f59e0b';
+      const ivSig=pct<25?'<span class="text-green-400 font-bold">📉 IV 저점 — 콜 옵션 매수 적기</span>':
+        pct<50?'<span class="text-lime-400 font-bold">📊 IV 정상범위</span>':
+        pct<75?'<span class="text-yellow-400 font-bold">⚠️ IV 높음 — 옵션 프리미엄 주의</span>':
+        '<span class="text-red-400 font-bold">🔴 IV 극고점 — 대변동 임박 신호</span>';
+      sh('iv-sig',ivSig);
+    }
   }catch(e){
-    document.getElementById('UPD').textContent='가격 갱신 실패 — 재시도 중...';
+    sh('call-wall','<div class="text-slate-500 text-xs text-center py-4">옵션 데이터 로딩 실패<br><span class="text-slate-600">Yahoo Finance 직접 접속 권장</span></div>');
   }
 }
 
-async function refreshMedia(){
-  if(Date.now()-_newsTs<30*60*1000) return;
-  _newsTs=Date.now();
-  showYT([]);
-  getNews().then(showNews).catch(function(){showNews([]);});
-  getYT().then(function(v){if(v.length)showYT(v);}).catch(function(){});
-}
-
-async function init(){
-  document.getElementById('loading').style.display='flex';
-  document.getElementById('app').style.display='none';
-  document.getElementById('lmsg').textContent='데이터 로딩 중...';
-
-  var tsla, fx;
-  try{
-    var res=await Promise.all([getTSLA(),getFX()]);
-    tsla=res[0]; fx=res[1]; _fx=fx;
-  }catch(e){
-    document.getElementById('loading').innerHTML=
-      '<div style="color:#f85149;text-align:center;padding:20px;line-height:2">가격 데이터 로드 실패<br><small style="color:#8b949e">'+e.message+'</small><br><button onclick="init()" class="btn" style="margin-top:8px">다시 시도</button></div>';
-    return;
+// ==================== MACRO ====================
+async function fetchMacro(){
+  const [t,d]=await Promise.allSettled([
+    px('https://query1.finance.yahoo.com/v8/finance/chart/%5ETNX?range=1d&interval=1d'),
+    px('https://query1.finance.yahoo.com/v8/finance/chart/DX-Y.NYB?range=1d&interval=1d')
+  ]);
+  if(t.status==='fulfilled'){
+    const q=t.value?.chart?.result?.[0]?.meta;
+    if(q){
+      const p=q.regularMarketPrice,pv=q.previousClose||q.chartPreviousClose,ch=+(p-pv).toFixed(3),cp=(ch/pv*100);
+      st('tnx',p?.toFixed(2)+'%');
+      sh('tnx-chg',(ch>=0?'▲':'▼')+Math.abs(ch).toFixed(3)+' ('+fp(cp)+')','text-xs mt-0.5 '+(ch>=0?'text-red-400':'text-green-400'));
+      st('tnx-imp',ch>0.05?'금리↑ → TSLA 성장주 압박':ch<-0.05?'금리↓ → 성장주 호재':'금리 안정 → 중립');
+    }
   }
-
-  render(tsla,fx);
-  document.getElementById('loading').style.display='none';
-  document.getElementById('app').style.display='block';
-
-  loadChart(_curRange, _curInt, document.querySelector('.pb.on'));
-
-  _newsTs=0; refreshMedia();
-
-  clearInterval(_timer); _tick=10;
-  _timer=setInterval(function(){
-    _tick--;
-    var el=document.getElementById('CD');
-    if(el) el.textContent=_tick+'초 후 갱신';
-    if(_tick<=0){_tick=10; refreshPrice(); refreshMedia();}
-  },1000);
+  if(d.status==='fulfilled'){
+    const q=d.value?.chart?.result?.[0]?.meta;
+    if(q){
+      const p=q.regularMarketPrice,pv=q.previousClose||q.chartPreviousClose,ch=+(p-pv).toFixed(2),cp=(ch/pv*100);
+      st('dxy',p?.toFixed(2));
+      sh('dxy-chg',(ch>=0?'▲':'▼')+Math.abs(ch).toFixed(2)+' ('+fp(cp)+')','text-xs mt-0.5 '+(ch>=0?'text-orange-400':'text-blue-400'));
+      st('dxy-imp',ch>0.3?'달러↑ → 해외매출 환차손':ch<-0.3?'달러↓ → 해외수익 호재':'달러 안정 → 중립');
+    }
+  }
+  sh('macro-ana','<strong class="text-emerald-400">현재 매크로 환경:</strong><br>• TSLA는 고성장 기술주로 <strong>금리에 민감</strong> — 10Y 수익률 하락 시 P/E 재평가 기대<br>• 달러 강세는 테슬라 유럽·중국 매출의 달러 환산을 <strong>감소</strong>시킴<br>• AI·로봇 테마 강세 지속 시 매크로 역풍에도 <strong>상대적 아웃퍼폼</strong> 가능');
 }
 
-window.addEventListener('load',init);
+// ==================== EVENTS ====================
+function setupEvents(){
+  const evts=[
+    {name:'💰 Q1 2026 실적 발표',date:new Date('2026-04-22T16:30:00-04:00'),col:'green'},
+    {name:'⚡ Tesla AI Day / 주주총회',date:new Date('2026-06-15T14:00:00-04:00'),col:'purple'},
+    {name:'🚗 Q2 2026 인도량 발표',date:new Date('2026-07-02T08:00:00-04:00'),col:'blue'},
+    {name:'💰 Q2 2026 실적 발표',date:new Date('2026-07-22T16:30:00-04:00'),col:'green'},
+    {name:'🤖 Optimus 업데이트 예정',date:new Date('2026-09-01T14:00:00-04:00'),col:'violet'},
+  ];
+  const cmap={blue:'border-blue-800 bg-blue-950',green:'border-green-800 bg-green-950',purple:'border-purple-800 bg-purple-950',violet:'border-violet-800 bg-violet-950'};
+  const tmap={blue:'text-blue-300',green:'text-green-300',purple:'text-purple-300',violet:'text-violet-300'};
+  function render(){
+    const n=new Date();
+    const upcoming=evts.filter(e=>e.date>=n).slice(0,4);
+    sh('events',upcoming.map(e=>{
+      const diff=e.date-n,dy=Math.floor(diff/864e5),hr=Math.floor(diff%864e5/36e5),mn=Math.floor(diff%36e5/6e4);
+      return`<div class="border rounded-lg p-3 ${cmap[e.col]||'border-slate-700 bg-slate-900'}"><div class="flex justify-between items-center"><div class="text-sm font-bold text-white">${e.name}</div><div class="text-right"><div class="text-xl font-black ${tmap[e.col]||'text-white'}">${dy}일</div><div class="text-xs text-slate-400">${hr}시간 ${mn}분</div></div></div><div class="text-xs text-slate-400 mt-1">${e.date.toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'})}</div></div>`;
+    }).join('')||'<div class="text-slate-500 text-xs text-center py-4">예정 이벤트 없음</div>');
+  }
+  render();setInterval(render,60000);
+}
+
+// ==================== MARKET STATUS ====================
+function updateMarketStatus(){
+  const n=new Date(),ny=new Date(n.toLocaleString('en-US',{timeZone:'America/New_York'}));
+  const h=ny.getHours(),m=ny.getMinutes(),dw=ny.getDay(),t=h*100+m,we=dw===0||dw===6;
+  let dot,lbl;
+  if(we){dot='bg-slate-500';lbl='주말 휴장';}
+  else if(t>=400&&t<930){dot='bg-yellow-400 pulse-dot';lbl='프리마켓';}
+  else if(t>=930&&t<1600){dot='bg-green-400 pulse-dot';lbl='정규장 OPEN';}
+  else if(t>=1600&&t<2000){dot='bg-blue-400';lbl='애프터마켓';}
+  else{dot='bg-slate-500';lbl='장 마감';}
+  el('mkt-dot').className='w-2 h-2 rounded-full '+dot;
+  st('mkt-label',lbl);
+}
+
+// ==================== MAIN FETCH ====================
+let busy=false;
+async function fetchTSLA(){
+  const d=await px('https://query1.finance.yahoo.com/v8/finance/chart/TSLA?range=1y&interval=1d');
+  const res=d?.chart?.result?.[0];if(!res)throw new Error('no result');
+  const m=res.meta,price=m.regularMarketPrice,prev=m.previousClose||m.chartPreviousClose;
+  const chg=+(price-prev).toFixed(2),chgP=(chg/prev*100);
+  const closes=(res.indicators?.quote?.[0]?.close||[]).filter(v=>v!=null);
+  updatePriceUI(price,chg,chgP,m.fiftyTwoWeekHigh,m.fiftyTwoWeekLow);
+  if(closes.length>0)updateTechs(closes,price);
+}
+
+async function refreshAll(){
+  if(busy)return;busy=true;
+  el('refresh-icon').classList.add('spin');
+  updateMarketStatus();
+  await Promise.allSettled([fetchTSLA(),fetchOpts(),fetchMacro()]);
+  el('refresh-icon').classList.remove('spin');
+  busy=false;
+}
+
+// ==================== INIT ====================
+document.addEventListener('DOMContentLoaded',()=>{
+  if(window.lucide)lucide.createIcons();
+  setupEvents();
+  refreshAll();
+  setInterval(refreshAll,5*60*1000);
+  setTimeout(()=>{if(window.lucide)lucide.createIcons();},1500);
+});
 </script>
 </body>
 </html>
