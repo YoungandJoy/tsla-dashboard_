@@ -400,25 +400,31 @@ const KB={shares:88.502,avg:377.64},FD={shares:78,avg:246.41};
 const TOTAL=166.502,AVG=316.12,COST=TOTAL*AVG;
 
 // ==================== PROXIES ====================
-// query2 fallback for same Yahoo Finance endpoints
 const Q2=u=>u.replace('query1.finance.yahoo.com','query2.finance.yahoo.com');
+// Safe encode: avoids double-encoding already-encoded sequences like %5E → %255E
+function safeEnc(u){return u.replace(/%[0-9A-Fa-f]{2}/g,m=>'\x01'+m).split('\x01').map((s,i)=>i===0?encodeURIComponent(s):s[0]+encodeURIComponent(s.slice(1))).join('').replace(/\x01/g,'');}
+// Cache-busting: appends _=timestamp to prevent stale proxy responses
+const cb=u=>u+(u.includes('?')?'&':'?')+'_='+Date.now();
 const PROXIES=[
-  u=>u,                                                                              // direct (works if no CORS restriction)
-  u=>Q2(u),                                                                         // query2 mirror
-  u=>`https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
-  u=>`https://api.allorigins.win/raw?url=${encodeURIComponent(Q2(u))}`,
-  u=>`https://corsproxy.io/?${encodeURIComponent(u)}`,
-  u=>`https://corsproxy.io/?${encodeURIComponent(Q2(u))}`,
-  u=>`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
-  u=>`https://thingproxy.freeboard.io/fetch/${u}`
+  u=>u,                                                            // 1. direct
+  u=>Q2(u),                                                        // 2. query2 mirror
+  u=>`https://api.allorigins.win/raw?url=${safeEnc(u)}`,          // 3. allorigins (safe-encoded)
+  u=>`https://api.allorigins.win/raw?url=${safeEnc(Q2(u))}`,      // 4. allorigins + q2
+  u=>`https://corsproxy.io/?${u}`,                                 // 5. corsproxy raw URL (no double-encoding)
+  u=>`https://corsproxy.io/?${Q2(u)}`,                             // 6. corsproxy + q2
+  u=>`https://api.codetabs.com/v1/proxy?quest=${safeEnc(u)}`,     // 7. codetabs
+  u=>`https://api.codetabs.com/v1/proxy?quest=${safeEnc(Q2(u))}`, // 8. codetabs + q2
+  u=>`https://thingproxy.freeboard.io/fetch/${u}`,                 // 9. thingproxy
+  u=>`https://cors.sh/${u}`,                                       // 10. cors.sh
 ];
 async function px(url){
+  const busted=cb(url); // add cache-buster once
   for(const p of PROXIES){
     try{
-      const r=await fetch(p(url),{signal:AbortSignal.timeout(7000),headers:{'Accept':'application/json'}});
+      const r=await fetch(p(busted),{signal:AbortSignal.timeout(5000)});
       if(!r.ok)continue;
       const txt=await r.text();
-      if(!txt||txt.startsWith('<'))continue; // HTML error page
+      if(!txt||txt.startsWith('<')||txt.startsWith('<!'))continue;
       return JSON.parse(txt);
     }catch(e){continue;}
   }
@@ -584,12 +590,18 @@ function updateTechs(closes,price){
 // ==================== OPTIONS ====================
 async function fetchOpts(){
   try{
-    // Try v7 first (has full OI data), fallback to v8
+    // Options chain is large (~5MB). Try v7 with near-term expiry only.
+    // Get nearest Friday expiry date (epoch seconds)
+    const now=new Date(),dow=now.getDay();
+    const daysToFri=dow<=5?(5-dow):(12-dow);
+    const fri=new Date(now);fri.setDate(now.getDate()+daysToFri);
+    const nearExp=Math.floor(fri.getTime()/1000);
     let d=null;
     for(const u of[
+      `https://query1.finance.yahoo.com/v7/finance/options/TSLA?date=${nearExp}`,
       'https://query1.finance.yahoo.com/v7/finance/options/TSLA',
+      `https://query2.finance.yahoo.com/v7/finance/options/TSLA?date=${nearExp}`,
       'https://query2.finance.yahoo.com/v7/finance/options/TSLA',
-      'https://query1.finance.yahoo.com/v8/finance/chart/TSLA?range=1d&interval=1d'
     ]){
       try{d=await px(u);if(d?.optionChain?.result?.[0])break;}catch(e){}
     }
@@ -645,44 +657,73 @@ async function fetchOpts(){
 }
 
 // ==================== MACRO ====================
+function applyTNX(p,pv){
+  const ch=+(p-pv).toFixed(3),cp=(ch/pv*100);
+  st('tnx',p.toFixed(2)+'%');
+  sh('tnx-chg',(ch>=0?'▲':'▼')+Math.abs(ch).toFixed(3)+' ('+fp(cp)+')','text-xs mt-0.5 '+(ch>=0?'text-red-400':'text-green-400'));
+  st('tnx-imp',ch>0.05?'금리↑ → TSLA 성장주 압박':ch<-0.05?'금리↓ → 성장주 호재':'금리 안정 → 중립');
+}
+function applyDXY(p,pv){
+  const ch=+(p-pv).toFixed(2),cp=(ch/pv*100);
+  st('dxy',p.toFixed(2));
+  sh('dxy-chg',(ch>=0?'▲':'▼')+Math.abs(ch).toFixed(2)+' ('+fp(cp)+')','text-xs mt-0.5 '+(ch>=0?'text-orange-400':'text-blue-400'));
+  st('dxy-imp',ch>0.3?'달러↑ → 해외매출 환차손':ch<-0.3?'달러↓ → 해외수익 호재':'달러 안정 → 중립');
+}
 async function fetchMacro(){
-  // Try TNX
-  let tnxOk=false;
-  for(const sym of['%5ETNX','TNX']){
+  let tnxOk=false,dxyOk=false;
+
+  // ① Primary: batch quote API — returns both symbols in ONE small JSON (~5KB vs chart's ~100KB)
+  //    Uses ^TNX (decoded) so encodeURIComponent in proxies doesn't double-encode %5E→%255E
+  try{
+    const d=await px('https://query1.finance.yahoo.com/v8/finance/quote?symbols=^TNX,DX-Y.NYB&fields=regularMarketPrice,regularMarketPreviousClose,regularMarketOpen');
+    for(const q of(d?.quoteResponse?.result||[])){
+      const p=q?.regularMarketPrice,pv=q?.regularMarketPreviousClose||q?.regularMarketOpen||p;
+      if(!p)continue;
+      if(q.symbol==='^TNX'){applyTNX(p,pv);tnxOk=true;}
+      else if(q.symbol==='DX-Y.NYB'){applyDXY(p,pv);dxyOk=true;}
+    }
+  }catch(e){}
+
+  // ② Fallback A: individual chart endpoints (^TNX decoded — safe for all proxies)
+  if(!tnxOk){
+    for(const sym of['^TNX','TNX']){
+      try{
+        const v=await px(`https://query1.finance.yahoo.com/v8/finance/chart/${sym}?range=1d&interval=1d`);
+        const m=v?.chart?.result?.[0]?.meta;
+        if(m?.regularMarketPrice){applyTNX(m.regularMarketPrice,m.previousClose||m.chartPreviousClose||m.regularMarketPrice);tnxOk=true;break;}
+      }catch(e){}
+    }
+  }
+  if(!dxyOk){
+    for(const sym of['DX-Y.NYB','DX=F']){
+      try{
+        const v=await px(`https://query1.finance.yahoo.com/v8/finance/chart/${sym}?range=1d&interval=1d`);
+        const m=v?.chart?.result?.[0]?.meta;
+        if(m?.regularMarketPrice){applyDXY(m.regularMarketPrice,m.previousClose||m.chartPreviousClose||m.regularMarketPrice);dxyOk=true;break;}
+      }catch(e){}
+    }
+  }
+
+  // ③ Fallback B: v10 quoteSummary (minimal price module, ~1KB)
+  if(!tnxOk){
     try{
-      const v=await px(`https://query1.finance.yahoo.com/v8/finance/chart/${sym}?range=1d&interval=1d`);
-      const q=v?.chart?.result?.[0]?.meta;
-      if(q?.regularMarketPrice){
-        const p=q.regularMarketPrice,pv=q.previousClose||q.chartPreviousClose||p,ch=+(p-pv).toFixed(3),cp=(ch/pv*100);
-        st('tnx',p.toFixed(2)+'%');
-        sh('tnx-chg',(ch>=0?'▲':'▼')+Math.abs(ch).toFixed(3)+' ('+fp(cp)+')','text-xs mt-0.5 '+(ch>=0?'text-red-400':'text-green-400'));
-        st('tnx-imp',ch>0.05?'금리↑ → TSLA 성장주 압박':ch<-0.05?'금리↓ → 성장주 호재':'금리 안정 → 중립');
-        tnxOk=true;break;
-      }
+      const v=await px('https://query1.finance.yahoo.com/v10/finance/quoteSummary/%5ETNX?modules=price');
+      const m=v?.quoteSummary?.result?.[0]?.price;
+      if(m?.regularMarketPrice?.raw){applyTNX(m.regularMarketPrice.raw,m.regularMarketPreviousClose?.raw||m.regularMarketPrice.raw);tnxOk=true;}
     }catch(e){}
   }
-  if(!tnxOk){st('tnx','--');st('tnx-chg','데이터 없음');}
-
-  // Try DXY (DX-Y.NYB then DX=F futures fallback)
-  let dxyOk=false;
-  for(const sym of['DX-Y.NYB','DX%3DF']){
+  if(!dxyOk){
     try{
-      const v=await px(`https://query1.finance.yahoo.com/v8/finance/chart/${sym}?range=1d&interval=1d`);
-      const q=v?.chart?.result?.[0]?.meta;
-      if(q?.regularMarketPrice){
-        const p=q.regularMarketPrice,pv=q.previousClose||q.chartPreviousClose||p,ch=+(p-pv).toFixed(2),cp=(ch/pv*100);
-        st('dxy',p.toFixed(2));
-        sh('dxy-chg',(ch>=0?'▲':'▼')+Math.abs(ch).toFixed(2)+' ('+fp(cp)+')','text-xs mt-0.5 '+(ch>=0?'text-orange-400':'text-blue-400'));
-        st('dxy-imp',ch>0.3?'달러↑ → 해외매출 환차손':ch<-0.3?'달러↓ → 해외수익 호재':'달러 안정 → 중립');
-        dxyOk=true;break;
-      }
+      const v=await px('https://query1.finance.yahoo.com/v10/finance/quoteSummary/DX-Y.NYB?modules=price');
+      const m=v?.quoteSummary?.result?.[0]?.price;
+      if(m?.regularMarketPrice?.raw){applyDXY(m.regularMarketPrice.raw,m.regularMarketPreviousClose?.raw||m.regularMarketPrice.raw);dxyOk=true;}
     }catch(e){}
   }
-  if(!dxyOk){st('dxy','--');st('dxy-chg','데이터 없음');}
 
-  // Timestamp
+  // Status timestamp
   const ts=new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
-  const el2=el('macro-updated');if(el2)el2.textContent=(tnxOk||dxyOk)?'업데이트: '+ts:'실시간 조회 실패';
+  const mu=el('macro-updated');
+  if(mu)mu.textContent=(tnxOk&&dxyOk)?'업데이트: '+ts:(tnxOk||dxyOk)?'일부 업데이트: '+ts:'API 차단 — 링크로 직접 확인';
 
   sh('macro-ana','<strong class="text-emerald-400">현재 매크로 환경:</strong><br>• TSLA는 고성장 기술주로 <strong>금리에 민감</strong> — 10Y 수익률 하락 시 P/E 재평가 기대<br>• 달러 강세는 테슬라 유럽·중국 매출의 달러 환산을 <strong>감소</strong>시킴<br>• AI·로봇 테마 강세 지속 시 매크로 역풍에도 <strong>상대적 아웃퍼폼</strong> 가능');
 }
