@@ -47,6 +47,7 @@ body{background:#020817}
       <div class="text-right">
         <div class="text-xl sm:text-2xl font-black text-white" id="h-price">$---.--</div>
         <div class="text-xs" id="h-chg">--</div>
+        <div class="text-xs mt-0.5 text-slate-400" id="h-ext" style="display:none"></div>
       </div>
       <button onclick="refreshAll()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors">
         <i data-lucide="refresh-cw" class="w-4 h-4 text-slate-400" id="refresh-icon"></i>
@@ -652,7 +653,16 @@ async function fetchOpts(){
       sh('iv-sig',ivSig);
     }
   }catch(e){
-    sh('call-wall','<div class="text-slate-500 text-xs text-center py-4">옵션 데이터 로딩 실패<br><span class="text-slate-600">Yahoo Finance 직접 접속 권장</span></div>');
+    sh('call-wall','<div class="text-slate-500 text-xs text-center py-4">옵션 체인 로드 실패<br><a href="https://finance.yahoo.com/quote/TSLA/options/" target="_blank" class="text-purple-400 underline text-xs">Yahoo Finance에서 직접 확인 →</a></div>');
+    // Fallback: try to get IV from Stooq for TSLA (volatility)
+    try{
+      const sq=await fetchStooqCSV('tsla.us');
+      // Compute simple "realized vol proxy" from stooq open vs close
+      if(sq.price&&sq.prev){
+        const rng=Math.abs(sq.price-sq.prev)/sq.prev*100;
+        st('iv-hv',rng.toFixed(1)+'%');
+      }
+    }catch(e2){}
   }
 }
 
@@ -669,24 +679,43 @@ function applyDXY(p,pv){
   sh('dxy-chg',(ch>=0?'▲':'▼')+Math.abs(ch).toFixed(2)+' ('+fp(cp)+')','text-xs mt-0.5 '+(ch>=0?'text-orange-400':'text-blue-400'));
   st('dxy-imp',ch>0.3?'달러↑ → 해외매출 환차손':ch<-0.3?'달러↓ → 해외수익 호재':'달러 안정 → 중립');
 }
+// Parse stooq CSV — free public data, direct CORS (no proxy needed)
+async function fetchStooqCSV(sym){
+  const r=await fetch(`https://stooq.com/q/l/?s=${sym}&f=sd2t2ohlcv&h&e=csv`,{signal:AbortSignal.timeout(5000)});
+  if(!r.ok)throw new Error('stooq_err');
+  const txt=await r.text();
+  const rows=txt.trim().split('\n');
+  if(rows.length<2)throw new Error('no_data');
+  const cols=rows[1].split(',');
+  const close=parseFloat(cols[5]),open=parseFloat(cols[2]);
+  if(isNaN(close))throw new Error('nan');
+  return{price:close,prev:open||close};
+}
 async function fetchMacro(){
   let tnxOk=false,dxyOk=false;
 
-  // ① Primary: batch quote API — returns both symbols in ONE small JSON (~5KB vs chart's ~100KB)
-  //    Uses ^TNX (decoded) so encodeURIComponent in proxies doesn't double-encode %5E→%255E
+  // ① Primary A: v7 quote API (batch, ~5KB, pre-encoded symbols to avoid proxy issues with ^)
   try{
-    const d=await px('https://query1.finance.yahoo.com/v8/finance/quote?symbols=^TNX,DX-Y.NYB&fields=regularMarketPrice,regularMarketPreviousClose,regularMarketOpen');
+    const d=await px('https://query1.finance.yahoo.com/v7/finance/quote?symbols=%5ETNX%2CDX-Y.NYB');
     for(const q of(d?.quoteResponse?.result||[])){
       const p=q?.regularMarketPrice,pv=q?.regularMarketPreviousClose||q?.regularMarketOpen||p;
       if(!p)continue;
-      if(q.symbol==='^TNX'){applyTNX(p,pv);tnxOk=true;}
+      if(q.symbol==='^TNX'||q.symbol==='TNX'){applyTNX(p,pv);tnxOk=true;}
       else if(q.symbol==='DX-Y.NYB'){applyDXY(p,pv);dxyOk=true;}
     }
   }catch(e){}
 
-  // ② Fallback A: individual chart endpoints (^TNX decoded — safe for all proxies)
+  // ① Primary B: Stooq CSV — public data, often bypasses CORS proxy entirely
   if(!tnxOk){
-    for(const sym of['^TNX','TNX']){
+    try{const s=await fetchStooqCSV('%5etnx');applyTNX(s.price,s.prev);tnxOk=true;}catch(e){}
+  }
+  if(!dxyOk){
+    try{const s=await fetchStooqCSV('dxy.f');applyDXY(s.price,s.prev);dxyOk=true;}catch(e){}
+  }
+
+  // ② Fallback: individual Yahoo chart API with %5ETNX (pre-encoded — avoids ^ in raw proxy URLs)
+  if(!tnxOk){
+    for(const sym of['%5ETNX']){
       try{
         const v=await px(`https://query1.finance.yahoo.com/v8/finance/chart/${sym}?range=1d&interval=1d`);
         const m=v?.chart?.result?.[0]?.meta;
@@ -695,7 +724,7 @@ async function fetchMacro(){
     }
   }
   if(!dxyOk){
-    for(const sym of['DX-Y.NYB','DX=F']){
+    for(const sym of['DX-Y.NYB','DX%3DF']){
       try{
         const v=await px(`https://query1.finance.yahoo.com/v8/finance/chart/${sym}?range=1d&interval=1d`);
         const m=v?.chart?.result?.[0]?.meta;
@@ -704,7 +733,7 @@ async function fetchMacro(){
     }
   }
 
-  // ③ Fallback B: v10 quoteSummary (minimal price module, ~1KB)
+  // ③ Fallback: v10 quoteSummary (price module only, ~1KB)
   if(!tnxOk){
     try{
       const v=await px('https://query1.finance.yahoo.com/v10/finance/quoteSummary/%5ETNX?modules=price');
@@ -720,10 +749,10 @@ async function fetchMacro(){
     }catch(e){}
   }
 
-  // Status timestamp
+  // Status
   const ts=new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
   const mu=el('macro-updated');
-  if(mu)mu.textContent=(tnxOk&&dxyOk)?'업데이트: '+ts:(tnxOk||dxyOk)?'일부 업데이트: '+ts:'API 차단 — 링크로 직접 확인';
+  if(mu)mu.textContent=(tnxOk&&dxyOk)?'업데이트: '+ts:(tnxOk||dxyOk)?'일부: '+ts:'API 차단 — 링크 직접 확인';
 
   sh('macro-ana','<strong class="text-emerald-400">현재 매크로 환경:</strong><br>• TSLA는 고성장 기술주로 <strong>금리에 민감</strong> — 10Y 수익률 하락 시 P/E 재평가 기대<br>• 달러 강세는 테슬라 유럽·중국 매출의 달러 환산을 <strong>감소</strong>시킴<br>• AI·로봇 테마 강세 지속 시 매크로 역풍에도 <strong>상대적 아웃퍼폼</strong> 가능');
 }
@@ -756,10 +785,10 @@ function updateMarketStatus(){
   const h=ny.getHours(),m=ny.getMinutes(),dw=ny.getDay(),t=h*100+m,we=dw===0||dw===6;
   let dot,lbl;
   if(we){dot='bg-slate-500';lbl='주말 휴장';}
-  else if(t>=400&&t<930){dot='bg-yellow-400 pulse-dot';lbl='프리마켓';}
-  else if(t>=930&&t<1600){dot='bg-green-400 pulse-dot';lbl='정규장 OPEN';}
-  else if(t>=1600&&t<2000){dot='bg-blue-400';lbl='애프터마켓';}
-  else{dot='bg-slate-500';lbl='장 마감';}
+  else if(t>=400&&t<930){dot='bg-yellow-400 pulse-dot';lbl='⏰ 프리마켓 (04:00~09:30 ET)';}
+  else if(t>=930&&t<1600){dot='bg-green-400 pulse-dot';lbl='🟢 정규장 OPEN';}
+  else if(t>=1600&&t<2000){dot='bg-blue-400 pulse-dot';lbl='🌙 애프터마켓 (16:00~20:00 ET)';}
+  else{dot='bg-slate-500';lbl='⏸ 장 마감';}
   el('mkt-dot').className='w-2 h-2 rounded-full '+dot;
   st('mkt-label',lbl);
 }
@@ -774,6 +803,20 @@ async function fetchTSLA(){
   const closes=(res.indicators?.quote?.[0]?.close||[]).filter(v=>v!=null);
   updatePriceUI(price,chg,chgP,m.fiftyTwoWeekHigh,m.fiftyTwoWeekLow);
   if(closes.length>0)updateTechs(closes,price);
+  // ── Pre / After-market ──
+  const ext=el('h-ext');
+  if(ext){
+    const ms=m.marketState;
+    if(ms==='PRE'&&m.preMarketPrice){
+      const pp=m.preMarketPrice,pc=+(m.preMarketChange||0).toFixed(2),pcp=+(m.preMarketChangePercent||0).toFixed(2);
+      ext.style.display='';
+      sh('h-ext','<span class="text-yellow-400 font-bold">▲ 프리마켓</span> '+f$(pp,2)+'  '+(pc>=0?'<span class="text-green-400">+'+pc+'</span>':'<span class="text-red-400">'+pc+'</span>')+' ('+fp(pcp)+')','text-xs mt-0.5');
+    } else if((ms==='POST'||ms==='POSTPOST')&&m.postMarketPrice){
+      const pp=m.postMarketPrice,pc=+(m.postMarketChange||0).toFixed(2),pcp=+(m.postMarketChangePercent||0).toFixed(2);
+      ext.style.display='';
+      sh('h-ext','<span class="text-blue-400 font-bold">▸ 애프터마켓</span> '+f$(pp,2)+'  '+(pc>=0?'<span class="text-green-400">+'+pc+'</span>':'<span class="text-red-400">'+pc+'</span>')+' ('+fp(pcp)+')','text-xs mt-0.5');
+    } else {ext.style.display='none';}
+  }
 }
 
 async function refreshAll(){
