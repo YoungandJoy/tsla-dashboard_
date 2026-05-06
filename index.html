@@ -66,7 +66,7 @@ body{background:#020817}
       <div class="flex items-center justify-between mb-3">
         <div>
           <div class="text-blue-400 text-xs font-semibold flex items-center gap-1 mb-0.5">
-            <i data-lucide="building-2" class="w-3 h-3"></i>KB증권 · 한국 계좌 <span class="text-slate-500 font-normal">(원화 기준)</span>
+            <i data-lucide="building-2" class="w-3 h-3"></i>한국투자증권 · 카카오뱅크 <span class="text-slate-500 font-normal">(원화 기준)</span>
           </div>
           <div class="text-slate-300 text-xs">88.502주 · 평단 <span class="text-white font-bold">$377.64</span></div>
         </div>
@@ -471,7 +471,7 @@ body{background:#020817}
 
 <script>
 // ==================== CONSTANTS ====================
-const KB={shares:88.502,avg:377.64},FD={shares:78,avg:246.41};
+const KB={shares:88.502,avg:377.64},FD={shares:78,avg:246.41}; // KB=한국투자(카카오뱅크), FD=Fidelity
 const TOTAL=166.502,AVG=316.12,COST=TOTAL*AVG;
 let USDKRW=1380; // 기본값 — fetchUSDKRW()로 실시간 갱신
 
@@ -913,9 +913,11 @@ let busy=false;
 async function fetchTSLA(){
   const d=await px('https://query1.finance.yahoo.com/v8/finance/chart/TSLA?range=1y&interval=1d');
   const res=d?.chart?.result?.[0];if(!res)throw new Error('no result');
-  const m=res.meta,price=m.regularMarketPrice,prev=m.previousClose||m.chartPreviousClose;
-  const chg=+(price-prev).toFixed(2),chgP=(chg/prev*100);
+  const m=res.meta,price=m.regularMarketPrice;
+  // regularMarketPreviousClose = 진짜 전일 종가 (chartPreviousClose는 1년 전 첫 종가라 오류 발생)
   const closes=(res.indicators?.quote?.[0]?.close||[]).filter(v=>v!=null);
+  const prev=m.regularMarketPreviousClose||m.previousClose||(closes.length>=2?closes[closes.length-2]:price);
+  const chg=+(price-prev).toFixed(2),chgP=(chg/prev*100);
   updatePriceUI(price,chg,chgP,m.fiftyTwoWeekHigh,m.fiftyTwoWeekLow);
   if(closes.length>0)updateTechs(closes,price);
   // ── Pre / After-market ──
