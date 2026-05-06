@@ -58,28 +58,102 @@ body{background:#020817}
 
 <main class="max-w-7xl mx-auto px-4 py-5 space-y-5">
 
-  <!-- PORTFOLIO SUMMARY CARDS -->
-  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-    <div class="card p-4">
-      <div class="text-slate-400 text-xs mb-1.5 flex items-center gap-1"><i data-lucide="wallet" class="w-3 h-3"></i>현재 자산가치</div>
-      <div class="text-xl font-black text-white" id="pf-val">$--,---</div>
-      <div class="text-xs mt-1" id="pf-pnl-pct">수익률: --%</div>
+  <!-- ══ PORTFOLIO: 계좌별 분리 ══ -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+    <!-- ① KB증권 (한국 계좌) -->
+    <div class="card p-4" style="border-left:3px solid #3b82f6">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <div class="text-blue-400 text-xs font-semibold flex items-center gap-1 mb-0.5">
+            <i data-lucide="building-2" class="w-3 h-3"></i>KB증권 · 한국 계좌
+          </div>
+          <div class="text-slate-300 text-xs">88.502주 · 평단 <span class="text-white font-bold">$377.64</span></div>
+        </div>
+        <div class="text-right">
+          <div class="text-lg font-black text-white" id="kb-val">$--,---</div>
+          <div class="text-xs mt-0.5" id="kb-pnl-pct">수익률: --%</div>
+        </div>
+      </div>
+      <div class="grid grid-cols-3 gap-1.5">
+        <div class="card2 p-2 text-center">
+          <div class="text-slate-500 text-xs">평가손익</div>
+          <div class="font-bold text-xs mt-0.5" id="kb-gain">$--</div>
+        </div>
+        <div class="card2 p-2 text-center">
+          <div class="text-slate-500 text-xs">오늘 손익</div>
+          <div class="font-bold text-xs mt-0.5" id="kb-today">$--</div>
+        </div>
+        <div class="card2 p-2 text-center">
+          <div class="text-slate-500 text-xs">평단 대비</div>
+          <div class="font-bold text-xs mt-0.5" id="kb-vs-avg">--%</div>
+        </div>
+      </div>
+      <div class="mt-2 text-xs text-slate-600">원금: $33,411 (88.502 × $377.64)</div>
     </div>
-    <div class="card p-4">
-      <div class="text-slate-400 text-xs mb-1.5 flex items-center gap-1"><i data-lucide="trending-up" class="w-3 h-3"></i>총 평가손익</div>
-      <div class="text-xl font-black" id="pf-gain">$--,---</div>
-      <div class="text-xs mt-1 text-slate-400" id="pf-cost">원금: $--,---</div>
+
+    <!-- ② Fidelity (미국 계좌) -->
+    <div class="card p-4" style="border-left:3px solid #22c55e">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <div class="text-green-400 text-xs font-semibold flex items-center gap-1 mb-0.5">
+            <i data-lucide="landmark" class="w-3 h-3"></i>Fidelity · 미국 계좌
+          </div>
+          <div class="text-slate-300 text-xs">78주 · 평단 <span class="text-white font-bold">$246.41</span></div>
+        </div>
+        <div class="text-right">
+          <div class="text-lg font-black text-white" id="fd-val">$--,---</div>
+          <div class="text-xs mt-0.5" id="fd-pnl-pct">수익률: --%</div>
+        </div>
+      </div>
+      <div class="grid grid-cols-3 gap-1.5">
+        <div class="card2 p-2 text-center">
+          <div class="text-slate-500 text-xs">평가손익</div>
+          <div class="font-bold text-xs mt-0.5" id="fd-gain">$--</div>
+        </div>
+        <div class="card2 p-2 text-center">
+          <div class="text-slate-500 text-xs">오늘 손익</div>
+          <div class="font-bold text-xs mt-0.5" id="fd-today">$--</div>
+        </div>
+        <div class="card2 p-2 text-center">
+          <div class="text-slate-500 text-xs">평단 대비</div>
+          <div class="font-bold text-xs mt-0.5" id="fd-vs-avg">--%</div>
+        </div>
+      </div>
+      <div class="mt-2 text-xs text-slate-600">원금: $19,220 (78 × $246.41)</div>
     </div>
-    <div class="card p-4">
-      <div class="text-slate-400 text-xs mb-1.5 flex items-center gap-1"><i data-lucide="target" class="w-3 h-3"></i>평단 대비</div>
-      <div class="text-xl font-black" id="pf-vs-avg">+--.-%</div>
-      <div class="text-xs mt-1 text-slate-400">평단가: $316.12</div>
+
+    <!-- ③ Total Portfolio -->
+    <div class="card p-4" style="border-left:3px solid #f59e0b;background:linear-gradient(135deg,#1a1400 0%,#0f172a 100%)">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <div class="text-amber-400 text-xs font-semibold flex items-center gap-1 mb-0.5">
+            <i data-lucide="pie-chart" class="w-3 h-3"></i>Total Portfolio
+          </div>
+          <div class="text-slate-300 text-xs">166.502주 · 평단 <span class="text-white font-bold">$316.12</span></div>
+        </div>
+        <div class="text-right">
+          <div class="text-xl font-black text-white" id="pf-val">$--,---</div>
+          <div class="text-xs mt-0.5" id="pf-pnl-pct">수익률: --%</div>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-2 mb-2">
+        <div class="card2 p-2">
+          <div class="text-slate-500 text-xs">총 평가손익</div>
+          <div class="font-black text-sm mt-0.5" id="pf-gain">$--,---</div>
+        </div>
+        <div class="card2 p-2">
+          <div class="text-slate-500 text-xs">오늘 전체 손익</div>
+          <div class="font-black text-sm mt-0.5" id="pf-today">$---</div>
+        </div>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="text-xs text-slate-500" id="pf-cost">원금: $52,631</span>
+        <span class="text-xs font-bold" id="pf-vs-avg">평단 대비 --%</span>
+      </div>
+      <div class="text-xs mt-0.5 text-slate-500" id="pf-today-pct">166.502주 기준</div>
     </div>
-    <div class="card p-4">
-      <div class="text-slate-400 text-xs mb-1.5 flex items-center gap-1"><i data-lucide="activity" class="w-3 h-3"></i>오늘 손익</div>
-      <div class="text-xl font-black" id="pf-today">$---</div>
-      <div class="text-xs mt-1 text-slate-400" id="pf-today-pct">166.502주 기준</div>
-    </div>
+
   </div>
 
   <!-- ROW 1: FEAR & GREED + DCA -->
@@ -512,12 +586,26 @@ function updatePriceUI(price,chg,chgP,h52,l52){
   const pv=TOTAL*price,pnl=pv-COST,pnlP=pnl/COST*100,td=TOTAL*chg;
   st('pf-val',f$(pv,0));
   sh('pf-pnl-pct','수익률: '+fp(pnlP),'text-xs mt-1 '+cc(pnl));
-  sh('pf-gain',(pnl>=0?'+':'')+f$(pnl,0),'text-xl font-black '+cc(pnl));
+  sh('pf-gain',(pnl>=0?'+':'')+f$(pnl,0),'font-black text-sm mt-0.5 '+cc(pnl));
   st('pf-cost','원금: '+f$(COST,0));
   const vsA=(price-AVG)/AVG*100;
-  sh('pf-vs-avg',fp(vsA),'text-xl font-black '+cc(vsA));
-  sh('pf-today',(td>=0?'+':'')+f$(td,0),'text-xl font-black '+cc(td));
+  sh('pf-vs-avg','평단 대비 '+fp(vsA),'text-xs font-bold '+cc(vsA));
+  sh('pf-today',(td>=0?'+':'')+f$(td,0),'font-black text-sm mt-0.5 '+cc(td));
   sh('pf-today-pct',fp(chgP)+' · 166.502주','text-xs mt-1 '+cc(td));
+  // ── KB증권 계좌 ──
+  const kv=KB.shares*price,kCost=KB.shares*KB.avg,kPnl=kv-kCost,kPnlP=kPnl/kCost*100,kTd=KB.shares*chg,kVsA=(price-KB.avg)/KB.avg*100;
+  st('kb-val',f$(kv,0));
+  sh('kb-pnl-pct','수익률: '+fp(kPnlP),'text-xs mt-0.5 '+cc(kPnl));
+  sh('kb-gain',(kPnl>=0?'+':'')+f$(kPnl,0),'font-bold text-xs mt-0.5 '+cc(kPnl));
+  sh('kb-today',(kTd>=0?'+':'')+f$(kTd,0),'font-bold text-xs mt-0.5 '+cc(kTd));
+  sh('kb-vs-avg',fp(kVsA),'font-bold text-xs mt-0.5 '+cc(kVsA));
+  // ── Fidelity 계좌 ──
+  const fv=FD.shares*price,fCost=FD.shares*FD.avg,fPnl=fv-fCost,fPnlP=fPnl/fCost*100,fTd=FD.shares*chg,fVsA=(price-FD.avg)/FD.avg*100;
+  st('fd-val',f$(fv,0));
+  sh('fd-pnl-pct','수익률: '+fp(fPnlP),'text-xs mt-0.5 '+cc(fPnl));
+  sh('fd-gain',(fPnl>=0?'+':'')+f$(fPnl,0),'font-bold text-xs mt-0.5 '+cc(fPnl));
+  sh('fd-today',(fTd>=0?'+':'')+f$(fTd,0),'font-bold text-xs mt-0.5 '+cc(fTd));
+  sh('fd-vs-avg',fp(fVsA),'font-bold text-xs mt-0.5 '+cc(fVsA));
   // DCA bars
   const barA=Math.max(2,Math.min(98,50+vsA));
   st('dca-avg-pct',fp(vsA));
@@ -538,10 +626,10 @@ function updatePriceUI(price,chg,chgP,h52,l52){
   else if(price<AVG*1.6){sig='🟠 홀딩 권장';det=`평단 대비 ${vsA.toFixed(1)}% 수익중. 현 포지션 유지.`;}
   else{sig='🔴 부분 익절 고려';det=`${vsA.toFixed(1)}% 수익. 목표가 점검 및 분할 익절 전략 검토.`;}
   st('dca-sig',sig);st('dca-det',det);
-  // Account P&L
-  const kp=KB.shares*(price-KB.avg),fdp=FD.shares*(price-FD.avg);
-  sh('kb-pnl',(kp>=0?'+':'')+f$(kp,0)+' ('+fp((price-KB.avg)/KB.avg*100)+')','text-xs mt-0.5 '+cc(kp));
-  sh('fd-pnl',(fdp>=0?'+':'')+f$(fdp,0)+' ('+fp((price-FD.avg)/FD.avg*100)+')','text-xs mt-0.5 '+cc(fdp));
+  // Account P&L (legacy DCA section ids — still update if present)
+  const kp=kPnl,fdp=fPnl;
+  if(el('kb-pnl'))sh('kb-pnl',(kp>=0?'+':'')+f$(kp,0)+' ('+fp(kVsA)+')','text-xs mt-0.5 '+cc(kp));
+  if(el('fd-pnl'))sh('fd-pnl',(fdp>=0?'+':'')+f$(fdp,0)+' ('+fp(fVsA)+')','text-xs mt-0.5 '+cc(fdp));
   // Price targets
   [[500,'t500','text-blue-300'],[800,'t800','text-green-300'],[1000,'t1000','text-amber-300']].forEach(([t,pfx,tc])=>{
     const tv=TOTAL*t,g=tv-COST,gp=g/COST*100,fc=(t-price)/price*100;
