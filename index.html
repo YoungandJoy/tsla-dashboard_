@@ -507,6 +507,21 @@ async function px(url){
   throw new Error('all_proxies_failed');
 }
 
+// 병렬 프록시 레이싱: 모든 프록시를 동시에 시도, 가장 빠른 응답 사용
+// 순차(최대 50초) → 병렬(최대 4초)
+async function pxRace(url){
+  const busted=cb(url);
+  const attempts=PROXIES.map(p=>
+    fetch(p(busted),{signal:AbortSignal.timeout(4000)})
+      .then(r=>{if(!r.ok)throw new Error('http'+r.status);return r.text();})
+      .then(txt=>{
+        if(!txt||txt.startsWith('<')||txt.startsWith('<!'))throw new Error('html');
+        return JSON.parse(txt);
+      })
+  );
+  return Promise.any(attempts); // first success wins
+}
+
 // ==================== MATH ====================
 function calcRSI(c,n=14){
   if(c.length<n+1)return null;
@@ -682,21 +697,35 @@ function updateTechs(closes,price){
 // ==================== OPTIONS ====================
 async function fetchOpts(){
   try{
-    // Options chain is large (~5MB). Try v7 with near-term expiry only.
-    // Get nearest Friday expiry date (epoch seconds)
+    // 가장 가까운 금요일 만기 날짜 계산
     const now=new Date(),dow=now.getDay();
-    const daysToFri=dow<=5?(5-dow):(12-dow);
+    // dow=5(금요일) 이면서 오후라면 다음 금요일로
+    const daysToFri=dow===0?5:dow===6?6:dow===5&&now.getHours()>=16?7:5-dow;
     const fri=new Date(now);fri.setDate(now.getDate()+daysToFri);
     const nearExp=Math.floor(fri.getTime()/1000);
+
+    // pxRace로 모든 프록시 병렬 시도: q1+q2 × date필터/없음 = 4개 URL 동시 레이싱
     let d=null;
-    for(const u of[
+    const optUrls=[
       `https://query1.finance.yahoo.com/v7/finance/options/TSLA?date=${nearExp}`,
-      'https://query1.finance.yahoo.com/v7/finance/options/TSLA',
       `https://query2.finance.yahoo.com/v7/finance/options/TSLA?date=${nearExp}`,
+      'https://query1.finance.yahoo.com/v7/finance/options/TSLA',
       'https://query2.finance.yahoo.com/v7/finance/options/TSLA',
-    ]){
-      try{d=await px(u);if(d?.optionChain?.result?.[0])break;}catch(e){}
-    }
+    ];
+    // Race all 4 URLs + all 10 proxies simultaneously (first valid wins)
+    const allAttempts=optUrls.flatMap(u=>
+      PROXIES.map(p=>
+        fetch(p(cb(u)),{signal:AbortSignal.timeout(8000)})
+          .then(r=>{if(!r.ok)throw new Error('http');return r.text();})
+          .then(txt=>{
+            if(!txt||txt.startsWith('<'))throw new Error('html');
+            const j=JSON.parse(txt);
+            if(!j?.optionChain?.result?.[0])throw new Error('no_chain');
+            return j;
+          })
+      )
+    );
+    try{d=await Promise.any(allAttempts);}catch(e){}
     if(!d)throw new Error();
     const res=d?.optionChain?.result?.[0];if(!res)throw new Error();
     const cp=res.quote?.regularMarketPrice||0;
@@ -744,16 +773,8 @@ async function fetchOpts(){
       sh('iv-sig',ivSig);
     }
   }catch(e){
-    sh('call-wall','<div class="text-slate-500 text-xs text-center py-4">옵션 체인 로드 실패<br><a href="https://finance.yahoo.com/quote/TSLA/options/" target="_blank" class="text-purple-400 underline text-xs">Yahoo Finance에서 직접 확인 →</a></div>');
-    // Fallback: try to get IV from Stooq for TSLA (volatility)
-    try{
-      const sq=await fetchStooqCSV('tsla.us');
-      // Compute simple "realized vol proxy" from stooq open vs close
-      if(sq.price&&sq.prev){
-        const rng=Math.abs(sq.price-sq.prev)/sq.prev*100;
-        st('iv-hv',rng.toFixed(1)+'%');
-      }
-    }catch(e2){}
+    sh('call-wall','<div class="text-slate-500 text-xs text-center py-4">옵션 체인 로드 실패 (CORS 차단)<br><span class="text-xs text-slate-600">프록시 서버 일시 차단 — 잠시 후 새로고침</span><br><a href="https://finance.yahoo.com/quote/TSLA/options/" target="_blank" class="text-purple-400 underline text-xs mt-1 inline-block">Yahoo Finance 직접 확인 →</a></div>');
+    sh('opt-sent','CORS 차단','text-xs text-slate-500');
   }
 }
 
@@ -809,9 +830,9 @@ async function fetchUSDKRW(){
 async function fetchMacro(){
   let tnxOk=false,dxyOk=false;
 
-  // ① Primary A: v7 quote API (batch, ~5KB, pre-encoded symbols to avoid proxy issues with ^)
+  // ① Primary A: v7 quote API — pxRace(병렬)로 최대 4초에 결과
   try{
-    const d=await px('https://query1.finance.yahoo.com/v7/finance/quote?symbols=%5ETNX%2CDX-Y.NYB');
+    const d=await pxRace('https://query1.finance.yahoo.com/v7/finance/quote?symbols=%5ETNX%2CDX-Y.NYB');
     for(const q of(d?.quoteResponse?.result||[])){
       const p=q?.regularMarketPrice,pv=q?.regularMarketPreviousClose||q?.regularMarketOpen||p;
       if(!p)continue;
@@ -820,12 +841,32 @@ async function fetchMacro(){
     }
   }catch(e){}
 
-  // ① Primary B: Stooq CSV — public data, often bypasses CORS proxy entirely
+  // ① Primary B: Stooq CSV (CORS-free 직접 접근) — TNX:%5Etnx, DXY:usdx.f
   if(!tnxOk){
-    try{const s=await fetchStooqCSV('%5etnx');applyTNX(s.price,s.prev);tnxOk=true;}catch(e){}
+    try{const s=await fetchStooqCSV('%5Etnx');applyTNX(s.price,s.prev);tnxOk=true;}catch(e){}
+  }
+  if(!tnxOk){
+    // Stooq alternate symbol for US 10Y
+    try{const s=await fetchStooqCSV('us10y.b');applyTNX(s.price,s.prev);tnxOk=true;}catch(e){}
   }
   if(!dxyOk){
-    try{const s=await fetchStooqCSV('dxy.f');applyDXY(s.price,s.prev);dxyOk=true;}catch(e){}
+    // Stooq DXY: usdx.f (달러인덱스 선물) — dxy.f는 없는 심볼
+    try{const s=await fetchStooqCSV('usdx.f');applyDXY(s.price,s.prev);dxyOk=true;}catch(e){}
+  }
+  if(!dxyOk){
+    try{const s=await fetchStooqCSV('dx.f');applyDXY(s.price,s.prev);dxyOk=true;}catch(e){}
+  }
+
+  // ① Primary C: FRED API — 미국 연방준비제도, CORS 허용, 일별 데이터
+  if(!tnxOk){
+    try{
+      const r=await fetch('https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS10',{signal:AbortSignal.timeout(6000)});
+      const txt=await r.text();
+      const rows=txt.trim().split('\n').filter(l=>!l.startsWith('DATE'));
+      const last=rows[rows.length-1].split(',');
+      const p=parseFloat(last[1]);
+      if(!isNaN(p)&&p>0){applyTNX(p,p);tnxOk=true;}
+    }catch(e){}
   }
 
   // ② Fallback: individual Yahoo chart API with %5ETNX (pre-encoded — avoids ^ in raw proxy URLs)
@@ -911,7 +952,7 @@ function updateMarketStatus(){
 // ==================== MAIN FETCH ====================
 let busy=false;
 async function fetchTSLA(){
-  const d=await px('https://query1.finance.yahoo.com/v8/finance/chart/TSLA?range=1y&interval=1d');
+  const d=await pxRace('https://query1.finance.yahoo.com/v8/finance/chart/TSLA?range=1y&interval=1d');
   const res=d?.chart?.result?.[0];if(!res)throw new Error('no result');
   const m=res.meta,price=m.regularMarketPrice;
   // regularMarketPreviousClose = 진짜 전일 종가 (chartPreviousClose는 1년 전 첫 종가라 오류 발생)
