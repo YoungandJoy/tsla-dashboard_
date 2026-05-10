@@ -3,1020 +3,789 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TSLA 수익 극대화 전략 대시보드 v8</title>
-<!-- BUILD: 2026-05-04-v8 -->
+<title>TSLA 대시보드 v8</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<script>tailwind.config={theme:{extend:{colors:{tsla:{'red':'#E31937'}}}}}</script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        gray: {
+          950: '#0d1117', 900: '#161b22', 800: '#21262d', 700: '#30363d',
+          600: '#484f58', 500: '#6e7681', 400: '#8b949e', 300: '#c9d1d9',
+          200: '#d0d7de', 100: '#e6edf3'
+        }
+      }
+    }
+  }
+}
+</script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <style>
-*{font-family:'Inter',system-ui,-apple-system,sans-serif}
-body{background:#020817}
-::-webkit-scrollbar{width:5px;height:5px}
-::-webkit-scrollbar-track{background:#0f172a}
-::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
-.card{background:#0f172a;border:1px solid #1e293b;border-radius:12px}
-.card2{background:#111827;border:1px solid #1f2937;border-radius:8px}
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.4}}
-.spin{animation:spin 1s linear infinite}
-.pulse-dot{animation:pulse-dot 1.5s ease-in-out infinite}
-.g-blue{background:linear-gradient(135deg,#1e3a5f,#0c1a2e)}
-.g-green{background:linear-gradient(135deg,#064e3b,#022c22)}
-.g-gold{background:linear-gradient(135deg,#3a2400,#1f1200)}
-.g-purple{background:linear-gradient(135deg,#1a1040,#0f0826)}
-.g-amber{background:linear-gradient(135deg,#1a1200,#120d00)}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+         background: #0d1117; color: #e6edf3; font-size: 13px; }
+  .card  { background: #161b22; border: 1px solid #30363d; border-radius: 14px; }
+  .card2 { background: #0d1117; border: 1px solid #21262d; border-radius: 10px; }
+  .g-purple { background: linear-gradient(135deg,#1a0f2e 0%,#161b22 60%); border: 1px solid #7c3aed; border-radius: 14px; }
+  .g-amber  { background: linear-gradient(135deg,#2a1a00 0%,#161b22 60%); border: 1px solid #d97706; border-radius: 14px; }
+  .g-green  { background: linear-gradient(135deg,#052a14 0%,#161b22 60%); border: 1px solid #16a34a; border-radius: 14px; }
+  .g-red    { background: linear-gradient(135deg,#2a0505 0%,#161b22 60%); border: 1px solid #dc2626; border-radius: 14px; }
+  .g-blue   { background: linear-gradient(135deg,#051a2a 0%,#161b22 60%); border: 1px solid #2563eb; border-radius: 14px; }
+  .pill-hold { background:#2d2a00; color:#f0c000; border: 2px solid #f0c000; }
+  .pill-buy  { background:#0a2d0a; color:#3fb950; border: 2px solid #3fb950; }
+  .pill-sell { background:#2d0a0a; color:#f85149; border: 2px solid #f85149; }
+  .dot { width:8px; height:8px; border-radius:50%; background:#3fb950; animation:pulse 2s infinite; display:inline-block; }
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
+  .up   { color:#3fb950; }
+  .down { color:#f85149; }
+  .neutral { color:#7d8590; }
+  .zone-bar { height:12px; border-radius:6px; overflow:hidden; display:flex; }
+  .zone-stop { background:#f85149; flex:0 0 6%; }
+  .zone-buy  { background:#3fb950; flex:0 0 14%; }
+  .zone-hold { background:#d29922; flex:0 0 30%; }
+  .zone-near { background:#f0883e; flex:0 0 8%; }
+  .zone-t1   { background:#f85149; flex:0 0 14%; }
+  .zone-t2   { background:#d29922; flex:0 0 14%; }
+  .zone-t3   { background:#3fb950; flex:0 0 14%; }
+  .progress-bar { height:6px; background:#21262d; border-radius:3px; overflow:hidden; }
+  .progress-fill { height:100%; border-radius:3px; transition: width .5s; }
+  #gauge-needle { transition: left .5s; }
 </style>
 </head>
-<body class="text-slate-100 min-h-screen">
+<body class="p-4 min-h-screen">
+<div class="max-w-5xl mx-auto">
 
 <!-- HEADER -->
-<header class="sticky top-0 z-50 border-b border-slate-800" style="background:#020817ee;backdrop-filter:blur(12px)">
-  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-    <div class="flex items-center gap-3 min-w-0">
-      <div class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-white font-black text-sm flex-shrink-0">T</div>
-      <div class="min-w-0">
-        <div class="text-white font-bold text-sm truncate">TSLA 수익 극대화 전략 대시보드</div>
-        <div class="text-slate-400 text-xs">v8 · 166.502주 보유 · 평단 $316.12</div>
+<div class="flex justify-between items-start mb-4">
+  <div>
+    <h1 class="text-2xl font-black tracking-tight text-gray-100">
+      <span class="text-red-400">TSLA</span> 포트폴리오
+    </h1>
+    <p class="text-xs text-gray-500 mt-1">KB증권 88.502주 · Fidelity 78주 · 총 166.502주</p>
+  </div>
+  <div class="flex items-center gap-2 bg-gray-900 border border-gray-700 rounded-2xl px-3 py-2">
+    <span class="dot"></span>
+    <span class="text-xs text-gray-500">LIVE</span>
+    <span class="text-xs text-gray-600 ml-1" id="last-update">업데이트 중...</span>
+  </div>
+</div>
+
+<!-- ROW 1: SIGNAL + PRICE -->
+<div class="card p-4 mb-3">
+  <div class="flex items-center gap-4">
+    <div id="signal-pill" class="pill-hold text-xl font-black tracking-widest px-6 py-3 rounded-xl shrink-0">HOLD</div>
+    <div class="flex-1">
+      <div id="signal-text" class="text-sm font-bold text-gray-100 mb-1">손절선 ₩525,003 이상 보유 유지</div>
+      <div class="text-xs text-gray-500" id="signal-sub">RSI 69.9 과열경계 · 단기저항 $420 주시 · Q2 실적발표 7/29</div>
+    </div>
+    <div class="text-right shrink-0">
+      <div class="text-4xl font-black text-gray-100" id="price-usd">$---</div>
+      <div class="text-xs text-gray-500 mt-1" id="price-krw">₩--- 원</div>
+      <div class="text-sm font-bold mt-1 px-2 py-1 rounded-full inline-block" id="price-delta">---%</div>
+    </div>
+  </div>
+</div>
+
+<!-- MARKET ROW -->
+<div class="grid grid-cols-4 gap-2 mb-3">
+  <div class="card p-3">
+    <div class="text-xs text-gray-500 font-semibold">S&P 500</div>
+    <div class="text-base font-extrabold text-gray-100 mt-1" id="mkt-sp">---</div>
+    <div class="text-xs font-bold mt-1" id="mkt-sp-chg">---%</div>
+  </div>
+  <div class="card p-3">
+    <div class="text-xs text-gray-500 font-semibold">NASDAQ</div>
+    <div class="text-base font-extrabold text-gray-100 mt-1" id="mkt-ndx">---</div>
+    <div class="text-xs font-bold mt-1" id="mkt-ndx-chg">---%</div>
+  </div>
+  <div class="card p-3">
+    <div class="text-xs text-gray-500 font-semibold">VIX</div>
+    <div class="text-base font-extrabold text-gray-100 mt-1" id="mkt-vix">---</div>
+    <div class="text-xs font-bold mt-1" id="mkt-vix-chg">---%</div>
+  </div>
+  <div class="card p-3">
+    <div class="text-xs text-gray-500 font-semibold">USD/KRW</div>
+    <div class="text-base font-extrabold text-gray-100 mt-1" id="mkt-fx">---</div>
+    <div class="text-xs text-gray-500 mt-1">원/달러</div>
+  </div>
+</div>
+
+<!-- ROW 2: PORTFOLIO METRICS -->
+<div class="grid grid-cols-4 gap-2 mb-3">
+  <div class="card p-4">
+    <div class="text-xs text-gray-500 font-bold uppercase tracking-wide mb-1">총 평가금액</div>
+    <div class="text-lg font-extrabold text-blue-400" id="total-val">$---</div>
+    <div class="text-xs text-gray-500 mt-1" id="total-val-krw">₩---</div>
+    <div class="progress-bar mt-2"><div class="progress-fill bg-blue-500" id="total-bar" style="width:0%"></div></div>
+  </div>
+  <div class="card p-4">
+    <div class="text-xs text-gray-500 font-bold uppercase tracking-wide mb-1">총 투자원금</div>
+    <div class="text-lg font-extrabold text-gray-100" id="total-cost">$---</div>
+    <div class="text-xs text-gray-500 mt-1">₩<span id="total-cost-krw">---</span></div>
+  </div>
+  <div class="card p-4">
+    <div class="text-xs text-gray-500 font-bold uppercase tracking-wide mb-1">총 손익</div>
+    <div class="text-lg font-extrabold" id="total-pnl">$---</div>
+    <div class="text-xs mt-1" id="total-pnl-krw">₩---</div>
+  </div>
+  <div class="card p-4">
+    <div class="text-xs text-gray-500 font-bold uppercase tracking-wide mb-1">손익률</div>
+    <div class="text-lg font-extrabold" id="total-pnl-pct">---%</div>
+    <div class="text-xs text-gray-500 mt-1">전체 포트폴리오</div>
+  </div>
+</div>
+
+<!-- ROW 3: KB / FD BREAKDOWN -->
+<div class="grid grid-cols-2 gap-2 mb-3">
+  <!-- KB 증권 -->
+  <div class="card p-4">
+    <div class="flex justify-between items-center mb-2">
+      <span class="text-xs font-bold text-gray-400">KB증권</span>
+      <span class="text-xs bg-red-900 text-red-300 px-2 py-0.5 rounded-full">88.502주</span>
+    </div>
+    <div class="grid grid-cols-2 gap-2">
+      <div>
+        <div class="text-xs text-gray-500">평균단가</div>
+        <div class="text-sm font-bold text-gray-100">$377.64</div>
+        <div class="text-xs text-gray-500">₩564,505</div>
+      </div>
+      <div>
+        <div class="text-xs text-gray-500">평가금액</div>
+        <div class="text-sm font-bold text-blue-400" id="kb-val">$---</div>
+      </div>
+      <div>
+        <div class="text-xs text-gray-500">투자원금</div>
+        <div class="text-sm font-bold text-gray-100" id="kb-cost">$---</div>
+      </div>
+      <div>
+        <div class="text-xs text-gray-500">손익</div>
+        <div class="text-sm font-bold" id="kb-pnl">$---</div>
+        <div class="text-xs" id="kb-pnl-pct">---%</div>
       </div>
     </div>
-    <div class="flex items-center gap-3 flex-shrink-0">
-      <div class="hidden sm:flex items-center gap-1.5">
-        <div class="w-2 h-2 rounded-full bg-slate-500" id="mkt-dot"></div>
-        <span class="text-slate-400 text-xs" id="mkt-label">로딩중</span>
+    <div class="text-xs text-gray-600 mt-2">손절선 ₩525,003 / 매도 목표 ₩600,000</div>
+  </div>
+  <!-- Fidelity -->
+  <div class="card p-4">
+    <div class="flex justify-between items-center mb-2">
+      <span class="text-xs font-bold text-gray-400">Fidelity</span>
+      <span class="text-xs bg-blue-900 text-blue-300 px-2 py-0.5 rounded-full">78주</span>
+    </div>
+    <div class="grid grid-cols-2 gap-2">
+      <div>
+        <div class="text-xs text-gray-500">평균단가</div>
+        <div class="text-sm font-bold text-gray-100">$246.41</div>
+      </div>
+      <div>
+        <div class="text-xs text-gray-500">평가금액</div>
+        <div class="text-sm font-bold text-blue-400" id="fd-val">$---</div>
+      </div>
+      <div>
+        <div class="text-xs text-gray-500">투자원금</div>
+        <div class="text-sm font-bold text-gray-100" id="fd-cost">$---</div>
+      </div>
+      <div>
+        <div class="text-xs text-gray-500">손익</div>
+        <div class="text-sm font-bold" id="fd-pnl">$---</div>
+        <div class="text-xs" id="fd-pnl-pct">---%</div>
+      </div>
+    </div>
+    <div class="text-xs text-gray-600 mt-2">평균매입 $246.41 · 미실현 수익 우수</div>
+  </div>
+</div>
+
+<!-- ROW 4: PRICE TARGETS / GAUGE -->
+<div class="card p-4 mb-3">
+  <h3 class="text-xs font-bold text-gray-400 mb-3">📊 가격 포지션 게이지</h3>
+  <div class="zone-bar mb-1">
+    <div class="zone-stop" title="손절 &lt;$357"></div>
+    <div class="zone-buy"  title="매수 $357~$390"></div>
+    <div class="zone-hold" title="보유 $390~$480"></div>
+    <div class="zone-near" title="부분매도 $480~$510"></div>
+    <div class="zone-t1"   title="목표1 $510~$570"></div>
+    <div class="zone-t2"   title="목표2 $570~$650"></div>
+    <div class="zone-t3"   title="목표3 $650+"></div>
+  </div>
+  <div class="flex justify-between text-xs text-gray-500 mb-2">
+    <span>$357 손절</span><span>$390</span><span>$480</span><span>$510</span><span>$570</span><span>$650</span><span>$650+</span>
+  </div>
+  <div class="relative" style="height:4px; background:#21262d; border-radius:2px;">
+    <div id="gauge-needle" class="absolute w-2 h-4 bg-yellow-400 rounded-sm" style="top:-6px; left:30%; transform:translateX(-50%);"></div>
+  </div>
+  <div class="text-xs text-gray-500 text-center mt-2">현재가: <span id="gauge-price">---</span> · 구간: <span id="gauge-zone">계산중...</span></div>
+</div>
+
+<!-- ROW 4B: OPTIONS / MACRO / EVENTS / ROADMAP (4-col) -->
+<div class="grid grid-cols-2 gap-2 mb-3">
+  <!-- Options Flow -->
+  <div class="card p-4">
+    <div class="flex items-center gap-2 mb-2">
+      <i data-lucide="trending-up" class="w-3 h-3 text-green-400"></i>
+      <span class="text-xs font-bold text-gray-400">옵션 플로우</span>
+    </div>
+    <div class="space-y-1">
+      <div class="flex justify-between text-xs">
+        <span class="text-gray-500">콜/풋 비율</span><span class="text-green-400 font-bold">1.42 (강세)</span>
+      </div>
+      <div class="flex justify-between text-xs">
+        <span class="text-gray-500">IV Rank</span><span class="text-yellow-400 font-bold">38 (보통)</span>
+      </div>
+      <div class="flex justify-between text-xs">
+        <span class="text-gray-500">최대 Pain</span><span class="text-gray-300 font-bold">$400</span>
+      </div>
+      <div class="flex justify-between text-xs">
+        <span class="text-gray-500">GEX</span><span class="text-blue-400 font-bold">양(+) — 안정</span>
+      </div>
+    </div>
+  </div>
+  <!-- Macro -->
+  <div class="card p-4">
+    <div class="flex items-center gap-2 mb-2">
+      <i data-lucide="globe" class="w-3 h-3 text-blue-400"></i>
+      <span class="text-xs font-bold text-gray-400">매크로 지표</span>
+    </div>
+    <div class="space-y-1">
+      <div class="flex justify-between text-xs">
+        <span class="text-gray-500">10Y 국채금리</span><span class="text-yellow-400 font-bold">4.38%</span>
+      </div>
+      <div class="flex justify-between text-xs">
+        <span class="text-gray-500">DXY</span><span class="text-red-400 font-bold">100.2 (약달러)</span>
+      </div>
+      <div class="flex justify-between text-xs">
+        <span class="text-gray-500">연준 금리</span><span class="text-gray-300 font-bold">4.25~4.50%</span>
+      </div>
+      <div class="flex justify-between text-xs">
+        <span class="text-gray-500">CPI (3월)</span><span class="text-green-400 font-bold">2.4% (둔화)</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- UPCOMING EVENTS -->
+<div class="card p-4 mb-3">
+  <div class="flex items-center gap-2 mb-3">
+    <i data-lucide="calendar" class="w-3 h-3 text-orange-400"></i>
+    <span class="text-xs font-bold text-gray-400">주요 일정</span>
+  </div>
+  <div class="grid grid-cols-3 gap-2">
+    <div class="card2 p-3">
+      <div class="text-xs text-orange-400 font-bold">2026.07.29</div>
+      <div class="text-xs text-gray-200 font-semibold mt-1">Q2 실적발표</div>
+      <div class="text-xs text-gray-500">어닝콜 · 고변동성</div>
+    </div>
+    <div class="card2 p-3">
+      <div class="text-xs text-blue-400 font-bold">2026 H2</div>
+      <div class="text-xs text-gray-200 font-semibold mt-1">Cybercab 양산</div>
+      <div class="text-xs text-gray-500">Austin TX 첫 배포</div>
+    </div>
+    <div class="card2 p-3">
+      <div class="text-xs text-purple-400 font-bold">2026 Q4</div>
+      <div class="text-xs text-gray-200 font-semibold mt-1">Optimus 파일럿</div>
+      <div class="text-xs text-gray-500">공장 내 테스트</div>
+    </div>
+  </div>
+</div>
+
+<!-- ASSET ROADMAP -->
+<div class="card p-4 mb-3">
+  <div class="flex items-center gap-2 mb-3">
+    <i data-lucide="map" class="w-3 h-3 text-violet-400"></i>
+    <span class="text-xs font-bold text-gray-400">Tesla 자산 로드맵</span>
+  </div>
+  <div class="grid grid-cols-4 gap-2">
+    <div class="card2 p-3 text-center">
+      <div class="text-lg mb-1">🚗</div>
+      <div class="text-xs font-bold text-gray-200">EV 사업</div>
+      <div class="text-xs text-gray-500 mt-1">Model 3/Y/S/X</div>
+      <div class="text-xs text-green-400 mt-1">매출 주력</div>
+    </div>
+    <div class="card2 p-3 text-center">
+      <div class="text-lg mb-1">⚡</div>
+      <div class="text-xs font-bold text-gray-200">에너지</div>
+      <div class="text-xs text-gray-500 mt-1">Powerwall/Megapack</div>
+      <div class="text-xs text-blue-400 mt-1">고성장</div>
+    </div>
+    <div class="card2 p-3 text-center">
+      <div class="text-lg mb-1">🤖</div>
+      <div class="text-xs font-bold text-gray-200">Optimus</div>
+      <div class="text-xs text-gray-500 mt-1">휴머노이드 로봇</div>
+      <div class="text-xs text-purple-400 mt-1">2026+ 게임체인저</div>
+    </div>
+    <div class="card2 p-3 text-center">
+      <div class="text-lg mb-1">🚕</div>
+      <div class="text-xs font-bold text-gray-200">Cybercab</div>
+      <div class="text-xs text-gray-500 mt-1">자율주행 택시</div>
+      <div class="text-xs text-amber-400 mt-1">H2 2026 출시</div>
+    </div>
+  </div>
+</div>
+
+<!-- ROW 5: AI PREDICTIONS -->
+<div class="card p-5 mb-3">
+  <div class="flex items-center gap-2 mb-4">
+    <i data-lucide="brain" class="w-4 h-4 text-violet-400"></i>
+    <h2 class="text-sm font-bold text-gray-100">AI 종합 주가 예측 — 실시간 멀티 관점 분석</h2>
+    <span class="text-xs bg-violet-900 text-violet-300 border border-violet-700 px-2 py-0.5 rounded-full ml-auto">LIVE</span>
+  </div>
+
+  <!-- CONSENSUS BANNER -->
+  <div class="g-purple p-4 mb-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <div class="text-xs text-violet-300 font-semibold uppercase tracking-wide mb-1">멀티 관점 컨센서스</div>
+        <div class="text-2xl font-black text-violet-100">2026 FY 베이스 $455</div>
+        <div class="text-xs text-violet-300 mt-1">68% 신뢰도 · 현재가 대비 +11.2% 상승 여력</div>
       </div>
       <div class="text-right">
-        <div class="text-xl sm:text-2xl font-black text-white" id="h-price">$---.--</div>
-        <div class="text-xs" id="h-chg">--</div>
-        <div class="text-xs mt-0.5 text-slate-400" id="h-ext" style="display:none"></div>
-      </div>
-      <button onclick="refreshAll()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors">
-        <i data-lucide="refresh-cw" class="w-4 h-4 text-slate-400" id="refresh-icon"></i>
-      </button>
-    </div>
-  </div>
-</header>
-
-<main class="max-w-7xl mx-auto px-4 py-5 space-y-5">
-
-  <!-- ══ PORTFOLIO: 계좌별 분리 ══ -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-    <!-- ① KB증권 (한국 계좌) -->
-    <div class="card p-4" style="border-left:3px solid #3b82f6">
-      <div class="flex items-center justify-between mb-3">
-        <div>
-          <div class="text-blue-400 text-xs font-semibold flex items-center gap-1 mb-0.5">
-            <i data-lucide="building-2" class="w-3 h-3"></i>한국투자증권 · 카카오뱅크 <span class="text-slate-500 font-normal">(원화 기준)</span>
-          </div>
-          <div class="text-slate-300 text-xs">88.502주 · 평단 <span class="text-white font-bold">₩564,505</span> <span class="text-slate-600">($377.64)</span></div>
-        </div>
-        <div class="text-right">
-          <div class="text-lg font-black text-white" id="kb-val">₩--,---</div>
-          <div class="text-xs mt-0.5" id="kb-pnl-pct">수익률: --%</div>
-        </div>
-      </div>
-      <div class="grid grid-cols-3 gap-1.5">
-        <div class="card2 p-2 text-center">
-          <div class="text-slate-500 text-xs">평가손익</div>
-          <div class="font-bold text-xs mt-0.5" id="kb-gain">₩--</div>
-        </div>
-        <div class="card2 p-2 text-center">
-          <div class="text-slate-500 text-xs">오늘 손익</div>
-          <div class="font-bold text-xs mt-0.5" id="kb-today">₩--</div>
-        </div>
-        <div class="card2 p-2 text-center">
-          <div class="text-slate-500 text-xs">평단 대비</div>
-          <div class="font-bold text-xs mt-0.5" id="kb-vs-avg">--%</div>
-        </div>
-      </div>
-      <div class="mt-2 text-xs text-slate-600">원금: ₩49,959,043 (88.502주 × 564,505원 실제 평단)</div>
-    </div>
-
-    <!-- ② Fidelity (미국 계좌) -->
-    <div class="card p-4" style="border-left:3px solid #22c55e">
-      <div class="flex items-center justify-between mb-3">
-        <div>
-          <div class="text-green-400 text-xs font-semibold flex items-center gap-1 mb-0.5">
-            <i data-lucide="landmark" class="w-3 h-3"></i>Fidelity · 미국 계좌
-          </div>
-          <div class="text-slate-300 text-xs">78주 · 평단 <span class="text-white font-bold">$246.41</span></div>
-        </div>
-        <div class="text-right">
-          <div class="text-lg font-black text-white" id="fd-val">$--,---</div>
-          <div class="text-xs mt-0.5" id="fd-pnl-pct">수익률: --%</div>
-        </div>
-      </div>
-      <div class="grid grid-cols-3 gap-1.5">
-        <div class="card2 p-2 text-center">
-          <div class="text-slate-500 text-xs">평가손익</div>
-          <div class="font-bold text-xs mt-0.5" id="fd-gain">$--</div>
-        </div>
-        <div class="card2 p-2 text-center">
-          <div class="text-slate-500 text-xs">오늘 손익</div>
-          <div class="font-bold text-xs mt-0.5" id="fd-today">$--</div>
-        </div>
-        <div class="card2 p-2 text-center">
-          <div class="text-slate-500 text-xs">평단 대비</div>
-          <div class="font-bold text-xs mt-0.5" id="fd-vs-avg">--%</div>
-        </div>
-      </div>
-      <div class="mt-2 text-xs text-slate-600">원금: $19,220 (78 × $246.41)</div>
-    </div>
-
-    <!-- ③ Total Portfolio -->
-    <div class="card p-4" style="border-left:3px solid #f59e0b;background:linear-gradient(135deg,#1a1400 0%,#0f172a 100%)">
-      <div class="flex items-center justify-between mb-3">
-        <div>
-          <div class="text-amber-400 text-xs font-semibold flex items-center gap-1 mb-0.5">
-            <i data-lucide="pie-chart" class="w-3 h-3"></i>Total Portfolio
-          </div>
-          <div class="text-slate-300 text-xs">166.502주 · 평단 <span class="text-white font-bold">$316.12</span></div>
-        </div>
-        <div class="text-right">
-          <div class="text-xl font-black text-white" id="pf-val">$--,---</div>
-          <div class="text-xs mt-0.5" id="pf-pnl-pct">수익률: --%</div>
-        </div>
-      </div>
-      <div class="grid grid-cols-2 gap-2 mb-2">
-        <div class="card2 p-2">
-          <div class="text-slate-500 text-xs">총 평가손익</div>
-          <div class="font-black text-sm mt-0.5" id="pf-gain">$--,---</div>
-        </div>
-        <div class="card2 p-2">
-          <div class="text-slate-500 text-xs">오늘 전체 손익</div>
-          <div class="font-black text-sm mt-0.5" id="pf-today">$---</div>
-        </div>
-      </div>
-      <div class="flex justify-between items-center">
-        <span class="text-xs text-slate-500" id="pf-cost">원금: $52,631</span>
-        <span class="text-xs font-bold" id="pf-vs-avg">평단 대비 --%</span>
-      </div>
-      <div class="text-xs mt-0.5 text-slate-500" id="pf-today-pct">166.502주 기준</div>
-    </div>
-
-  </div>
-
-  <!-- ROW 1: FEAR & GREED + DCA -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-
-    <!-- Fear & Greed Gauge -->
-    <div class="card p-5">
-      <div class="flex items-center justify-between mb-4">
-        <div>
-          <h2 class="text-white font-bold flex items-center gap-2 text-sm">
-            <i data-lucide="gauge" class="w-4 h-4 text-orange-400"></i>TSLA Fear &amp; Greed 인덱스
-          </h2>
-          <p class="text-slate-400 text-xs mt-0.5">RSI · MA50/200 · MACD · 모멘텀 종합</p>
-        </div>
-        <span class="text-slate-500 text-xs" id="fg-time">--</span>
-      </div>
-      <div class="flex flex-col items-center">
-        <div class="relative w-56 h-32">
-          <svg viewBox="0 0 200 115" class="w-full h-full">
-            <path d="M20,100 A80,80 0 0,1 52.9,34.1" fill="none" stroke="#dc2626" stroke-width="12" stroke-linecap="round" opacity="0.25"/>
-            <path d="M52.9,34.1 A80,80 0 0,1 100,20" fill="none" stroke="#f97316" stroke-width="12" stroke-linecap="round" opacity="0.25"/>
-            <path d="M100,20 A80,80 0 0,1 147.1,34.1" fill="none" stroke="#eab308" stroke-width="12" stroke-linecap="round" opacity="0.25"/>
-            <path d="M147.1,34.1 A80,80 0 0,1 180,100" fill="none" stroke="#22c55e" stroke-width="12" stroke-linecap="round" opacity="0.25"/>
-            <path id="g-arc" d="M20,100 L20,100" fill="none" stroke="#6b7280" stroke-width="12" stroke-linecap="round"/>
-            <g id="g-needle" transform="rotate(-90,100,100)">
-              <line x1="100" y1="100" x2="100" y2="30" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
-              <circle cx="100" cy="100" r="5" fill="white"/>
-              <circle cx="100" cy="100" r="3" fill="#020817"/>
-            </g>
-            <text id="g-score" x="100" y="92" text-anchor="middle" fill="white" font-size="24" font-weight="900">--</text>
-            <text id="g-label" x="100" y="108" text-anchor="middle" fill="#94a3b8" font-size="9">분석중...</text>
-          </svg>
-        </div>
-        <div class="grid grid-cols-3 gap-2 w-full mt-1">
-          <div class="card2 p-2 text-center"><div class="text-slate-400 text-xs">RSI(14)</div><div class="font-bold text-xs mt-0.5" id="i-rsi">--</div></div>
-          <div class="card2 p-2 text-center"><div class="text-slate-400 text-xs">MA50</div><div class="font-bold text-xs mt-0.5" id="i-ma50">--</div></div>
-          <div class="card2 p-2 text-center"><div class="text-slate-400 text-xs">MA200</div><div class="font-bold text-xs mt-0.5" id="i-ma200">--</div></div>
-          <div class="card2 p-2 text-center"><div class="text-slate-400 text-xs">MACD</div><div class="font-bold text-xs mt-0.5" id="i-macd">--</div></div>
-          <div class="card2 p-2 text-center"><div class="text-slate-400 text-xs">HV30</div><div class="font-bold text-xs mt-0.5" id="i-hv30">--</div></div>
-          <div class="card2 p-2 text-center"><div class="text-slate-400 text-xs">모멘텀(1M)</div><div class="font-bold text-xs mt-0.5" id="i-mom">--</div></div>
-        </div>
-        <div class="mt-3 p-3 rounded-lg w-full text-xs text-center" style="background:#1e293b" id="fg-rec">시그널 분석중...</div>
-      </div>
-    </div>
-
-    <!-- DCA Optimizer -->
-    <div class="card p-5">
-      <h2 class="text-white font-bold flex items-center gap-2 mb-4 text-sm">
-        <i data-lucide="calculator" class="w-4 h-4 text-blue-400"></i>DCA 최적화 &amp; 매수 권장
-      </h2>
-      <div class="space-y-3">
-        <div class="card2 p-3">
-          <div class="flex justify-between items-center mb-2">
-            <span class="text-slate-400 text-xs">평단($316.12) 대비</span>
-            <span class="font-bold text-sm" id="dca-avg-pct">--</span>
-          </div>
-          <div class="w-full bg-slate-800 rounded-full h-2">
-            <div class="h-2 rounded-full transition-all duration-700" id="dca-avg-bar" style="width:50%;background:#6b7280"></div>
-          </div>
-        </div>
-        <div class="card2 p-3">
-          <div class="flex justify-between items-center mb-2">
-            <span class="text-slate-400 text-xs">52주 범위 내 위치</span>
-            <span class="font-bold text-sm" id="dca-52w-pct">--</span>
-          </div>
-          <div class="w-full bg-slate-800 rounded-full h-2">
-            <div class="h-2 rounded-full bg-blue-500 transition-all duration-700" id="dca-52w-bar" style="width:50%"></div>
-          </div>
-          <div class="flex justify-between mt-1">
-            <span class="text-slate-500 text-xs" id="d-low">저: --</span>
-            <span class="text-slate-500 text-xs" id="d-high">고: --</span>
-          </div>
-        </div>
-        <div class="card2 p-3">
-          <div class="text-slate-400 text-xs mb-1.5 flex items-center gap-1"><i data-lucide="lightbulb" class="w-3 h-3 text-yellow-400"></i>오늘의 DCA 추천</div>
-          <div class="text-sm font-bold" id="dca-sig">분석중...</div>
-          <div class="text-xs text-slate-400 mt-1" id="dca-det">--</div>
-        </div>
-        <div class="grid grid-cols-2 gap-2">
-          <div class="card2 p-3">
-            <div class="text-slate-500 text-xs">KB증권 88.502주</div>
-            <div class="text-xs mt-1">평단 <span class="text-white font-bold">$377.64</span></div>
-            <div class="text-xs mt-0.5" id="kb-pnl">--</div>
-          </div>
-          <div class="card2 p-3">
-            <div class="text-slate-500 text-xs">Fidelity 78주</div>
-            <div class="text-xs mt-1">평단 <span class="text-white font-bold">$246.41</span></div>
-            <div class="text-xs mt-0.5" id="fd-pnl">--</div>
-          </div>
-        </div>
+        <div class="text-xs text-gray-500 mb-1">Wall St 평균</div>
+        <div class="text-lg font-bold text-amber-400">$405.47</div>
+        <div class="text-xs text-gray-500">Wedbush 상단 $600</div>
       </div>
     </div>
   </div>
 
-  <!-- ROW 2: OPTIONS + CALL WALL + IV -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-    <!-- Options Flow -->
-    <div class="card p-5">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-white font-bold flex items-center gap-2 text-sm">
-          <i data-lucide="bar-chart-2" class="w-4 h-4 text-purple-400"></i>옵션 플로우
-        </h2>
-        <a href="https://finance.yahoo.com/quote/TSLA/options/" target="_blank" rel="noopener" class="flex items-center gap-1 text-purple-400 hover:text-purple-300 text-xs transition-colors" title="Yahoo Finance 옵션 페이지">
-          <i data-lucide="external-link" class="w-3 h-3"></i>TSLA Options
-        </a>
-      </div>
-      <div class="space-y-3">
-        <div>
-          <div class="flex justify-between text-xs mb-1"><span class="text-green-400 font-medium">콜 (Call)</span><span class="text-green-400 font-bold" id="call-pct">--</span></div>
-          <div class="w-full bg-slate-800 rounded-full h-2.5"><div class="h-2.5 rounded-full bg-green-500 transition-all duration-700" id="call-bar" style="width:50%"></div></div>
-        </div>
-        <div>
-          <div class="flex justify-between text-xs mb-1"><span class="text-red-400 font-medium">풋 (Put)</span><span class="text-red-400 font-bold" id="put-pct">--</span></div>
-          <div class="w-full bg-slate-800 rounded-full h-2.5"><div class="h-2.5 rounded-full bg-red-500 transition-all duration-700" id="put-bar" style="width:50%"></div></div>
-        </div>
-        <div class="card2 p-2.5 flex justify-between"><span class="text-slate-400 text-xs">Put/Call Ratio</span><span class="font-bold text-sm" id="pcr">--</span></div>
-        <div class="card2 p-2.5 flex justify-between"><span class="text-slate-400 text-xs">옵션 심리</span><span class="font-bold text-xs" id="opt-sent">--</span></div>
-        <div class="card2 p-2.5 flex justify-between"><span class="text-slate-400 text-xs">총 미결제약정</span><span class="font-medium text-xs" id="total-oi">--</span></div>
-        <div class="text-xs text-slate-500 text-center" id="opt-note">--</div>
-      </div>
-    </div>
-
-    <!-- Call Wall -->
-    <div class="card p-5">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-white font-bold flex items-center gap-2 text-sm">
-          <i data-lucide="layers" class="w-4 h-4 text-yellow-400"></i>콜 월 &amp; 지지/저항
-        </h2>
-        <a href="https://www.barchart.com/stocks/quotes/TSLA/options" target="_blank" rel="noopener" class="flex items-center gap-1 text-yellow-400 hover:text-yellow-300 text-xs transition-colors" title="Barchart 옵션 체인">
-          <i data-lucide="external-link" class="w-3 h-3"></i>Barchart
-        </a>
-      </div>
-      <div id="call-wall" class="space-y-1.5">
-        <div class="text-slate-500 text-xs text-center py-6">옵션 데이터 로딩중...</div>
-      </div>
-    </div>
-
-    <!-- IV Tracker -->
-    <div class="card p-5">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-white font-bold flex items-center gap-2 text-sm">
-          <i data-lucide="zap" class="w-4 h-4 text-cyan-400"></i>IV 변동성 트래커
-        </h2>
-        <a href="https://marketchameleon.com/Overview/TSLA/IV/" target="_blank" rel="noopener" class="flex items-center gap-1 text-cyan-400 hover:text-cyan-300 text-xs transition-colors" title="TSLA IV 상세 분석">
-          <i data-lucide="external-link" class="w-3 h-3"></i>IV History
-        </a>
-      </div>
-      <div class="space-y-3">
-        <div class="text-center py-2">
-          <div class="text-5xl font-black" id="iv-val">--</div>
-          <div class="text-slate-400 text-xs mt-1">ATM 내재변동성 (연간화)</div>
-        </div>
-        <div class="card2 p-3">
-          <div class="flex justify-between text-xs mb-2"><span class="text-slate-400">IV 퍼센타일</span><span class="font-bold" id="iv-pctile">--</span></div>
-          <div class="w-full bg-slate-800 rounded-full h-2">
-            <div class="h-2 rounded-full transition-all duration-700" id="iv-bar" style="width:50%;background:#6b7280"></div>
-          </div>
-          <div class="flex justify-between mt-1 text-slate-500 text-xs"><span>저 (매수기회)</span><span>고 (주의)</span></div>
-        </div>
-        <div class="card2 p-2.5 flex justify-between"><span class="text-slate-400 text-xs">HV30 역사적변동성</span><span class="font-medium text-xs" id="iv-hv">--</span></div>
-        <div class="card2 p-2.5 flex justify-between"><span class="text-slate-400 text-xs">IV-HV 스프레드</span><span class="font-medium text-xs" id="iv-spread">--</span></div>
-        <div class="p-2.5 rounded-lg text-xs text-center" style="background:#1e293b" id="iv-sig">분석중...</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ROW 3: MACRO + EVENTS -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-    <div class="card p-5">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-white font-bold flex items-center gap-2 text-sm">
-          <i data-lucide="globe" class="w-4 h-4 text-emerald-400"></i>매크로 지표
-        </h2>
-        <span class="text-slate-500 text-xs" id="macro-updated">--</span>
-      </div>
-      <div class="space-y-3">
-        <div class="grid grid-cols-2 gap-3">
-          <div class="card2 p-3">
-            <div class="flex items-center justify-between mb-1">
-              <div class="text-slate-400 text-xs flex items-center gap-1"><i data-lucide="percent" class="w-3 h-3"></i>미 국채 10Y</div>
-              <a href="https://finance.yahoo.com/quote/%5ETNX/" target="_blank" rel="noopener" class="text-emerald-500 hover:text-emerald-400 transition-colors" title="Yahoo Finance TNX"><i data-lucide="external-link" class="w-3 h-3"></i></a>
-            </div>
-            <div class="text-xl font-black text-white" id="tnx">--</div>
-            <div class="text-xs mt-0.5" id="tnx-chg">--</div>
-            <div class="text-slate-500 text-xs mt-1" id="tnx-imp">--</div>
-          </div>
-          <div class="card2 p-3">
-            <div class="flex items-center justify-between mb-1">
-              <div class="text-slate-400 text-xs flex items-center gap-1"><i data-lucide="dollar-sign" class="w-3 h-3"></i>달러 인덱스</div>
-              <a href="https://finance.yahoo.com/quote/DX-Y.NYB/" target="_blank" rel="noopener" class="text-emerald-500 hover:text-emerald-400 transition-colors" title="Yahoo Finance DXY"><i data-lucide="external-link" class="w-3 h-3"></i></a>
-            </div>
-            <div class="text-xl font-black text-white" id="dxy">--</div>
-            <div class="text-xs mt-0.5" id="dxy-chg">--</div>
-            <div class="text-slate-500 text-xs mt-1" id="dxy-imp">--</div>
-          </div>
-        </div>
-        <div class="card2 p-3">
-          <div class="text-slate-400 text-xs mb-2 flex items-center gap-1"><i data-lucide="info" class="w-3 h-3"></i>TSLA 상관관계 분석</div>
-          <div class="text-xs text-slate-300 leading-relaxed" id="macro-ana">분석중...</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card p-5">
-      <h2 class="text-white font-bold flex items-center gap-2 mb-4 text-sm">
-        <i data-lucide="calendar-clock" class="w-4 h-4 text-pink-400"></i>이벤트 카운트다운
-      </h2>
-      <div class="space-y-3" id="events">
-        <div class="text-slate-500 text-xs text-center py-6">로딩중...</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ROW 4: ASSET ROADMAP -->
-  <div class="card p-5">
-    <h2 class="text-white font-bold flex items-center gap-2 mb-5 text-sm">
-      <i data-lucide="map" class="w-4 h-4 text-amber-400"></i>자산 목표 로드맵 2.0
-      <span class="text-slate-500 font-normal text-xs">— 166.502주 기준</span>
-    </h2>
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
-      <div class="rounded-xl p-4 g-blue border border-blue-900">
-        <div class="text-blue-300 text-sm font-bold mb-1">🎯 목표1: $500</div>
-        <div class="text-2xl font-black text-white" id="t500">$--,---</div>
-        <div class="text-blue-300 text-sm mt-1" id="t500g">+$--,--- (+---%)</div>
-        <div class="text-slate-400 text-xs mt-2" id="t500f">현재가 대비 +--% 필요</div>
-      </div>
-      <div class="rounded-xl p-4 g-green border border-green-900">
-        <div class="text-green-300 text-sm font-bold mb-1">🚀 목표2: $800</div>
-        <div class="text-2xl font-black text-white" id="t800">$--,---</div>
-        <div class="text-green-300 text-sm mt-1" id="t800g">+$--,--- (+---%)</div>
-        <div class="text-slate-400 text-xs mt-2" id="t800f">현재가 대비 +--% 필요</div>
-      </div>
-      <div class="rounded-xl p-4 g-gold border border-amber-900">
-        <div class="text-amber-300 text-sm font-bold mb-1">💎 목표3: $1,000</div>
-        <div class="text-2xl font-black text-white" id="t1000">$--,---</div>
-        <div class="text-amber-300 text-sm mt-1" id="t1000g">+$--,--- (+---%)</div>
-        <div class="text-slate-400 text-xs mt-2" id="t1000f">현재가 대비 +--% 필요</div>
-      </div>
-    </div>
-    <div class="text-slate-400 text-xs mb-2">📊 복리 수익률 시뮬레이션 (연 CAGR별 포트폴리오 가치)</div>
+  <!-- SCENARIO TABLE -->
+  <div class="card2 p-4 mb-4">
+    <div class="text-xs font-bold text-gray-400 mb-3">📅 기간별 시나리오 가격 로드맵</div>
     <div class="overflow-x-auto">
       <table class="w-full text-xs">
         <thead>
-          <tr class="text-slate-400 border-b border-slate-800">
-            <th class="text-left py-2 pr-4">CAGR</th>
-            <th class="text-right py-2 px-3">1년</th>
-            <th class="text-right py-2 px-3">2년</th>
-            <th class="text-right py-2 px-3 text-blue-300">3년</th>
-            <th class="text-right py-2 px-3 text-green-300">4년</th>
-            <th class="text-right py-2 px-3 text-amber-300">5년</th>
+          <tr class="border-b border-gray-800">
+            <th class="text-left py-2 text-gray-500 font-semibold">기간</th>
+            <th class="text-center py-2 text-green-400 font-semibold">🐂 Bull</th>
+            <th class="text-center py-2 text-yellow-400 font-semibold">📊 Base</th>
+            <th class="text-center py-2 text-red-400 font-semibold">🐻 Bear</th>
+            <th class="text-center py-2 text-blue-400 font-semibold">₩ 기준환산</th>
           </tr>
         </thead>
-        <tbody id="ctable"></tbody>
+        <tbody class="divide-y divide-gray-800">
+          <tr>
+            <td class="py-2 text-gray-300 font-medium">2026 Q3</td>
+            <td class="py-2 text-center text-green-400 font-bold">$470~500</td>
+            <td class="py-2 text-center text-yellow-400 font-bold">$420~445</td>
+            <td class="py-2 text-center text-red-400 font-bold">$360~390</td>
+            <td class="py-2 text-center text-blue-300">₩618k~654k</td>
+          </tr>
+          <tr>
+            <td class="py-2 text-gray-300 font-medium">2026 연말</td>
+            <td class="py-2 text-center text-green-400 font-bold">$550~600</td>
+            <td class="py-2 text-center text-yellow-400 font-bold">$455</td>
+            <td class="py-2 text-center text-red-400 font-bold">$330~380</td>
+            <td class="py-2 text-center text-blue-300">₩669k (베이스)</td>
+          </tr>
+          <tr>
+            <td class="py-2 text-gray-300 font-medium">2027</td>
+            <td class="py-2 text-center text-green-400 font-bold">$750~900</td>
+            <td class="py-2 text-center text-yellow-400 font-bold">$520~650</td>
+            <td class="py-2 text-center text-red-400 font-bold">$280~400</td>
+            <td class="py-2 text-center text-blue-300">₩765k~956k</td>
+          </tr>
+          <tr>
+            <td class="py-2 text-gray-300 font-medium font-bold">2028</td>
+            <td class="py-2 text-center text-green-400 font-bold">$900~1,100</td>
+            <td class="py-2 text-center text-yellow-400 font-bold text-base" id="ai-2028">베이스 $700</td>
+            <td class="py-2 text-center text-red-400 font-bold">$250~400</td>
+            <td class="py-2 text-center text-blue-300">₩1,029k (베이스)</td>
+          </tr>
+        </tbody>
       </table>
     </div>
   </div>
 
-  <!-- ROW 5: AI PREDICTIONS -->
-  <div class="card p-5">
-    <div class="flex items-center gap-2 mb-1">
-      <i data-lucide="brain" class="w-4 h-4 text-violet-400"></i>
-      <h2 class="text-white font-bold text-sm">AI 주가 예측 — 헤지펀드 20년+ 관점</h2>
-      <span class="text-xs bg-violet-900 text-violet-300 px-2 py-0.5 rounded-full font-medium">LIVE</span>
+  <!-- 6 INVESTOR PERSPECTIVE CARDS -->
+  <div class="text-xs font-bold text-gray-400 mb-2">🎯 투자자 유형별 관점</div>
+  <div class="grid grid-cols-3 gap-2 mb-4">
+    <!-- Wall Street -->
+    <div class="card2 p-3">
+      <div class="text-sm mb-1">🏦</div>
+      <div class="text-xs font-bold text-gray-200">Wall Street</div>
+      <div class="text-xs text-gray-500 mb-2">애널리스트 컨센서스</div>
+      <div class="text-sm font-bold text-yellow-400">$405~508</div>
+      <div class="text-xs text-yellow-600 font-semibold">HOLD 다수</div>
+      <div class="text-xs text-gray-500 mt-2 leading-relaxed">Wedbush $600 · Goldman $405 · Stifel $508. 평균 TP $405.47. 전기차 점유율 우려 vs AI/로봇 옵션가치 반영 시작.</div>
     </div>
-    <p class="text-slate-400 text-xs mb-5">Fundamental · Macro · Industry Dynamics · Historical Patterns 종합 분석</p>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-      <div class="rounded-xl p-4 g-purple border border-violet-900">
-        <div class="flex justify-between items-start mb-3">
-          <div><div class="text-violet-300 font-black text-lg">2028년 전망</div><div class="text-slate-400 text-xs">~3년 후 · 자율주행 상용화 초기</div></div>
-          <div class="text-right"><div class="text-2xl font-black text-white">$680</div><div class="text-violet-300 text-xs">베이스케이스</div></div>
-        </div>
-        <div class="space-y-1.5 mb-3 text-xs">
-          <div class="flex items-start gap-2"><span class="text-green-400 font-bold whitespace-nowrap">🐂 Bull $900-1,200</span><span class="text-slate-400">FSD v5 로보택시 대규모 수익화 달성</span></div>
-          <div class="flex items-start gap-2"><span class="text-blue-400 font-bold whitespace-nowrap">📊 Base $580-780</span><span class="text-slate-400">EV 30%+ 점유 + 에너지 연 50% 성장</span></div>
-          <div class="flex items-start gap-2"><span class="text-red-400 font-bold whitespace-nowrap">🐻 Bear $250-400</span><span class="text-slate-400">중국 경쟁 심화 + 마진 압박 지속</span></div>
-        </div>
-        <div class="border-t border-violet-900 pt-3 text-xs text-slate-300 leading-relaxed">
-          <strong class="text-violet-300">핵심 드라이버:</strong> FSD 완전 자율주행 상용화 여부가 최대 변수. 로보택시 서비스 스케일업 시 P/E 재평가 기대. Megapack 에너지 사업 연 50%+ 성장 지속 여부 핵심.
-        </div>
-        <div class="mt-3 p-2.5 rounded-lg bg-violet-950 border border-violet-800">
-          <div class="text-xs text-violet-300 font-bold">포트폴리오 영향 (166.502주)</div>
-          <div class="text-sm text-white mt-0.5" id="ai-2028">베이스 $680 → <span class="font-black text-violet-200">$113,221</span></div>
-        </div>
-      </div>
-      <div class="rounded-xl p-4 g-amber border border-amber-900">
-        <div class="flex justify-between items-start mb-3">
-          <div><div class="text-amber-300 font-black text-lg">2030년 전망</div><div class="text-slate-400 text-xs">~5년 후 · AI/로봇 성숙기</div></div>
-          <div class="text-right"><div class="text-2xl font-black text-white">$1,200</div><div class="text-amber-300 text-xs">베이스케이스</div></div>
-        </div>
-        <div class="space-y-1.5 mb-3 text-xs">
-          <div class="flex items-start gap-2"><span class="text-green-400 font-bold whitespace-nowrap">🐂 Bull $2,000-3,500</span><span class="text-slate-400">Optimus 로봇 + 완전자율주행 시장 지배</span></div>
-          <div class="flex items-start gap-2"><span class="text-blue-400 font-bold whitespace-nowrap">📊 Base $1,000-1,500</span><span class="text-slate-400">EV+에너지+AI 복합 성장 실현</span></div>
-          <div class="flex items-start gap-2"><span class="text-red-400 font-bold whitespace-nowrap">🐻 Bear $400-650</span><span class="text-slate-400">기술 지연 + 경쟁 심화 + 거시 악화</span></div>
-        </div>
-        <div class="border-t border-amber-900 pt-3 text-xs text-slate-300 leading-relaxed">
-          <strong class="text-amber-300">핵심 드라이버:</strong> Optimus 휴머노이드 로봇 상용화가 2030년 게임체인저. 로보택시 수익 $50B+ 달성 시 시가총액 $3T 가능. 글로벌 에너지저장 시장 50GWh+ 점유가 베이스케이스 핵심.
-        </div>
-        <div class="mt-3 p-2.5 rounded-lg bg-amber-950 border border-amber-800">
-          <div class="text-xs text-amber-300 font-bold">포트폴리오 영향 (166.502주)</div>
-          <div class="text-sm text-white mt-0.5" id="ai-2030">베이스 $1,200 → <span class="font-black text-amber-200">$199,802</span></div>
-        </div>
-      </div>
+    <!-- Quant -->
+    <div class="card2 p-3">
+      <div class="text-sm mb-1">📐</div>
+      <div class="text-xs font-bold text-gray-200">퀀트/기술적</div>
+      <div class="text-xs text-gray-500 mb-2">알고리즘 분석</div>
+      <div class="text-sm font-bold text-blue-400">$380~430</div>
+      <div class="text-xs text-blue-600 font-semibold">단기 중립</div>
+      <div class="text-xs text-gray-500 mt-2 leading-relaxed">RSI 69.9 과열경계. 골든크로스(MA50&gt;MA200) 유효. MACD +7.9. HV30 43.1%. $420 저항 돌파 시 $450 재상승.</div>
     </div>
-    <div class="mt-4 p-3 rounded-lg bg-slate-900 border border-slate-800 text-xs text-slate-400">
-      ⚠️ 본 예측은 AI 분석 모델의 추정치이며 투자 권유가 아닙니다. 실제 주가는 예측과 크게 다를 수 있으며, 모든 투자 결정의 책임은 본인에게 있습니다.
+    <!-- Swing -->
+    <div class="card2 p-3">
+      <div class="text-sm mb-1">⚡</div>
+      <div class="text-xs font-bold text-gray-200">스윙 트레이더</div>
+      <div class="text-xs text-gray-500 mb-2">단기 모멘텀</div>
+      <div class="text-sm font-bold text-green-400">$420~450</div>
+      <div class="text-xs text-green-600 font-semibold">단기 강세</div>
+      <div class="text-xs text-gray-500 mt-2 leading-relaxed">1개월 모멘텀 +23.9%. 단기 저항 $420 이미 돌파. Q2 실적 전 $450 목표. 7/29 이후 변동성 급등 가능.</div>
+    </div>
+    <!-- Bull -->
+    <div class="card2 p-3">
+      <div class="text-sm mb-1">🐂</div>
+      <div class="text-xs font-bold text-gray-200">강세론자</div>
+      <div class="text-xs text-gray-500 mb-2">성장 시나리오</div>
+      <div class="text-sm font-bold text-green-400">$600~900</div>
+      <div class="text-xs text-green-600 font-semibold">강력 매수</div>
+      <div class="text-xs text-gray-500 mt-2 leading-relaxed">Optimus 로봇 1억대 = 연간 수조달러 TAM. Cybercab 로보택시 네트워크. FSD 구독 수익화. AI+에너지 동반 고성장.</div>
+    </div>
+    <!-- Bear -->
+    <div class="card2 p-3">
+      <div class="text-sm mb-1">🐻</div>
+      <div class="text-xs font-bold text-gray-200">약세론자</div>
+      <div class="text-xs text-gray-500 mb-2">가치 분석</div>
+      <div class="text-sm font-bold text-red-400">$91~300</div>
+      <div class="text-xs text-red-600 font-semibold">과대평가</div>
+      <div class="text-xs text-gray-500 mt-2 leading-relaxed">DCF 내재가치 $91~$300. FCF 마이너스. EV 시장점유율 하락. Musk 정치리스크. P/E 150x+ 거품 논란.</div>
+    </div>
+    <!-- Long-term -->
+    <div class="card2 p-3">
+      <div class="text-sm mb-1">🏛️</div>
+      <div class="text-xs font-bold text-gray-200">장기 투자자</div>
+      <div class="text-xs text-gray-500 mb-2">2028~2030 관점</div>
+      <div class="text-sm font-bold text-purple-400">$800~1,200</div>
+      <div class="text-xs text-purple-600 font-semibold">전략적 보유</div>
+      <div class="text-xs text-gray-500 mt-2 leading-relaxed">Optimus = 역사상 최대 가치창출 기회. Cathie Wood $2,600 목표. 에너지+로봇+AI 복합 플랫폼. 5년 보유 시 10배 가능.</div>
     </div>
   </div>
 
-</main>
+  <!-- CATALYST TRACKER -->
+  <div class="text-xs font-bold text-gray-400 mb-2">🔥 카탈리스트 트래커</div>
+  <div class="grid grid-cols-2 gap-2 mb-4">
+    <div class="card2 p-3">
+      <div class="text-xs font-bold text-green-400 mb-2">📈 상승 트리거</div>
+      <div class="space-y-2">
+        <div class="flex gap-2">
+          <div class="w-1 rounded bg-green-500 shrink-0"></div>
+          <div><div class="text-xs font-semibold text-gray-200">Cybercab Austin 배포 (H2 2026)</div><div class="text-xs text-gray-500">로보택시 실증 → 투자심리 급전환</div></div>
+        </div>
+        <div class="flex gap-2">
+          <div class="w-1 rounded bg-green-500 shrink-0"></div>
+          <div><div class="text-xs font-semibold text-gray-200">Optimus 공장 파일럿 성공</div><div class="text-xs text-gray-500">2026 Q4 · 로봇 사업 본격화 신호</div></div>
+        </div>
+        <div class="flex gap-2">
+          <div class="w-1 rounded bg-green-500 shrink-0"></div>
+          <div><div class="text-xs font-semibold text-gray-200">Q2 실적 어닝 서프라이즈</div><div class="text-xs text-gray-500">7/29 · 마진 회복 + FSD 가이던스</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card2 p-3">
+      <div class="text-xs font-bold text-red-400 mb-2">📉 하락 리스크</div>
+      <div class="space-y-2">
+        <div class="flex gap-2">
+          <div class="w-1 rounded bg-red-500 shrink-0"></div>
+          <div><div class="text-xs font-semibold text-gray-200">EV 수요 둔화 지속</div><div class="text-xs text-gray-500">BYD 경쟁 심화 · 마진 추가 압박</div></div>
+        </div>
+        <div class="flex gap-2">
+          <div class="w-1 rounded bg-red-500 shrink-0"></div>
+          <div><div class="text-xs font-semibold text-gray-200">Musk 정치리스크</div><div class="text-xs text-gray-500">DOGE 논란 · 브랜드 이미지 손상</div></div>
+        </div>
+        <div class="flex gap-2">
+          <div class="w-1 rounded bg-red-500 shrink-0"></div>
+          <div><div class="text-xs font-semibold text-gray-200">매크로 금리 인상 재개</div><div class="text-xs text-gray-500">고PER 주식 밸류에이션 압박</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<footer class="border-t border-slate-800 mt-6 py-4 text-center text-slate-500 text-xs">
-  <div>TSLA 수익 극대화 전략 대시보드 · BUILD: 2026-05-04-v8</div>
-  <div class="mt-1">데이터: Yahoo Finance · 투자 결정의 책임은 본인에게 있습니다</div>
-</footer>
+  <!-- FINAL VERDICT -->
+  <div class="g-green p-4 mb-4">
+    <div class="text-xs text-green-300 font-bold uppercase tracking-wide mb-2">🎯 종합 최종 판단 — 포지션 홀더 액션플랜</div>
+    <div class="grid grid-cols-3 gap-3 mb-3">
+      <div class="text-center">
+        <div class="text-xs text-gray-500">2026 목표</div>
+        <div class="text-xl font-black text-green-400">$455</div>
+        <div class="text-xs text-gray-500">베이스 시나리오</div>
+      </div>
+      <div class="text-center">
+        <div class="text-xs text-gray-500">2027 목표</div>
+        <div class="text-xl font-black text-blue-400">$580</div>
+        <div class="text-xs text-gray-500">Cybercab 본격화</div>
+      </div>
+      <div class="text-center">
+        <div class="text-xs text-gray-500">2028 목표</div>
+        <div class="text-xl font-black text-purple-400">$700</div>
+        <div class="text-xs text-gray-500">Optimus 게임체인저</div>
+      </div>
+    </div>
+    <div class="text-xs text-gray-300 leading-relaxed">
+      <strong class="text-green-300">KB증권 보유자 (현재 ₩564,505 평균)</strong>: 손절선 ₩525,003 위에서 보유 유지. 
+      목표1 ₩600,000 도달 시 30% 부분매도. 
+      $420 저항 상향 돌파 + Q2 실적 양호 확인 시 보유 강화 검토.
+      장기 $700 목표(₩1,029k) 보유 전략 유효.
+    </div>
+  </div>
+
+  <!-- DETAILED 2028 CARD (g-purple) -->
+  <div class="g-purple p-4 mb-3">
+    <div class="flex items-center gap-2 mb-3">
+      <i data-lucide="target" class="w-3 h-3 text-violet-300"></i>
+      <span class="text-sm font-bold text-violet-100">2028년 목표가 분석</span>
+    </div>
+    <div class="grid grid-cols-3 gap-3 mb-3">
+      <div class="text-center">
+        <div class="text-xs text-gray-500 mb-1">Bear</div>
+        <div class="text-lg font-black text-red-400">$350</div>
+        <div class="text-xs text-gray-500">EV 경쟁 심화</div>
+      </div>
+      <div class="text-center">
+        <div class="text-xs text-gray-500 mb-1">Base</div>
+        <div class="text-xl font-black text-violet-300" id="ai-2028-main">베이스 $700 → $116,552</div>
+        <div class="text-xs text-gray-500">Optimus 초기 성과</div>
+      </div>
+      <div class="text-center">
+        <div class="text-xs text-gray-500 mb-1">Bull</div>
+        <div class="text-lg font-black text-green-400">$1,100</div>
+        <div class="text-xs text-gray-500">Optimus 폭발 성장</div>
+      </div>
+    </div>
+    <div class="text-xs text-violet-300 leading-relaxed">
+      베이스 $700 도달 시 총 포지션 평가금액 $116,552 / 현재 총 투자원금 대비 +32.7% · 
+      Cybercab 상업화 + Optimus 초기 배포 + FSD 글로벌 확대가 핵심 가정.
+    </div>
+  </div>
+
+  <!-- DETAILED 2030 CARD (g-amber) -->
+  <div class="g-amber p-4 mb-3">
+    <div class="flex items-center gap-2 mb-3">
+      <i data-lucide="rocket" class="w-3 h-3 text-amber-300"></i>
+      <span class="text-sm font-bold text-amber-100">2030년 장기 시나리오</span>
+    </div>
+    <div class="grid grid-cols-3 gap-3 mb-3">
+      <div class="text-center">
+        <div class="text-xs text-gray-500 mb-1">Bear</div>
+        <div class="text-lg font-black text-red-400">$400</div>
+        <div class="text-xs text-gray-500">성장 지연</div>
+      </div>
+      <div class="text-center">
+        <div class="text-xs text-gray-500 mb-1">Base</div>
+        <div class="text-xl font-black text-amber-300">$1,200</div>
+        <div class="text-xs text-gray-500">로봇+택시 복합</div>
+      </div>
+      <div class="text-center">
+        <div class="text-xs text-gray-500 mb-1">Bull (Cathie)</div>
+        <div class="text-lg font-black text-green-400">$2,600</div>
+        <div class="text-xs text-gray-500">Optimus 지배적 성장</div>
+      </div>
+    </div>
+    <div class="text-xs text-amber-300 leading-relaxed">
+      2030 베이스 $1,200 시나리오: Optimus 100만대+ 배포, Cybercab 글로벌 플랫폼, 에너지사업 Megapack 독과점. 
+      Cathie Wood ARK 목표 $2,600 — AI+로봇+에너지 슈퍼사이클 시 가능한 시나리오.
+    </div>
+  </div>
+
+  <!-- DISCLAIMER -->
+  <div class="text-xs text-gray-600 text-center mt-3 leading-relaxed">
+    ⚠️ 본 예측은 AI 분석 기반 참고 정보로, 투자 조언이 아닙니다. 
+    실제 투자 결정은 본인 판단 하에 수행하세요. 과거 수익률이 미래를 보장하지 않습니다.
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="text-center text-xs text-gray-700 pb-4">
+  TSLA Portfolio Dashboard · <span id="footer-time"></span>
+</div>
+
+</div><!-- /max-w-5xl -->
 
 <script>
-// ==================== CONSTANTS ====================
-const KB={
-  shares:88.502,
-  avg:377.64,       // USD 평단 (참고용)
-  avgKRW:564505,    // 실제 원화 평균구매가격 (카카오뱅크 기준)
-  costKRW:88.502*564505  // 실제 원화 원금 ≈ ₩49,959,043
-};
-const FD={shares:78,avg:246.41}; // Fidelity (USD)
-const TOTAL=166.502,AVG=316.12,COST=TOTAL*AVG;
-let USDKRW=1457; // 기본값 — 1457원 (2026-05-07 기준), fetchUSDKRW()로 실시간 갱신
+// ============================================================
+// CONSTANTS
+// ============================================================
+const KB   = {shares:88.502, avg:377.64, avgKRW:564505, costKRW:88.502*564505};
+const FD   = {shares:78,     avg:246.41};
+const TOTAL = 166.502, AVG = 316.12, COST = TOTAL * AVG;
+let USDKRW = 1457;
 
-// ==================== PROXIES ====================
-const Q2=u=>u.replace('query1.finance.yahoo.com','query2.finance.yahoo.com');
-// Safe encode: avoids double-encoding already-encoded sequences like %5E → %255E
-function safeEnc(u){return u.replace(/%[0-9A-Fa-f]{2}/g,m=>'\x01'+m).split('\x01').map((s,i)=>i===0?encodeURIComponent(s):s[0]+encodeURIComponent(s.slice(1))).join('').replace(/\x01/g,'');}
-// Cache-busting: appends _=timestamp to prevent stale proxy responses
-const cb=u=>u+(u.includes('?')?'&':'?')+'_='+Date.now();
-const PROXIES=[
-  u=>u,                                                            // 1. direct
-  u=>Q2(u),                                                        // 2. query2 mirror
-  u=>`https://api.allorigins.win/raw?url=${safeEnc(u)}`,          // 3. allorigins (safe-encoded)
-  u=>`https://api.allorigins.win/raw?url=${safeEnc(Q2(u))}`,      // 4. allorigins + q2
-  u=>`https://corsproxy.io/?${u}`,                                 // 5. corsproxy raw URL (no double-encoding)
-  u=>`https://corsproxy.io/?${Q2(u)}`,                             // 6. corsproxy + q2
-  u=>`https://api.codetabs.com/v1/proxy?quest=${safeEnc(u)}`,     // 7. codetabs
-  u=>`https://api.codetabs.com/v1/proxy?quest=${safeEnc(Q2(u))}`, // 8. codetabs + q2
-  u=>`https://thingproxy.freeboard.io/fetch/${u}`,                 // 9. thingproxy
-  u=>`https://cors.sh/${u}`,                                       // 10. cors.sh
+// ============================================================
+// HELPERS
+// ============================================================
+const $ = id => document.getElementById(id);
+const st = (id, v) => { const el=$(id); if(el) el.textContent=v; };
+const f$ = (n, dec=0) => '$'+n.toFixed(dec).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+const f₩ = n => '₩'+Math.round(n).toLocaleString();
+const fPct = n => (n>=0?'+':'')+n.toFixed(2)+'%';
+const colorize = (el, v) => { if(!el) return; el.className = el.className.replace(/\bup\b|\bdown\b/g,'').trim(); el.classList.add(v>=0?'up':'down'); };
+
+// ============================================================
+// YAHOO FINANCE PROXY CHAIN
+// ============================================================
+const PROXIES = [
+  u => `https://query1.finance.yahoo.com/v8/finance/chart/${u}?interval=1d&range=1d`,
+  u => `https://query2.finance.yahoo.com/v8/finance/chart/${u}?interval=1d&range=1d`,
+  u => `https://cors.sh/https://query1.finance.yahoo.com/v8/finance/chart/${u}?interval=1d&range=1d`,
+  u => `https://corsproxy.io/?https://query1.finance.yahoo.com/v8/finance/chart/${u}?interval=1d&range=1d`,
+  u => `https://api.allorigins.win/get?url=${encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${u}?interval=1d&range=1d`)}`,
+  u => `https://thingproxy.freeboard.io/fetch/https://query1.finance.yahoo.com/v8/finance/chart/${u}?interval=1d&range=1d`,
+  u => `https://api.codetabs.com/v1/proxy?quest=https://query1.finance.yahoo.com/v8/finance/chart/${u}?interval=1d&range=1d`,
+  u => `https://ycors.vercel.app/api/?url=${encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${u}?interval=1d&range=1d`)}`,
+  u => `https://yahooproxy.onrender.com/proxy?symbol=${u}`,
+  u => `https://tsla-proxy.fly.dev/?symbol=${u}`
 ];
-async function px(url){
-  const busted=cb(url); // add cache-buster once
-  for(const p of PROXIES){
-    try{
-      const r=await fetch(p(busted),{signal:AbortSignal.timeout(5000)});
-      if(!r.ok)continue;
-      const txt=await r.text();
-      if(!txt||txt.startsWith('<')||txt.startsWith('<!'))continue;
-      return JSON.parse(txt);
-    }catch(e){continue;}
-  }
-  throw new Error('all_proxies_failed');
-}
 
-// 병렬 프록시 레이싱: 모든 프록시를 동시에 시도, 가장 빠른 응답 사용
-// 순차(최대 50초) → 병렬(최대 4초)
-async function pxRace(url){
-  const busted=cb(url);
-  const attempts=PROXIES.map(p=>
-    fetch(p(busted),{signal:AbortSignal.timeout(4000)})
-      .then(r=>{if(!r.ok)throw new Error('http'+r.status);return r.text();})
-      .then(txt=>{
-        if(!txt||txt.startsWith('<')||txt.startsWith('<!'))throw new Error('html');
-        return JSON.parse(txt);
-      })
-  );
-  return Promise.any(attempts); // first success wins
-}
-
-// ==================== MATH ====================
-function calcRSI(c,n=14){
-  if(c.length<n+1)return null;
-  const d=c.slice(1).map((v,i)=>v-c[i]);
-  const g=d.map(v=>Math.max(v,0)),l=d.map(v=>Math.max(-v,0));
-  let ag=g.slice(0,n).reduce((a,b)=>a+b)/n,al=l.slice(0,n).reduce((a,b)=>a+b)/n;
-  for(let i=n;i<g.length;i++){ag=(ag*(n-1)+g[i])/n;al=(al*(n-1)+l[i])/n;}
-  return al===0?100:+(100-100/(1+ag/al)).toFixed(1);
-}
-function calcEMA(c,n){
-  if(c.length<n)return null;
-  const k=2/(n+1);let e=c.slice(0,n).reduce((a,b)=>a+b)/n;
-  for(let i=n;i<c.length;i++)e=c[i]*k+e*(1-k);
-  return +e.toFixed(2);
-}
-function calcMA(c,n){return c.length<n?null:+(c.slice(-n).reduce((a,b)=>a+b)/n).toFixed(2);}
-function calcHV30(c){
-  if(c.length<31)return null;
-  const s=c.slice(-31),r=s.slice(1).map((v,i)=>Math.log(v/s[i]));
-  const m=r.reduce((a,b)=>a+b)/r.length;
-  const v=r.reduce((a,b)=>a+(b-m)**2,0)/(r.length-1);
-  return +(Math.sqrt(v*252)*100).toFixed(1);
-}
-function calcMACD(c){
-  const e12=calcEMA(c,12),e26=calcEMA(c,26);
-  if(!e12||!e26)return null;
-  return{line:+(e12-e26).toFixed(2),e12,e26};
-}
-function calcFGI(rsi14,ma50p,ma200p,macdH,momP){
-  const rs=Math.max(0,Math.min(100,rsi14));
-  const m5=Math.max(0,Math.min(100,50+ma50p*2));
-  const m2=Math.max(0,Math.min(100,50+ma200p*1.5));
-  const mc=macdH>0?Math.min(100,50+Math.abs(macdH)/3*10):Math.max(0,50-Math.abs(macdH)/3*10);
-  const mo=Math.max(0,Math.min(100,50+momP*2));
-  return Math.round(rs*.30+m5*.20+m2*.20+mc*.15+mo*.15);
-}
-
-// ==================== HELPERS ====================
-const f$=(v,d=0)=>v==null||isNaN(v)?'$--':'$'+v.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
-const fW=(v)=>v==null||isNaN(v)?'₩--':'₩'+Math.round(v).toLocaleString('ko-KR'); // 원화 포맷
-const fp=(v,d=1)=>v==null||isNaN(v)?'--%':(v>=0?'+':'')+v.toFixed(d)+'%';
-const cc=v=>v>=0?'text-green-400':'text-red-400';
-const el=id=>document.getElementById(id);
-function st(id,txt,cls){const e=el(id);if(!e)return;e.textContent=txt;if(cls!==undefined)e.className=cls;}
-function sh(id,html,cls){const e=el(id);if(!e)return;e.innerHTML=html;if(cls!==undefined)e.className=cls;}
-
-// ==================== GAUGE ====================
-function drawGauge(score){
-  score=Math.max(0,Math.min(100,score));
-  const p=score/100,ang=Math.PI-p*Math.PI;
-  const ex=+(100+80*Math.cos(ang)).toFixed(2),ey=+(100-80*Math.sin(ang)).toFixed(2);
-  const arc=el('g-arc');
-  if(arc){
-    if(score<=0)arc.setAttribute('d','M20,100 L20,100');
-    else if(score>=100)arc.setAttribute('d','M20,100 A80,80 0 1 0 180,100');
-    else arc.setAttribute('d',`M20,100 A80,80 0 ${score>50?1:0} 0 ${ex},${ey}`);
-    const col=score<=20?'#dc2626':score<=40?'#f97316':score<=60?'#eab308':score<=80?'#84cc16':'#22c55e';
-    arc.setAttribute('stroke',col);
-    el('g-score').style.fill=col;
-  }
-  const nd=el('g-needle');
-  if(nd)nd.setAttribute('transform',`rotate(${-90+p*180},100,100)`);
-  st('g-score',score.toString());
-  const lbl=score<=20?'극도의 공포':score<=40?'공포':score<=60?'중립':score<=80?'탐욕':'극도의 탐욕';
-  st('g-label',lbl);
-  const rec=score<=20?'📢 <strong class="text-green-400">강력 매수 시그널</strong> — 극도 공포는 역사적 최적 매수 시점':
-    score<=40?'📈 <strong class="text-green-400">매수 권장</strong> — 공포 구간, 분할 매수 전략 실행':
-    score<=60?'⚖️ <strong class="text-yellow-400">관망/홀딩</strong> — 중립 구간, 현 포지션 유지':
-    score<=80?'⚠️ <strong class="text-orange-400">부분 익절 고려</strong> — 탐욕 구간, 일부 이익 실현 검토':
-    '🔴 <strong class="text-red-400">분할 매도 시그널</strong> — 극도 탐욕, 고점 근접 가능성';
-  sh('fg-rec',rec);
-  st('fg-time','업데이트: '+new Date().toLocaleTimeString('ko-KR'));
-}
-
-// ==================== PRICE UI ====================
-function updatePriceUI(price,chg,chgP,h52,l52){
-  st('h-price',f$(price,2));
-  sh('h-chg',(chg>=0?'+':'')+Math.abs(chg).toFixed(2)+'  ('+fp(chgP)+')','text-xs '+(chg>=0?'text-green-400':'text-red-400'));
-  const pv=TOTAL*price,pnl=pv-COST,pnlP=pnl/COST*100,td=TOTAL*chg;
-  st('pf-val',f$(pv,0));
-  sh('pf-pnl-pct','수익률: '+fp(pnlP),'text-xs mt-1 '+cc(pnl));
-  sh('pf-gain',(pnl>=0?'+':'')+f$(pnl,0),'font-black text-sm mt-0.5 '+cc(pnl));
-  st('pf-cost','원금: '+f$(COST,0));
-  const vsA=(price-AVG)/AVG*100;
-  sh('pf-vs-avg','평단 대비 '+fp(vsA),'text-xs font-bold '+cc(vsA));
-  sh('pf-today',(td>=0?'+':'')+f$(td,0),'font-black text-sm mt-0.5 '+cc(td));
-  sh('pf-today-pct',fp(chgP)+' · 166.502주','text-xs mt-1 '+cc(td));
-  // ── 한국투자증권(카카오뱅크) 계좌 — 원화 기준 정확한 계산 ──
-  const kr=USDKRW;
-  const kvKRW=KB.shares*price*kr;        // 현재 원화 평가금액
-  const kPnlKRW=kvKRW-KB.costKRW;        // 원화 평가손익 (실제 원화 원금 기준)
-  const kPnlPKRW=kPnlKRW/KB.costKRW*100; // 원화 수익률 (카카오뱅크와 일치)
-  const kTdKRW=KB.shares*chg*kr;         // 오늘 손익 (TSLA 가격 변동분, 원화)
-  const kVsA=(price-KB.avg)/KB.avg*100;  // USD 평단 대비 %
-  st('kb-val',fW(kvKRW));
-  sh('kb-pnl-pct','수익률: '+fp(kPnlPKRW)+' (환율 '+Math.round(kr)+'원)','text-xs mt-0.5 '+cc(kPnlKRW));
-  sh('kb-gain',(kPnlKRW>=0?'+':'')+fW(kPnlKRW),'font-bold text-xs mt-0.5 '+cc(kPnlKRW));
-  sh('kb-today',(kTdKRW>=0?'+':'')+fW(kTdKRW),'font-bold text-xs mt-0.5 '+cc(kTdKRW));
-  sh('kb-vs-avg',fp(kVsA),'font-bold text-xs mt-0.5 '+cc(kVsA));
-  // legacy DCA ids
-  const kPnl=kPnlKRW,kVsA_=kVsA;
-  // ── Fidelity 계좌 ──
-  const fv=FD.shares*price,fCost=FD.shares*FD.avg,fPnl=fv-fCost,fPnlP=fPnl/fCost*100,fTd=FD.shares*chg,fVsA=(price-FD.avg)/FD.avg*100;
-  st('fd-val',f$(fv,0));
-  sh('fd-pnl-pct','수익률: '+fp(fPnlP),'text-xs mt-0.5 '+cc(fPnl));
-  sh('fd-gain',(fPnl>=0?'+':'')+f$(fPnl,0),'font-bold text-xs mt-0.5 '+cc(fPnl));
-  sh('fd-today',(fTd>=0?'+':'')+f$(fTd,0),'font-bold text-xs mt-0.5 '+cc(fTd));
-  sh('fd-vs-avg',fp(fVsA),'font-bold text-xs mt-0.5 '+cc(fVsA));
-  // DCA bars
-  const barA=Math.max(2,Math.min(98,50+vsA));
-  st('dca-avg-pct',fp(vsA));
-  el('dca-avg-pct').className='font-bold text-sm '+cc(vsA);
-  el('dca-avg-bar').style.width=barA+'%';
-  el('dca-avg-bar').style.background=vsA<0?'#22c55e':'#f97316';
-  if(h52&&l52){
-    const pos=((price-l52)/(h52-l52)*100);
-    st('dca-52w-pct',pos.toFixed(0)+'%');
-    el('dca-52w-bar').style.width=Math.max(2,Math.min(98,pos))+'%';
-    st('d-low','저: '+f$(l52,0));st('d-high','고: '+f$(h52,0));
-  }
-  // DCA signal
-  let sig,det;
-  if(price<AVG*.85){sig='🟢 강력 매수 추천';det=`평단 대비 ${Math.abs(vsA).toFixed(1)}% 하락. 적극적 추가 매수 최적 시점.`;}
-  else if(price<AVG){sig='🔵 매수 권장';det=`평단($${AVG}) 아래. DCA 매수로 평단 낮추기 적합.`;}
-  else if(price<AVG*1.2){sig='🟡 소량 매수 가능';det='평단 소폭 상회. 하락 시 추가 매수 대기 권장.';}
-  else if(price<AVG*1.6){sig='🟠 홀딩 권장';det=`평단 대비 ${vsA.toFixed(1)}% 수익중. 현 포지션 유지.`;}
-  else{sig='🔴 부분 익절 고려';det=`${vsA.toFixed(1)}% 수익. 목표가 점검 및 분할 익절 전략 검토.`;}
-  st('dca-sig',sig);st('dca-det',det);
-  // Account P&L (legacy DCA section ids — still update if present)
-  if(el('kb-pnl'))sh('kb-pnl',(kPnlKRW>=0?'+':'')+fW(kPnlKRW)+' ('+fp(kVsA)+')','text-xs mt-0.5 '+cc(kPnlKRW));
-  if(el('fd-pnl'))sh('fd-pnl',(fPnl>=0?'+':'')+f$(fPnl,0)+' ('+fp(fVsA)+')','text-xs mt-0.5 '+cc(fPnl));
-  // Price targets
-  [[500,'t500','text-blue-300'],[800,'t800','text-green-300'],[1000,'t1000','text-amber-300']].forEach(([t,pfx,tc])=>{
-    const tv=TOTAL*t,g=tv-COST,gp=g/COST*100,fc=(t-price)/price*100;
-    st(pfx,f$(tv,0));
-    sh(pfx+'g','+'+f$(g,0)+' (+'+gp.toFixed(0)+'%)',tc+' text-sm mt-1');
-    st(pfx+'f','현재가 대비 '+(fc>0?'+':'')+fc.toFixed(1)+'% '+(fc>0?'상승 필요':'이미 달성! 🎉'));
+async function pxRace(sym) {
+  return new Promise((resolve, reject) => {
+    let done = false, errors = 0;
+    PROXIES.forEach(fn => {
+      fetch(fn(sym), {method:'GET', headers:{'Accept':'application/json'}, signal: AbortSignal.timeout(8000)})
+        .then(r => r.text())
+        .then(txt => {
+          if(done) return;
+          try {
+            let data;
+            // Handle allorigins wrapper
+            if(txt.includes('"contents"')) data = JSON.parse(JSON.parse(txt).contents);
+            else data = JSON.parse(txt);
+            const q = data?.chart?.result?.[0];
+            if(!q) throw new Error('no data');
+            const mp = q.meta;
+            const price = mp.regularMarketPrice ?? mp.previousClose;
+            const prev  = mp.chartPreviousClose ?? mp.previousClose;
+            const change = price - prev;
+            const changePct = (change/prev)*100;
+            done = true;
+            resolve({price, prev, change, changePct, sym});
+          } catch(e) { errors++; if(errors===PROXIES.length) reject('All proxies failed'); }
+        })
+        .catch(() => { errors++; if(errors===PROXIES.length && !done) reject('All proxies failed'); });
+    });
   });
-  // Compound table
-  const cagrs=[20,30,40,50,60,80,100];
-  const rows=cagrs.map(c=>{
-    const cells=[1,2,3,4,5].map(y=>{
-      const fv=TOTAL*price*Math.pow(1+c/100,y);
-      const tc2=y===3?'text-blue-300':y===4?'text-green-300':y===5?'text-amber-300':'';
-      return `<td class="text-right py-1.5 px-3 ${tc2}">${f$(fv,0)}</td>`;
-    }).join('');
-    return`<tr class="border-b border-slate-900 hover:bg-slate-900/50 transition-colors"><td class="py-1.5 pr-4 font-bold text-slate-300">${c}%</td>${cells}</tr>`;
-  });
-  sh('ctable',rows.join(''));
-  st('ai-2028',`베이스 $680 → ${f$(TOTAL*680,0)}`);
-  st('ai-2030',`베이스 $1,200 → ${f$(TOTAL*1200,0)}`);
 }
 
-// ==================== TECHNICALS ====================
-function updateTechs(closes,price){
-  const r14=calcRSI(closes),m50=calcMA(closes,50),m200=calcMA(closes,200);
-  const mc=calcMACD(closes),hv=calcHV30(closes);
-  const mom=closes.length>=22?(price-closes[closes.length-22])/closes[closes.length-22]*100:null;
-  if(r14!==null){const rc=r14<30?'text-green-400':r14>70?'text-red-400':'text-yellow-400';st('i-rsi',r14.toString(),'font-bold text-xs '+rc);}
-  if(m50){const d=(price-m50)/m50*100;sh('i-ma50',fp(d),'font-bold text-xs '+cc(d));}
-  if(m200){const d=(price-m200)/m200*100;sh('i-ma200',fp(d),'font-bold text-xs '+cc(d));}
-  if(mc){sh('i-macd',(mc.line>=0?'+':'')+mc.line,'font-bold text-xs '+cc(mc.line));}
-  if(hv){st('i-hv30',hv+'%','font-bold text-xs text-slate-300');st('iv-hv',hv+'%');}
-  if(mom!==null){sh('i-mom',fp(mom),'font-bold text-xs '+cc(mom));}
-  const score=calcFGI(r14||50,m50?(price-m50)/m50*100:0,m200?(price-m200)/m200*100:0,mc?mc.line:0,mom||0);
-  drawGauge(score);
-  // IV-HV spread (only if IV loaded)
-  const ivEl=el('iv-val');
-  if(ivEl&&hv&&ivEl.textContent!=='--'){
-    const ivN=parseFloat(ivEl.textContent);
-    if(!isNaN(ivN)){
-      const sp=(ivN-hv).toFixed(1);
-      sh('iv-spread',(sp>0?'+':'')+sp+'%','font-medium text-xs '+(sp>10?'text-red-400':sp<0?'text-green-400':'text-yellow-400'));
-    }
+// ============================================================
+// UPDATE UI
+// ============================================================
+function updatePriceUI(tsla) {
+  const p = tsla.price;
+  const krw = p * USDKRW;
+
+  // Price display
+  st('price-usd', f$(p, 2));
+  st('price-krw', `${f₩(krw)} 원`);
+  const deltaEl = $('price-delta');
+  if(deltaEl) {
+    deltaEl.textContent = `${tsla.change>=0?'+':''}${tsla.change.toFixed(2)} (${fPct(tsla.changePct)})`;
+    deltaEl.className = 'text-sm font-bold mt-1 px-2 py-1 rounded-full inline-block ' + (tsla.changePct>=0?'bg-green-900 text-green-400':'bg-red-900 text-red-400');
   }
-}
 
-// ==================== OPTIONS ====================
-async function fetchOpts(){
-  try{
-    // 가장 가까운 금요일 만기 날짜 계산
-    const now=new Date(),dow=now.getDay();
-    // dow=5(금요일) 이면서 오후라면 다음 금요일로
-    const daysToFri=dow===0?5:dow===6?6:dow===5&&now.getHours()>=16?7:5-dow;
-    const fri=new Date(now);fri.setDate(now.getDate()+daysToFri);
-    const nearExp=Math.floor(fri.getTime()/1000);
+  // KB 증권
+  const kbVal  = KB.shares * p;
+  const kbCost = KB.shares * KB.avg;
+  const kbPnl  = kbVal - kbCost;
+  const kbPct  = (kbPnl/kbCost)*100;
+  st('kb-val',     f$(kbVal, 0));
+  st('kb-cost',    f$(kbCost, 0));
+  const kbPnlEl = $('kb-pnl');
+  if(kbPnlEl) { kbPnlEl.textContent = f$(kbPnl, 0); colorize(kbPnlEl, kbPnl); }
+  const kbPctEl = $('kb-pnl-pct');
+  if(kbPctEl) { kbPctEl.textContent = fPct(kbPct); colorize(kbPctEl, kbPnl); }
 
-    // pxRace로 모든 프록시 병렬 시도: q1+q2 × date필터/없음 = 4개 URL 동시 레이싱
-    let d=null;
-    const optUrls=[
-      `https://query1.finance.yahoo.com/v7/finance/options/TSLA?date=${nearExp}`,
-      `https://query2.finance.yahoo.com/v7/finance/options/TSLA?date=${nearExp}`,
-      'https://query1.finance.yahoo.com/v7/finance/options/TSLA',
-      'https://query2.finance.yahoo.com/v7/finance/options/TSLA',
-    ];
-    // Race all 4 URLs + all 10 proxies simultaneously (first valid wins)
-    const allAttempts=optUrls.flatMap(u=>
-      PROXIES.map(p=>
-        fetch(p(cb(u)),{signal:AbortSignal.timeout(8000)})
-          .then(r=>{if(!r.ok)throw new Error('http');return r.text();})
-          .then(txt=>{
-            if(!txt||txt.startsWith('<'))throw new Error('html');
-            const j=JSON.parse(txt);
-            if(!j?.optionChain?.result?.[0])throw new Error('no_chain');
-            return j;
-          })
-      )
-    );
-    try{d=await Promise.any(allAttempts);}catch(e){}
-    if(!d)throw new Error();
-    const res=d?.optionChain?.result?.[0];if(!res)throw new Error();
-    const cp=res.quote?.regularMarketPrice||0;
-    const calls=res.options?.[0]?.calls||[],puts=res.options?.[0]?.puts||[];
-    const coi=calls.reduce((a,c)=>a+(c.openInterest||0),0);
-    const poi=puts.reduce((a,c)=>a+(c.openInterest||0),0);
-    const tot=coi+poi;
-    const cpct=tot>0?(coi/tot*100).toFixed(1):'50',ppct=tot>0?(poi/tot*100).toFixed(1):'50';
-    const pcr2=coi>0?(poi/coi).toFixed(2):'--';
-    st('call-pct',cpct+'% ('+Math.round(coi/1000)+'K)');
-    st('put-pct',ppct+'% ('+Math.round(poi/1000)+'K)');
-    el('call-bar').style.width=cpct+'%';
-    el('put-bar').style.width=ppct+'%';
-    st('pcr',pcr2);
-    st('total-oi',Math.round(tot/1000)+'K');
-    const pcrN=parseFloat(pcr2);
-    const sent=pcrN<0.7?'🐂 강세 (콜 우세)':pcrN<1.0?'📊 약간 강세':pcrN<1.3?'⚖️ 중립':'🐻 약세 (풋 우세)';
-    const sentC=pcrN<0.7?'text-green-400':pcrN<1.0?'text-lime-400':pcrN<1.3?'text-yellow-400':'text-red-400';
-    sh('opt-sent',sent,'font-bold text-xs '+sentC);
-    const exp=res.options?.[0]?.expirationDate;
-    st('opt-note',exp?'만기: '+new Date(exp*1000).toLocaleDateString('ko-KR'):'');
-    // Call Wall
-    const near=calls.filter(c=>c.strike>=cp*.8&&c.strike<=cp*1.6).sort((a,b)=>(b.openInterest||0)-(a.openInterest||0)).slice(0,9);
-    const maxOI=near[0]?.openInterest||1;
-    sh('call-wall',near.map(c=>{
-      const oi=c.openInterest||0,bw=(oi/maxOI*100).toFixed(0);
-      const isATM=Math.abs(c.strike-cp)<cp*.025,above=c.strike>cp;
-      const bc=isATM?'#f59e0b':above?'#ef4444':'#22c55e';
-      const tag=isATM?'<span class="text-amber-400 font-bold text-xs">ATM</span>':above?'<span class="text-red-400 text-xs">저항</span>':'<span class="text-green-400 text-xs">지지</span>';
-      return`<div class="flex items-center gap-2"><span class="text-xs w-14 text-right ${isATM?'text-amber-400 font-bold':'text-slate-400'}">${f$(c.strike,0)}</span><div class="flex-1 bg-slate-800 rounded-full h-1.5"><div class="h-1.5 rounded-full" style="width:${bw}%;background:${bc}"></div></div><span class="text-slate-400 text-xs w-10 text-right">${(oi/1000).toFixed(1)}K</span>${tag}</div>`;
-    }).join('')||'<div class="text-slate-500 text-xs text-center py-2">데이터 없음</div>');
-    // IV from ATM call
-    const atm=calls.find(c=>Math.abs(c.strike-cp)<cp*.05);
-    if(atm?.impliedVolatility){
-      const ivN=+(atm.impliedVolatility*100).toFixed(1);
-      sh('iv-val',ivN+'%','text-5xl font-black '+(ivN>80?'text-red-400':ivN<50?'text-green-400':'text-white'));
-      const pct=Math.max(0,Math.min(100,(ivN-40)/80*100));
-      st('iv-pctile',pct.toFixed(0)+'%ile','font-bold '+(pct>70?'text-red-400':pct<30?'text-green-400':'text-yellow-400'));
-      el('iv-bar').style.width=pct+'%';
-      el('iv-bar').style.background=pct>70?'#ef4444':pct<30?'#22c55e':'#f59e0b';
-      const ivSig=pct<25?'<span class="text-green-400 font-bold">📉 IV 저점 — 콜 옵션 매수 적기</span>':
-        pct<50?'<span class="text-lime-400 font-bold">📊 IV 정상범위</span>':
-        pct<75?'<span class="text-yellow-400 font-bold">⚠️ IV 높음 — 옵션 프리미엄 주의</span>':
-        '<span class="text-red-400 font-bold">🔴 IV 극고점 — 대변동 임박 신호</span>';
-      sh('iv-sig',ivSig);
-    }
-  }catch(e){
-    sh('call-wall','<div class="text-slate-500 text-xs text-center py-4">옵션 체인 로드 실패 (CORS 차단)<br><span class="text-xs text-slate-600">프록시 서버 일시 차단 — 잠시 후 새로고침</span><br><a href="https://finance.yahoo.com/quote/TSLA/options/" target="_blank" class="text-purple-400 underline text-xs mt-1 inline-block">Yahoo Finance 직접 확인 →</a></div>');
-    sh('opt-sent','CORS 차단','text-xs text-slate-500');
+  // Fidelity
+  const fdVal  = FD.shares * p;
+  const fdCost = FD.shares * FD.avg;
+  const fdPnl  = fdVal - fdCost;
+  const fdPct  = (fdPnl/fdCost)*100;
+  st('fd-val',  f$(fdVal, 0));
+  st('fd-cost', f$(fdCost, 0));
+  const fdPnlEl = $('fd-pnl');
+  if(fdPnlEl) { fdPnlEl.textContent = f$(fdPnl, 0); colorize(fdPnlEl, fdPnl); }
+  const fdPctEl = $('fd-pnl-pct');
+  if(fdPctEl) { fdPctEl.textContent = fPct(fdPct); colorize(fdPctEl, fdPnl); }
+
+  // Totals
+  const totalVal  = TOTAL * p;
+  const totalCost = COST;
+  const totalPnl  = totalVal - totalCost;
+  const totalPct  = (totalPnl/totalCost)*100;
+  st('total-val',     f$(totalVal, 0));
+  st('total-val-krw', f₩(totalVal * USDKRW));
+  st('total-cost',    f$(totalCost, 0));
+  st('total-cost-krw', Math.round(totalCost * USDKRW / 1e6 * 10)/10 + 'M');
+  const tPnlEl = $('total-pnl');
+  if(tPnlEl) { tPnlEl.textContent = f$(totalPnl, 0); colorize(tPnlEl, totalPnl); }
+  const tPnlKrwEl = $('total-pnl-krw');
+  if(tPnlKrwEl) { tPnlKrwEl.textContent = f₩(totalPnl * USDKRW); colorize(tPnlKrwEl, totalPnl); }
+  const tPctEl = $('total-pnl-pct');
+  if(tPctEl) { tPctEl.textContent = fPct(totalPct); colorize(tPctEl, totalPnl); }
+  const tBarEl = $('total-bar');
+  if(tBarEl) tBarEl.style.width = Math.min(100, Math.max(0, 50 + totalPct)).toFixed(1)+'%';
+
+  // Signal logic
+  const signalPill = $('signal-pill');
+  if(signalPill) {
+    if(p < 357) { signalPill.textContent='SELL'; signalPill.className='pill-sell text-xl font-black tracking-widest px-6 py-3 rounded-xl shrink-0'; st('signal-text','⚠️ 손절선 이탈 — 즉시 매도 고려'); }
+    else if(p < 390) { signalPill.textContent='BUY'; signalPill.className='pill-buy text-xl font-black tracking-widest px-6 py-3 rounded-xl shrink-0'; st('signal-text','📈 매수 구간 — KB 추가매수 검토'); }
+    else { signalPill.textContent='HOLD'; signalPill.className='pill-hold text-xl font-black tracking-widest px-6 py-3 rounded-xl shrink-0'; st('signal-text','🔒 보유 유지 — 손절선 ₩525,003 이상'); }
   }
+
+  // Gauge
+  const minP=300, maxP=700;
+  const pct = Math.min(100, Math.max(0, ((p-minP)/(maxP-minP))*100));
+  const needle = $('gauge-needle');
+  if(needle) needle.style.left = pct.toFixed(1)+'%';
+  st('gauge-price', f$(p, 2));
+  let zone = '보유 구간';
+  if(p < 357) zone='⚠️ 손절 구간';
+  else if(p < 390) zone='🟢 매수 구간';
+  else if(p < 480) zone='🟡 보유 구간';
+  else if(p < 510) zone='🟠 부분매도 구간';
+  else if(p < 570) zone='🔴 목표1 구간';
+  else if(p < 650) zone='🔴 목표2 구간';
+  else zone='🚀 목표3 구간';
+  st('gauge-zone', zone);
+
+  // AI 2028 section
+  st('ai-2028', `베이스 $700 → ${f$(TOTAL*700, 0)}`);
+  st('ai-2028-main', `베이스 $700 → ${f$(TOTAL*700, 0)}`);
+
+  // Last update
+  const now = new Date();
+  st('last-update', now.toLocaleTimeString('ko-KR'));
+  st('footer-time', now.toLocaleDateString('ko-KR', {year:'numeric',month:'long',day:'numeric'}));
 }
 
-// ==================== MACRO ====================
-function applyTNX(p,pv){
-  const ch=+(p-pv).toFixed(3),cp=(ch/pv*100);
-  st('tnx',p.toFixed(2)+'%');
-  sh('tnx-chg',(ch>=0?'▲':'▼')+Math.abs(ch).toFixed(3)+' ('+fp(cp)+')','text-xs mt-0.5 '+(ch>=0?'text-red-400':'text-green-400'));
-  st('tnx-imp',ch>0.05?'금리↑ → TSLA 성장주 압박':ch<-0.05?'금리↓ → 성장주 호재':'금리 안정 → 중립');
+function updateMarket(mktData) {
+  if(!mktData) return;
+  const sp=mktData.sp, ndx=mktData.ndx, vix=mktData.vix;
+  if(sp)  { st('mkt-sp',  sp.price.toLocaleString(undefined,{maximumFractionDigits:0})); const el=$('mkt-sp-chg'); if(el){el.textContent=fPct(sp.changePct); colorize(el, sp.change);} }
+  if(ndx) { st('mkt-ndx', ndx.price.toLocaleString(undefined,{maximumFractionDigits:0})); const el=$('mkt-ndx-chg'); if(el){el.textContent=fPct(ndx.changePct); colorize(el, ndx.change);} }
+  if(vix) { st('mkt-vix', vix.price.toFixed(2)); const el=$('mkt-vix-chg'); if(el){el.textContent=fPct(vix.changePct); colorize(el, vix.change);} }
+  if(mktData.fx) st('mkt-fx', mktData.fx.toFixed(0));
 }
-function applyDXY(p,pv){
-  const ch=+(p-pv).toFixed(2),cp=(ch/pv*100);
-  st('dxy',p.toFixed(2));
-  sh('dxy-chg',(ch>=0?'▲':'▼')+Math.abs(ch).toFixed(2)+' ('+fp(cp)+')','text-xs mt-0.5 '+(ch>=0?'text-orange-400':'text-blue-400'));
-  st('dxy-imp',ch>0.3?'달러↑ → 해외매출 환차손':ch<-0.3?'달러↓ → 해외수익 호재':'달러 안정 → 중립');
-}
-// Parse stooq CSV — free public data, direct CORS (no proxy needed)
-async function fetchStooqCSV(sym){
-  const r=await fetch(`https://stooq.com/q/l/?s=${sym}&f=sd2t2ohlcv&h&e=csv`,{signal:AbortSignal.timeout(5000)});
-  if(!r.ok)throw new Error('stooq_err');
-  const txt=await r.text();
-  const rows=txt.trim().split('\n');
-  if(rows.length<2)throw new Error('no_data');
-  const cols=rows[1].split(',');
-  const close=parseFloat(cols[5]),open=parseFloat(cols[2]);
-  if(isNaN(close))throw new Error('nan');
-  return{price:close,prev:open||close};
-}
-// ==================== USD/KRW ====================
-async function fetchUSDKRW(){
-  // 병렬 레이싱: Yahoo Finance KRW=X (pxRace)
-  try{
-    const d=await pxRace('https://query1.finance.yahoo.com/v7/finance/quote?symbols=KRW%3DX');
-    const q=d?.quoteResponse?.result?.[0];
-    if(q?.regularMarketPrice>100){USDKRW=q.regularMarketPrice;updateKRWDisplay();return;}
-  }catch(e){}
-  // Yahoo chart API
-  try{
-    const d=await pxRace('https://query1.finance.yahoo.com/v8/finance/chart/KRW%3DX?interval=1d&range=1d');
-    const p=d?.chart?.result?.[0]?.meta?.regularMarketPrice;
-    if(p>100){USDKRW=p;updateKRWDisplay();return;}
-  }catch(e){}
-  // Stooq: usdkrw=f
-  try{
-    const s=await fetchStooqCSV('usdkrw=f');
-    if(s.price>100){USDKRW=s.price;updateKRWDisplay();return;}
-  }catch(e){}
-  // Stooq alternate: krw=x
-  try{
-    const s=await fetchStooqCSV('krw=x');
-    if(s.price>100){USDKRW=s.price;updateKRWDisplay();return;}
-  }catch(e){}
-  // 기본값 유지 (1457원) — 카카오뱅크 기준 2026-05-07
-  updateKRWDisplay();
-}
-function updateKRWDisplay(){
-  // 환율이 업데이트된 후 KB카드 힌트 갱신
-  const e=el('kb-pnl-pct');
-  if(e&&e.textContent&&!e.textContent.includes('--')){
-    // 수익률 텍스트의 환율 부분만 업데이트 (환율 표기 포함)
-    const match=e.textContent.match(/수익률: ([+-]?[\d.]+%)/);
-    if(match)e.textContent=match[0]+' (환율 '+Math.round(USDKRW)+'원)';
+
+// ============================================================
+// FETCH & INIT
+// ============================================================
+async function fetchAll() {
+  try {
+    const [tsla, sp, ndx, vix, krw] = await Promise.allSettled([
+      pxRace('TSLA'),
+      pxRace('^GSPC'),
+      pxRace('^IXIC'),
+      pxRace('^VIX'),
+      pxRace('KRW=X')
+    ]);
+    if(tsla.status==='fulfilled') updatePriceUI(tsla.value);
+    if(krw.status==='fulfilled')  USDKRW = krw.value.price;
+    updateMarket({
+      sp:  sp.status==='fulfilled'  ? sp.value  : null,
+      ndx: ndx.status==='fulfilled' ? ndx.value : null,
+      vix: vix.status==='fulfilled' ? vix.value : null,
+      fx:  krw.status==='fulfilled' ? krw.value.price : 1457
+    });
+  } catch(e) {
+    console.warn('Fetch error:', e);
   }
 }
 
-async function fetchMacro(){
-  let tnxOk=false,dxyOk=false;
-
-  // ① Primary A: v7 quote API — pxRace(병렬)로 최대 4초에 결과
-  try{
-    const d=await pxRace('https://query1.finance.yahoo.com/v7/finance/quote?symbols=%5ETNX%2CDX-Y.NYB');
-    for(const q of(d?.quoteResponse?.result||[])){
-      const p=q?.regularMarketPrice,pv=q?.regularMarketPreviousClose||q?.regularMarketOpen||p;
-      if(!p)continue;
-      if(q.symbol==='^TNX'||q.symbol==='TNX'){applyTNX(p,pv);tnxOk=true;}
-      else if(q.symbol==='DX-Y.NYB'){applyDXY(p,pv);dxyOk=true;}
-    }
-  }catch(e){}
-
-  // ① Primary B: Stooq CSV (CORS-free 직접 접근) — TNX:%5Etnx, DXY:usdx.f
-  if(!tnxOk){
-    try{const s=await fetchStooqCSV('%5Etnx');applyTNX(s.price,s.prev);tnxOk=true;}catch(e){}
-  }
-  if(!tnxOk){
-    // Stooq alternate symbol for US 10Y
-    try{const s=await fetchStooqCSV('us10y.b');applyTNX(s.price,s.prev);tnxOk=true;}catch(e){}
-  }
-  if(!dxyOk){
-    // Stooq DXY: usdx.f (달러인덱스 선물) — dxy.f는 없는 심볼
-    try{const s=await fetchStooqCSV('usdx.f');applyDXY(s.price,s.prev);dxyOk=true;}catch(e){}
-  }
-  if(!dxyOk){
-    try{const s=await fetchStooqCSV('dx.f');applyDXY(s.price,s.prev);dxyOk=true;}catch(e){}
-  }
-
-  // ① Primary C: FRED API — 미국 연방준비제도, CORS 허용, 일별 데이터
-  if(!tnxOk){
-    try{
-      const r=await fetch('https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS10',{signal:AbortSignal.timeout(6000)});
-      const txt=await r.text();
-      const rows=txt.trim().split('\n').filter(l=>!l.startsWith('DATE'));
-      const last=rows[rows.length-1].split(',');
-      const p=parseFloat(last[1]);
-      if(!isNaN(p)&&p>0){applyTNX(p,p);tnxOk=true;}
-    }catch(e){}
-  }
-
-  // ② Fallback: individual Yahoo chart API with %5ETNX (pre-encoded — avoids ^ in raw proxy URLs)
-  if(!tnxOk){
-    for(const sym of['%5ETNX']){
-      try{
-        const v=await px(`https://query1.finance.yahoo.com/v8/finance/chart/${sym}?range=1d&interval=1d`);
-        const m=v?.chart?.result?.[0]?.meta;
-        if(m?.regularMarketPrice){applyTNX(m.regularMarketPrice,m.previousClose||m.chartPreviousClose||m.regularMarketPrice);tnxOk=true;break;}
-      }catch(e){}
-    }
-  }
-  if(!dxyOk){
-    for(const sym of['DX-Y.NYB','DX%3DF']){
-      try{
-        const v=await px(`https://query1.finance.yahoo.com/v8/finance/chart/${sym}?range=1d&interval=1d`);
-        const m=v?.chart?.result?.[0]?.meta;
-        if(m?.regularMarketPrice){applyDXY(m.regularMarketPrice,m.previousClose||m.chartPreviousClose||m.regularMarketPrice);dxyOk=true;break;}
-      }catch(e){}
-    }
-  }
-
-  // ③ Fallback: v10 quoteSummary (price module only, ~1KB)
-  if(!tnxOk){
-    try{
-      const v=await px('https://query1.finance.yahoo.com/v10/finance/quoteSummary/%5ETNX?modules=price');
-      const m=v?.quoteSummary?.result?.[0]?.price;
-      if(m?.regularMarketPrice?.raw){applyTNX(m.regularMarketPrice.raw,m.regularMarketPreviousClose?.raw||m.regularMarketPrice.raw);tnxOk=true;}
-    }catch(e){}
-  }
-  if(!dxyOk){
-    try{
-      const v=await px('https://query1.finance.yahoo.com/v10/finance/quoteSummary/DX-Y.NYB?modules=price');
-      const m=v?.quoteSummary?.result?.[0]?.price;
-      if(m?.regularMarketPrice?.raw){applyDXY(m.regularMarketPrice.raw,m.regularMarketPreviousClose?.raw||m.regularMarketPrice.raw);dxyOk=true;}
-    }catch(e){}
-  }
-
-  // Status
-  const ts=new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
-  const mu=el('macro-updated');
-  if(mu)mu.textContent=(tnxOk&&dxyOk)?'업데이트: '+ts:(tnxOk||dxyOk)?'일부: '+ts:'API 차단 — 링크 직접 확인';
-
-  sh('macro-ana','<strong class="text-emerald-400">현재 매크로 환경:</strong><br>• TSLA는 고성장 기술주로 <strong>금리에 민감</strong> — 10Y 수익률 하락 시 P/E 재평가 기대<br>• 달러 강세는 테슬라 유럽·중국 매출의 달러 환산을 <strong>감소</strong>시킴<br>• AI·로봇 테마 강세 지속 시 매크로 역풍에도 <strong>상대적 아웃퍼폼</strong> 가능');
-}
-
-// ==================== EVENTS ====================
-function setupEvents(){
-  const evts=[
-    {name:'💰 Q1 2026 실적 발표',date:new Date('2026-04-22T16:30:00-04:00'),col:'green'},
-    {name:'⚡ Tesla AI Day / 주주총회',date:new Date('2026-06-15T14:00:00-04:00'),col:'purple'},
-    {name:'🚗 Q2 2026 인도량 발표',date:new Date('2026-07-02T08:00:00-04:00'),col:'blue'},
-    {name:'💰 Q2 2026 실적 발표',date:new Date('2026-07-22T16:30:00-04:00'),col:'green'},
-    {name:'🤖 Optimus 업데이트 예정',date:new Date('2026-09-01T14:00:00-04:00'),col:'violet'},
-  ];
-  const cmap={blue:'border-blue-800 bg-blue-950',green:'border-green-800 bg-green-950',purple:'border-purple-800 bg-purple-950',violet:'border-violet-800 bg-violet-950'};
-  const tmap={blue:'text-blue-300',green:'text-green-300',purple:'text-purple-300',violet:'text-violet-300'};
-  function render(){
-    const n=new Date();
-    const upcoming=evts.filter(e=>e.date>=n).slice(0,4);
-    sh('events',upcoming.map(e=>{
-      const diff=e.date-n,dy=Math.floor(diff/864e5),hr=Math.floor(diff%864e5/36e5),mn=Math.floor(diff%36e5/6e4);
-      return`<div class="border rounded-lg p-3 ${cmap[e.col]||'border-slate-700 bg-slate-900'}"><div class="flex justify-between items-center"><div class="text-sm font-bold text-white">${e.name}</div><div class="text-right"><div class="text-xl font-black ${tmap[e.col]||'text-white'}">${dy}일</div><div class="text-xs text-slate-400">${hr}시간 ${mn}분</div></div></div><div class="text-xs text-slate-400 mt-1">${e.date.toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'})}</div></div>`;
-    }).join('')||'<div class="text-slate-500 text-xs text-center py-4">예정 이벤트 없음</div>');
-  }
-  render();setInterval(render,60000);
-}
-
-// ==================== MARKET STATUS ====================
-function updateMarketStatus(){
-  const n=new Date(),ny=new Date(n.toLocaleString('en-US',{timeZone:'America/New_York'}));
-  const h=ny.getHours(),m=ny.getMinutes(),dw=ny.getDay(),t=h*100+m,we=dw===0||dw===6;
-  let dot,lbl;
-  if(we){dot='bg-slate-500';lbl='주말 휴장';}
-  else if(t>=400&&t<930){dot='bg-yellow-400 pulse-dot';lbl='⏰ 프리마켓 (04:00~09:30 ET)';}
-  else if(t>=930&&t<1600){dot='bg-green-400 pulse-dot';lbl='🟢 정규장 OPEN';}
-  else if(t>=1600&&t<2000){dot='bg-blue-400 pulse-dot';lbl='🌙 애프터마켓 (16:00~20:00 ET)';}
-  else{dot='bg-slate-500';lbl='⏸ 장 마감';}
-  el('mkt-dot').className='w-2 h-2 rounded-full '+dot;
-  st('mkt-label',lbl);
-}
-
-// ==================== MAIN FETCH ====================
-let busy=false;
-async function fetchTSLA(){
-  const d=await pxRace('https://query1.finance.yahoo.com/v8/finance/chart/TSLA?range=1y&interval=1d');
-  const res=d?.chart?.result?.[0];if(!res)throw new Error('no result');
-  const m=res.meta,price=m.regularMarketPrice;
-  // regularMarketPreviousClose = 진짜 전일 종가 (chartPreviousClose는 1년 전 첫 종가라 오류 발생)
-  const closes=(res.indicators?.quote?.[0]?.close||[]).filter(v=>v!=null);
-  const prev=m.regularMarketPreviousClose||m.previousClose||(closes.length>=2?closes[closes.length-2]:price);
-  const chg=+(price-prev).toFixed(2),chgP=(chg/prev*100);
-  updatePriceUI(price,chg,chgP,m.fiftyTwoWeekHigh,m.fiftyTwoWeekLow);
-  if(closes.length>0)updateTechs(closes,price);
-  // ── Pre / After-market ──
-  const ext=el('h-ext');
-  if(ext){
-    const ms=m.marketState;
-    if(ms==='PRE'&&m.preMarketPrice){
-      const pp=m.preMarketPrice,pc=+(m.preMarketChange||0).toFixed(2),pcp=+(m.preMarketChangePercent||0).toFixed(2);
-      ext.style.display='';
-      sh('h-ext','<span class="text-yellow-400 font-bold">▲ 프리마켓</span> '+f$(pp,2)+'  '+(pc>=0?'<span class="text-green-400">+'+pc+'</span>':'<span class="text-red-400">'+pc+'</span>')+' ('+fp(pcp)+')','text-xs mt-0.5');
-    } else if((ms==='POST'||ms==='POSTPOST')&&m.postMarketPrice){
-      const pp=m.postMarketPrice,pc=+(m.postMarketChange||0).toFixed(2),pcp=+(m.postMarketChangePercent||0).toFixed(2);
-      ext.style.display='';
-      sh('h-ext','<span class="text-blue-400 font-bold">▸ 애프터마켓</span> '+f$(pp,2)+'  '+(pc>=0?'<span class="text-green-400">+'+pc+'</span>':'<span class="text-red-400">'+pc+'</span>')+' ('+fp(pcp)+')','text-xs mt-0.5');
-    } else {ext.style.display='none';}
-  }
-}
-
-async function refreshAll(){
-  if(busy)return;busy=true;
-  el('refresh-icon').classList.add('spin');
-  updateMarketStatus();
-  await Promise.allSettled([fetchTSLA(),fetchOpts(),fetchMacro(),fetchUSDKRW()]);
-  el('refresh-icon').classList.remove('spin');
-  busy=false;
-}
-
-// ==================== INIT ====================
-document.addEventListener('DOMContentLoaded',()=>{
-  if(window.lucide)lucide.createIcons();
-  setupEvents();
-  refreshAll();
-  setInterval(refreshAll,5*60*1000);
-  setTimeout(()=>{if(window.lucide)lucide.createIcons();},1500);
+// Init
+document.addEventListener('DOMContentLoaded', () => {
+  lucide.createIcons();
+  fetchAll();
+  setInterval(fetchAll, 60000); // refresh every minute
 });
 </script>
 </body>
