@@ -1337,12 +1337,12 @@ async function buildPortfolioScenarioTable(){
   tbody.innerHTML=rows.join('');
 }
 
-function refreshAll(){
-  buildPortfolioScenarioTable();
+async function refreshAll(){
   if(busy)return;busy=true;
   el('refresh-icon').classList.add('spin');
   updateMarketStatus();
   await Promise.allSettled([fetchTSLA(),fetchOpts(),fetchMacro(),fetchUSDKRW()]);
+  buildPortfolioScenarioTable();
   el('refresh-icon').classList.remove('spin');
   busy=false;
 }
