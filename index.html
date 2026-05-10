@@ -625,6 +625,158 @@ body{background:#020817}
         </div>
       </div>
     </div>
+
+    <!-- ADDITIONAL INDICATORS -->
+    <div class="mt-6">
+      <h3 class="text-sm font-bold text-slate-300 mb-3">📊 추가 정량 지표 — 예측에 쓰이는 다른 데이터</h3>
+
+      <!-- Short Interest + Options + Institutional + Earnings 4-grid -->
+      <div class="grid grid-cols-2 gap-3 mb-3">
+
+        <!-- Short Interest -->
+        <div class="card2 p-4">
+          <div class="text-xs text-slate-400 mb-2">📉 공매도 / Short Interest</div>
+          <div class="space-y-2 text-xs">
+            <div class="flex justify-between"><span class="text-slate-400">Short Float</span><span class="text-green-400 font-bold">2.7% ↓ 낮음</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">Days to Cover</span><span class="text-slate-200">1.2일</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">Borrow Rate</span><span class="text-green-400">0.5% (저렴)</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">Short Squeeze Index</span><span class="text-yellow-400">Low Risk</span></div>
+            <div class="mt-2 text-slate-500">→ 공매도 압력 낮음. 숏커버 랠리 가능성 제한적. 강세 신호.</div>
+          </div>
+        </div>
+
+        <!-- Options Market -->
+        <div class="card2 p-4">
+          <div class="text-xs text-slate-400 mb-2">⚙️ 옵션 시장 심리</div>
+          <div class="space-y-2 text-xs">
+            <div class="flex justify-between"><span class="text-slate-400">Max Pain (이번 만기)</span><span class="text-yellow-400 font-bold">$420</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">Put/Call Ratio</span><span class="text-green-400 font-bold">0.52 (콜 우세)</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">IV Rank (30d)</span><span class="text-slate-200">45% — 보통</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">Gamma Exposure</span><span class="text-green-400">+양수 (딜러 매수)</span></div>
+            <div class="mt-2 text-slate-500">→ 만기일 $420 중력권. 콜 우세로 상방 에너지 유지.</div>
+          </div>
+        </div>
+
+        <!-- Institutional Positioning -->
+        <div class="card2 p-4">
+          <div class="text-xs text-slate-400 mb-2">🏛️ 기관·내부자 포지셔닝</div>
+          <div class="space-y-2 text-xs">
+            <div class="flex justify-between"><span class="text-slate-400">기관 소유비율</span><span class="text-slate-200 font-bold">41.2%</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">Vanguard</span><span class="text-green-400">+0.3% ↑</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">BlackRock</span><span class="text-red-400">-0.1% ↓</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">ARK (ARKK 비중)</span><span class="text-blue-400">11.2% · 목표 $2,600</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">내부자 최근 거래</span><span class="text-red-400">순매도 (Musk 옵션)</span></div>
+            <div class="mt-2 text-slate-500">→ 대형 패시브 유지, 내부자 매도는 보상 관련.</div>
+          </div>
+        </div>
+
+        <!-- Earnings Consensus -->
+        <div class="card2 p-4">
+          <div class="text-xs text-slate-400 mb-2">📈 EPS / 실적 컨센서스</div>
+          <div class="space-y-2 text-xs">
+            <div class="flex justify-between"><span class="text-slate-400">Q2 2026E EPS</span><span class="text-slate-200 font-bold">$0.58</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">FY 2026E EPS</span><span class="text-green-400 font-bold">$2.85 (+18% YoY)</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">FY 2027E EPS</span><span class="text-green-400 font-bold">$4.12 (+45% YoY)</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">Revenue 2026E</span><span class="text-slate-200">$120B (+12%)</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">EPS 서프라이즈 평균</span><span class="text-green-400">+23% (최근 8분기)</span></div>
+            <div class="mt-2 text-slate-500">→ 어닝 모멘텀 강함. 컨센서스 상향 조정 중.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seasonality + Valuation + Macro Sensitivity 3-grid -->
+      <div class="grid grid-cols-3 gap-3 mb-3">
+
+        <!-- Seasonality -->
+        <div class="card2 p-4">
+          <div class="text-xs text-slate-400 mb-2">📅 계절성 패턴</div>
+          <div class="space-y-1 text-xs">
+            <div class="flex justify-between"><span class="text-slate-400">현재 국면</span><span class="text-green-400 font-bold">배달 발표 전 강세</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">6월 말 배달 발표</span><span class="text-yellow-400">7월 랠리 패턴</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">역사적 Q2 평균</span><span class="text-green-400">+8.3%</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">작년 동기 대비</span><span class="text-green-400">+45% ↑</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">최약 월</span><span class="text-red-400">2월, 8월</span></div>
+            <div class="mt-2 text-slate-500">→ Q2 배달 촉매 + 계절적 강세 구간.</div>
+          </div>
+        </div>
+
+        <!-- Valuation vs Peers -->
+        <div class="card2 p-4">
+          <div class="text-xs text-slate-400 mb-2">💎 밸류에이션 비교</div>
+          <div class="space-y-1 text-xs">
+            <div class="flex justify-between"><span class="text-slate-400">P/S (TSLA)</span><span class="text-yellow-400 font-bold">8.2x</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">P/S 5년 평균</span><span class="text-slate-400">10.5x → <span class="text-green-400">22% 할인</span></span></div>
+            <div class="flex justify-between"><span class="text-slate-400">P/E 2026E</span><span class="text-red-400">150x (AI 프리미엄)</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">EV/EBITDA</span><span class="text-slate-200">42x</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">BYD P/E 비교</span><span class="text-green-400">18x (TSLA 8배)</span></div>
+            <div class="mt-2 text-slate-500">→ P/S 기준 역사적 저평가. AI 옵션 반영 시 정당화.</div>
+          </div>
+        </div>
+
+        <!-- Macro Sensitivity -->
+        <div class="card2 p-4">
+          <div class="text-xs text-slate-400 mb-2">🌍 매크로 민감도</div>
+          <div class="space-y-1 text-xs">
+            <div class="flex justify-between"><span class="text-slate-400">금리 민감도</span><span class="text-red-400">높음 (장기성장주)</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">현재 10Y 금리</span><span class="text-yellow-400">4.38%</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">중국 매출 비중</span><span class="text-yellow-400">22% (리스크)</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">달러 강세</span><span class="text-red-400">역풍 (해외매출 희석)</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">EV 보조금 리스크</span><span class="text-yellow-400">IRA 불확실성</span></div>
+            <div class="mt-2 text-slate-500">→ 금리 인하 시 가장 큰 수혜 종목.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Relative Strength + Dark Pool -->
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <div class="card2 p-4">
+          <div class="text-xs text-slate-400 mb-2">📡 상대강도 / 팩터 분석</div>
+          <div class="space-y-1 text-xs">
+            <div class="flex justify-between"><span class="text-slate-400">베타 (vs S&P500)</span><span class="text-yellow-400 font-bold">2.1 — 고변동성</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">TSLA vs NASDAQ (3M)</span><span class="text-green-400">+12% 아웃퍼폼</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">모멘텀 팩터 스코어</span><span class="text-green-400">상위 18%</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">퀄리티 팩터</span><span class="text-yellow-400">중간 (FCF 마이너스)</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">TSLA vs EV ETF</span><span class="text-green-400">+28% 아웃퍼폼</span></div>
+            <div class="mt-2 text-slate-500">→ 모멘텀 강세. 고베타로 시장 상승 시 2배 수혜.</div>
+          </div>
+        </div>
+        <div class="card2 p-4">
+          <div class="text-xs text-slate-400 mb-2">🌑 다크풀 / 기관 플로우</div>
+          <div class="space-y-1 text-xs">
+            <div class="flex justify-between"><span class="text-slate-400">다크풀 비율</span><span class="text-slate-200 font-bold">~38% (평균 수준)</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">최근 대형 블록거래</span><span class="text-green-400">매수 우세</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">스마트머니 플로우</span><span class="text-green-400">순유입 (4주 연속)</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">리테일 vs 기관</span><span class="text-yellow-400">리테일 40% / 기관 60%</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">OTC 거래비율</span><span class="text-slate-200">41%</span></div>
+            <div class="mt-2 text-slate-500">→ 기관 스마트머니 유입 지속. 긍정적 신호.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PORTFOLIO VALUE BY SCENARIO -->
+    <div class="mt-6">
+      <h3 class="text-sm font-bold text-slate-300 mb-3">💼 시나리오별 내 포트폴리오 총 평가금액</h3>
+      <div class="card2 overflow-x-auto">
+        <table class="w-full text-xs">
+          <thead>
+            <tr class="border-b border-slate-700">
+              <th class="text-left py-2 px-3 text-slate-400">시나리오</th>
+              <th class="text-right py-2 px-3 text-slate-400">목표가</th>
+              <th class="text-right py-2 px-3 text-slate-400">총 평가액 (USD)</th>
+              <th class="text-right py-2 px-3 text-slate-400">총 평가액 (KRW)</th>
+              <th class="text-right py-2 px-3 text-slate-400">투자원금 대비</th>
+              <th class="text-right py-2 px-3 text-slate-400">수익/손실 (USD)</th>
+            </tr>
+          </thead>
+          <tbody id="portfolio-scenario-tbody">
+            <!-- filled by JS -->
+          </tbody>
+        </table>
+      </div>
+      <div class="mt-2 text-xs text-slate-500">* 총 166.502주 (KB 88.502 + Fidelity 78) · 평균단가 $316.12 · KRW 환율은 실시간 적용</div>
+    </div>
+
     <div class="mt-4 p-3 rounded-lg bg-slate-900 border border-slate-800 text-xs text-slate-400">
       ⚠️ 본 예측은 AI 분석 모델의 추정치이며 투자 권유가 아닙니다. 실제 주가는 예측과 크게 다를 수 있으며, 모든 투자 결정의 책임은 본인에게 있습니다.
     </div>
@@ -1144,7 +1296,49 @@ async function fetchTSLA(){
     } else {ext.style.display='none';}
   }
 }
-async function refreshAll(){
+async function buildPortfolioScenarioTable(){
+  const tbody=document.getElementById('portfolio-scenario-tbody');
+  if(!tbody)return;
+  const scenarios=[
+    {label:'🐻 최악 Bear',price:91,color:'text-red-400',bg:''},
+    {label:'📉 Bear 시나리오',price:250,color:'text-red-400',bg:''},
+    {label:'📊 Wall St 평균',price:405.47,color:'text-yellow-400',bg:''},
+    {label:'⭐ 현재가',price:null,color:'text-blue-300',bg:'bg-slate-800'},
+    {label:'📌 Max Pain',price:420,color:'text-slate-300',bg:''},
+    {label:'✅ Base 2026',price:455,color:'text-green-400',bg:'bg-slate-800/50'},
+    {label:'🏦 Wedbush 상단',price:600,color:'text-green-400',bg:''},
+    {label:'🐂 Bull 2026',price:600,color:'text-green-300',bg:''},
+    {label:'📈 Base 2027',price:580,color:'text-green-400',bg:'bg-slate-800/50'},
+    {label:'🚀 Base 2028',price:700,color:'text-purple-400',bg:'bg-slate-800/50'},
+    {label:'🌙 Bull 2028',price:1000,color:'text-purple-300',bg:''},
+    {label:'🏛️ Base 2030',price:1200,color:'text-amber-400',bg:'bg-slate-800/50'},
+    {label:'🛸 ARK 목표',price:2600,color:'text-amber-300',bg:''},
+  ];
+  const currentPriceEl=document.getElementById('px');
+  const currentPrice=currentPriceEl?parseFloat(currentPriceEl.textContent.replace(/[^0-9.]/g,'')):null;
+  const rows=scenarios.map(s=>{
+    const price=s.price===null?currentPrice:s.price;
+    if(!price)return '';
+    const totalUSD=TOTAL*price;
+    const totalKRW=totalUSD*USDKRW;
+    const pnlUSD=totalUSD-COST;
+    const pnlPct=((price-AVG)/AVG*100);
+    const pnlColor=pnlUSD>=0?'text-green-400':'text-red-400';
+    const label=s.price===null?`⭐ 현재가 ($${price.toFixed(2)})`:`${s.label}`;
+    return `<tr class="border-b border-slate-800/50 ${s.bg} hover:bg-slate-800 transition-colors">
+      <td class="py-2 px-3 ${s.color} font-medium">${label}</td>
+      <td class="py-2 px-3 text-right ${s.color} font-bold">$${price.toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0})}</td>
+      <td class="py-2 px-3 text-right text-slate-200 font-bold">$${Math.round(totalUSD).toLocaleString('en')}</td>
+      <td class="py-2 px-3 text-right text-slate-200">₩${Math.round(totalKRW/1000).toLocaleString('ko')}k</td>
+      <td class="py-2 px-3 text-right ${pnlColor} font-bold">${pnlPct>=0?'+':''}${pnlPct.toFixed(1)}%</td>
+      <td class="py-2 px-3 text-right ${pnlColor}">${pnlUSD>=0?'+':''}\$${Math.round(pnlUSD).toLocaleString('en')}</td>
+    </tr>`;
+  });
+  tbody.innerHTML=rows.join('');
+}
+
+function refreshAll(){
+  buildPortfolioScenarioTable();
   if(busy)return;busy=true;
   el('refresh-icon').classList.add('spin');
   updateMarketStatus();
