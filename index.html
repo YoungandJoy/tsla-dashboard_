@@ -630,125 +630,215 @@ body{background:#020817}
     <div class="mt-6">
       <h3 class="text-sm font-bold text-slate-300 mb-3">📊 추가 정량 지표 — 예측에 쓰이는 다른 데이터</h3>
 
-      <!-- Short Interest + Options + Institutional + Earnings 4-grid -->
       <div class="grid grid-cols-2 gap-3 mb-3">
-
         <!-- Short Interest -->
         <div class="card2 p-4">
-          <div class="text-xs text-slate-400 mb-2">📉 공매도 / Short Interest</div>
-          <div class="space-y-2 text-xs">
-            <div class="flex justify-between"><span class="text-slate-400">Short Float</span><span class="text-green-400 font-bold">2.7% ↓ 낮음</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">Days to Cover</span><span class="text-slate-200">1.2일</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">Borrow Rate</span><span class="text-green-400">0.5% (저렴)</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">Short Squeeze Index</span><span class="text-yellow-400">Low Risk</span></div>
-            <div class="mt-2 text-slate-500">→ 공매도 압력 낮음. 숏커버 랠리 가능성 제한적. 강세 신호.</div>
+          <div class="text-xs font-bold text-slate-300 mb-3">📉 공매도 / Short Interest</div>
+          <div class="space-y-3 text-xs">
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">Short Float</span><span class="text-green-400 font-bold">2.7% ↓ 낮음</span></div>
+              <div class="text-slate-500">전체 유통주식 중 공매도 비율. 낮을수록 하방 압력이 약해 주가에 유리.</div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">Days to Cover</span><span class="text-slate-200">1.2일</span></div>
+              <div class="text-slate-500">공매도 포지션 전량 청산에 필요한 거래일. 짧으면 숏스퀴즈(급등) 가능성도 낮음.</div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">Borrow Rate</span><span class="text-green-400">0.5% (저렴)</span></div>
+              <div class="text-slate-500">주식 빌리는 비용. 저렴하면 공매도가 쉬워 지속되지만, 비싸지면 숏커버 유발.</div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">Short Squeeze Index</span><span class="text-yellow-400">Low Risk</span></div>
+              <div class="text-slate-500">공매도 세력이 손실 방어를 위해 매수 전환(숏커버)으로 주가가 급등할 위험도.</div>
+            </div>
           </div>
         </div>
 
         <!-- Options Market -->
         <div class="card2 p-4">
-          <div class="text-xs text-slate-400 mb-2">⚙️ 옵션 시장 심리</div>
-          <div class="space-y-2 text-xs">
-            <div class="flex justify-between"><span class="text-slate-400">Max Pain (이번 만기)</span><span class="text-yellow-400 font-bold">$420</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">Put/Call Ratio</span><span class="text-green-400 font-bold">0.52 (콜 우세)</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">IV Rank (30d)</span><span class="text-slate-200">45% — 보통</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">Gamma Exposure</span><span class="text-green-400">+양수 (딜러 매수)</span></div>
-            <div class="mt-2 text-slate-500">→ 만기일 $420 중력권. 콜 우세로 상방 에너지 유지.</div>
+          <div class="text-xs font-bold text-slate-300 mb-3">⚙️ 옵션 시장 심리</div>
+          <div class="space-y-3 text-xs">
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">Max Pain (이번 만기)</span><span class="text-yellow-400 font-bold">$420</span></div>
+              <div class="text-slate-500">옵션 매도자(시장조성자)가 가장 적게 손해보는 가격. 만기일 주가가 이 가격으로 수렴하는 경향 있음.</div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">Put/Call Ratio</span><span class="text-green-400 font-bold">0.52 (콜 우세)</span></div>
+              <div class="text-slate-500">풋(하락 베팅) ÷ 콜(상승 베팅). 0.7 이하면 시장 참여자 다수가 상승에 돈 걸고 있는 것.</div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">IV Rank (30d)</span><span class="text-slate-200">45% — 보통</span></div>
+              <div class="text-slate-500">현재 변동성이 지난 1년 중 몇 %위인지. 80% 이상이면 옵션 비싸고, 30% 이하면 저렴한 구간.</div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">Gamma Exposure</span><span class="text-green-400">+양수 (딜러 매수)</span></div>
+              <div class="text-slate-500">시장조성자(딜러)가 헤지를 위해 주가 상승 시 추가 매수해야 하는 구조. 양수면 상방 모멘텀 강화.</div>
+            </div>
           </div>
         </div>
 
         <!-- Institutional Positioning -->
         <div class="card2 p-4">
-          <div class="text-xs text-slate-400 mb-2">🏛️ 기관·내부자 포지셔닝</div>
-          <div class="space-y-2 text-xs">
-            <div class="flex justify-between"><span class="text-slate-400">기관 소유비율</span><span class="text-slate-200 font-bold">41.2%</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">Vanguard</span><span class="text-green-400">+0.3% ↑</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">BlackRock</span><span class="text-red-400">-0.1% ↓</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">ARK (ARKK 비중)</span><span class="text-blue-400">11.2% · 목표 $2,600</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">내부자 최근 거래</span><span class="text-red-400">순매도 (Musk 옵션)</span></div>
-            <div class="mt-2 text-slate-500">→ 대형 패시브 유지, 내부자 매도는 보상 관련.</div>
+          <div class="text-xs font-bold text-slate-300 mb-3">🏛️ 기관·내부자 포지셔닝</div>
+          <div class="space-y-3 text-xs">
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">기관 소유비율</span><span class="text-slate-200 font-bold">41.2%</span></div>
+              <div class="text-slate-500">ETF·연기금·펀드 등 기관이 보유한 비중. 높을수록 안정적 수요 기반. 기관이 팔면 대형 하락.</div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">Vanguard</span><span class="text-green-400">+0.3% ↑</span></div>
+              <div class="text-slate-500">세계 최대 패시브 운용사. 지분 증가 = S&P500 내 TSLA 비중 확대 반영. 자동 매수.</div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">ARK (ARKK 비중)</span><span class="text-blue-400">11.2% · 목표 $2,600</span></div>
+              <div class="text-slate-500">Cathie Wood의 혁신 ETF. ARKK 자금 유출입이 TSLA 주가에 직접 영향. 목표가 $2,600.</div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">내부자 최근 거래</span><span class="text-red-400">순매도 (Musk 옵션)</span></div>
+              <div class="text-slate-500">임원진의 자사주 거래. Musk의 매도는 스톡옵션 행사 관련으로 악재라기보다 정해진 보상 프로그램.</div>
+            </div>
           </div>
         </div>
 
         <!-- Earnings Consensus -->
         <div class="card2 p-4">
-          <div class="text-xs text-slate-400 mb-2">📈 EPS / 실적 컨센서스</div>
-          <div class="space-y-2 text-xs">
-            <div class="flex justify-between"><span class="text-slate-400">Q2 2026E EPS</span><span class="text-slate-200 font-bold">$0.58</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">FY 2026E EPS</span><span class="text-green-400 font-bold">$2.85 (+18% YoY)</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">FY 2027E EPS</span><span class="text-green-400 font-bold">$4.12 (+45% YoY)</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">Revenue 2026E</span><span class="text-slate-200">$120B (+12%)</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">EPS 서프라이즈 평균</span><span class="text-green-400">+23% (최근 8분기)</span></div>
-            <div class="mt-2 text-slate-500">→ 어닝 모멘텀 강함. 컨센서스 상향 조정 중.</div>
+          <div class="text-xs font-bold text-slate-300 mb-3">📈 EPS / 실적 컨센서스</div>
+          <div class="space-y-3 text-xs">
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">Q2 2026E EPS</span><span class="text-slate-200 font-bold">$0.58</span></div>
+              <div class="text-slate-500">2분기 주당순이익 예상치. 실제 발표가 이걸 넘으면(서프라이즈) 주가 급등, 밑돌면 급락.</div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">FY 2026E EPS</span><span class="text-green-400 font-bold">$2.85 (+18% YoY)</span></div>
+              <div class="text-slate-500">올해 연간 주당순이익 컨센서스. P/E 계산의 기준. 현재 주가 $428 ÷ $2.85 = P/E 150x.</div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">FY 2027E EPS</span><span class="text-green-400 font-bold">$4.12 (+45% YoY)</span></div>
+              <div class="text-slate-500">내년 예상 EPS. 이 기준으로 Forward P/E 계산 시 약 104x. 성장률이 높으면 고P/E가 정당화.</div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">EPS 서프라이즈 평균</span><span class="text-green-400">+23% (최근 8분기)</span></div>
+              <div class="text-slate-500">최근 2년간 실제 EPS가 예상치를 평균 23% 초과. 이 패턴이 지속되면 주가 상방 기대 유효.</div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Seasonality + Valuation + Macro Sensitivity 3-grid -->
       <div class="grid grid-cols-3 gap-3 mb-3">
-
         <!-- Seasonality -->
         <div class="card2 p-4">
-          <div class="text-xs text-slate-400 mb-2">📅 계절성 패턴</div>
-          <div class="space-y-1 text-xs">
-            <div class="flex justify-between"><span class="text-slate-400">현재 국면</span><span class="text-green-400 font-bold">배달 발표 전 강세</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">6월 말 배달 발표</span><span class="text-yellow-400">7월 랠리 패턴</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">역사적 Q2 평균</span><span class="text-green-400">+8.3%</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">작년 동기 대비</span><span class="text-green-400">+45% ↑</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">최약 월</span><span class="text-red-400">2월, 8월</span></div>
-            <div class="mt-2 text-slate-500">→ Q2 배달 촉매 + 계절적 강세 구간.</div>
+          <div class="text-xs font-bold text-slate-300 mb-3">📅 계절성 패턴</div>
+          <div class="space-y-3 text-xs">
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">현재 국면</span><span class="text-green-400 font-bold">배달 발표 전 강세</span></div>
+              <div class="text-slate-500">TSLA는 분기 배달 수치 발표 직전에 기대감으로 주가 상승하는 패턴이 반복됨.</div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">6월 말 배달 발표</span><span class="text-yellow-400">7월 랠리 패턴</span></div>
+              <div class="text-slate-500">Q2 배달 수치 발표 후 예상치 초과 시 7월에 대형 랠리가 역사적으로 자주 나타남.</div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">역사적 Q2 평균 수익률</span><span class="text-green-400">+8.3%</span></div>
+              <div class="text-slate-500">과거 데이터 기준 2분기(4~6월) TSLA 평균 수익률. 계절적으로 강세 구간.</div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">최약 월</span><span class="text-red-400">2월, 8월</span></div>
+              <div class="text-slate-500">계절적으로 수익률이 낮은 달. 이 시기 보유 비중 조절 고려 가능.</div>
+            </div>
           </div>
         </div>
 
         <!-- Valuation vs Peers -->
         <div class="card2 p-4">
-          <div class="text-xs text-slate-400 mb-2">💎 밸류에이션 비교</div>
-          <div class="space-y-1 text-xs">
-            <div class="flex justify-between"><span class="text-slate-400">P/S (TSLA)</span><span class="text-yellow-400 font-bold">8.2x</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">P/S 5년 평균</span><span class="text-slate-400">10.5x → <span class="text-green-400">22% 할인</span></span></div>
-            <div class="flex justify-between"><span class="text-slate-400">P/E 2026E</span><span class="text-red-400">150x (AI 프리미엄)</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">EV/EBITDA</span><span class="text-slate-200">42x</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">BYD P/E 비교</span><span class="text-green-400">18x (TSLA 8배)</span></div>
-            <div class="mt-2 text-slate-500">→ P/S 기준 역사적 저평가. AI 옵션 반영 시 정당화.</div>
+          <div class="text-xs font-bold text-slate-300 mb-3">💎 밸류에이션 비교</div>
+          <div class="space-y-3 text-xs">
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">P/S (TSLA)</span><span class="text-yellow-400 font-bold">8.2x</span></div>
+              <div class="text-slate-500">시가총액 ÷ 연매출. 1달러 매출에 시장이 얼마를 지불하나. 낮을수록 상대적 저평가.</div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">P/S 5년 평균 대비</span><span class="text-green-400">22% 할인 중</span></div>
+              <div class="text-slate-500">역사적 평균(10.5x) 대비 현재가 22% 저렴. 매출 성장 회복 시 재평가 여력 존재.</div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">P/E 2026E</span><span class="text-red-400">150x (AI 프리미엄)</span></div>
+              <div class="text-slate-500">이익 대비 주가. 150x는 전통차 업체(8~12x) 대비 엄청나게 높음. AI·로봇 미래가치 선반영.</div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">BYD P/E 비교</span><span class="text-slate-200">18x (TSLA의 1/8)</span></div>
+              <div class="text-slate-500">중국 최대 EV 경쟁사. TSLA가 8배 프리미엄에 거래됨. AI·소프트웨어 성장성 차이가 이유.</div>
+            </div>
           </div>
         </div>
 
         <!-- Macro Sensitivity -->
         <div class="card2 p-4">
-          <div class="text-xs text-slate-400 mb-2">🌍 매크로 민감도</div>
-          <div class="space-y-1 text-xs">
-            <div class="flex justify-between"><span class="text-slate-400">금리 민감도</span><span class="text-red-400">높음 (장기성장주)</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">현재 10Y 금리</span><span class="text-yellow-400">4.38%</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">중국 매출 비중</span><span class="text-yellow-400">22% (리스크)</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">달러 강세</span><span class="text-red-400">역풍 (해외매출 희석)</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">EV 보조금 리스크</span><span class="text-yellow-400">IRA 불확실성</span></div>
-            <div class="mt-2 text-slate-500">→ 금리 인하 시 가장 큰 수혜 종목.</div>
+          <div class="text-xs font-bold text-slate-300 mb-3">🌍 매크로 민감도</div>
+          <div class="space-y-3 text-xs">
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">금리 민감도</span><span class="text-red-400">높음 (장기성장주)</span></div>
+              <div class="text-slate-500">TSLA는 먼 미래 이익에 베팅. 금리 높으면 미래가치 현재할인 시 손해. 금리 인하 시 최대 수혜.</div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">현재 10Y 금리</span><span class="text-yellow-400">4.38%</span></div>
+              <div class="text-slate-500">미국 국채 10년물 수익률. 5% 돌파 시 성장주 전반 역풍. 3%대 진입 시 성장주 랠리.</div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">중국 매출 비중</span><span class="text-yellow-400">22% (리스크)</span></div>
+              <div class="text-slate-500">전체 매출의 22%가 중국. 미·중 무역전쟁, 관세, BYD 경쟁 심화 시 직접 타격.</div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">EV 보조금 리스크</span><span class="text-yellow-400">IRA 불확실성</span></div>
+              <div class="text-slate-500">인플레이션 감축법(IRA)상 EV 세액공제 $7,500. 정책 변경 시 판매 수요에 즉각 영향.</div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Relative Strength + Dark Pool -->
       <div class="grid grid-cols-2 gap-3 mb-3">
+        <!-- Relative Strength -->
         <div class="card2 p-4">
-          <div class="text-xs text-slate-400 mb-2">📡 상대강도 / 팩터 분석</div>
-          <div class="space-y-1 text-xs">
-            <div class="flex justify-between"><span class="text-slate-400">베타 (vs S&P500)</span><span class="text-yellow-400 font-bold">2.1 — 고변동성</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">TSLA vs NASDAQ (3M)</span><span class="text-green-400">+12% 아웃퍼폼</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">모멘텀 팩터 스코어</span><span class="text-green-400">상위 18%</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">퀄리티 팩터</span><span class="text-yellow-400">중간 (FCF 마이너스)</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">TSLA vs EV ETF</span><span class="text-green-400">+28% 아웃퍼폼</span></div>
-            <div class="mt-2 text-slate-500">→ 모멘텀 강세. 고베타로 시장 상승 시 2배 수혜.</div>
+          <div class="text-xs font-bold text-slate-300 mb-3">📡 상대강도 / 팩터 분석</div>
+          <div class="space-y-3 text-xs">
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">베타 (vs S&P500)</span><span class="text-yellow-400 font-bold">2.1 — 고변동성</span></div>
+              <div class="text-slate-500">시장이 1% 오를 때 TSLA는 평균 2.1% 움직임. 상승장엔 2배 수익, 하락장엔 2배 손실.</div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">TSLA vs NASDAQ (3M)</span><span class="text-green-400">+12% 아웃퍼폼</span></div>
+              <div class="text-slate-500">최근 3개월 나스닥 대비 12% 초과 수익. 강한 모멘텀 지속 중. 기관이 선호하는 신호.</div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">모멘텀 팩터 스코어</span><span class="text-green-400">상위 18%</span></div>
+              <div class="text-slate-500">전체 주식 대비 가격 모멘텀 순위. 상위 20% 이내 진입 = 퀀트 펀드 자동 편입 구간.</div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">퀄리티 팩터</span><span class="text-yellow-400">중간 (FCF 마이너스)</span></div>
+              <div class="text-slate-500">재무 건전성 지표. 현재 잉여현금흐름(FCF) 마이너스로 재투자 단계. 수익성 개선 시 재평가.</div>
+            </div>
           </div>
         </div>
+
+        <!-- Dark Pool -->
         <div class="card2 p-4">
-          <div class="text-xs text-slate-400 mb-2">🌑 다크풀 / 기관 플로우</div>
-          <div class="space-y-1 text-xs">
-            <div class="flex justify-between"><span class="text-slate-400">다크풀 비율</span><span class="text-slate-200 font-bold">~38% (평균 수준)</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">최근 대형 블록거래</span><span class="text-green-400">매수 우세</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">스마트머니 플로우</span><span class="text-green-400">순유입 (4주 연속)</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">리테일 vs 기관</span><span class="text-yellow-400">리테일 40% / 기관 60%</span></div>
-            <div class="flex justify-between"><span class="text-slate-400">OTC 거래비율</span><span class="text-slate-200">41%</span></div>
-            <div class="mt-2 text-slate-500">→ 기관 스마트머니 유입 지속. 긍정적 신호.</div>
+          <div class="text-xs font-bold text-slate-300 mb-3">🌑 다크풀 / 기관 플로우</div>
+          <div class="space-y-3 text-xs">
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">다크풀 비율</span><span class="text-slate-200 font-bold">~38% (평균 수준)</span></div>
+              <div class="text-slate-500">장외 비공개 거래소에서 이루어지는 기관 대량 거래 비중. 기관의 '조용한 매집' 신호 파악용.</div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">최근 대형 블록거래</span><span class="text-green-400">매수 우세</span></div>
+              <div class="text-slate-500">수십만주 이상 단건 거래. 헤지펀드·연기금의 방향성. 매수 우세면 기관이 몰래 쌓는 중.</div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">스마트머니 플로우</span><span class="text-green-400">순유입 (4주 연속)</span></div>
+              <div class="text-slate-500">헤지펀드·자산운용사 등 정보력 높은 투자자의 자금 흐름. 4주 연속 유입 = 중기 강세 신호.</div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-0.5"><span class="text-slate-400">리테일 vs 기관 비율</span><span class="text-yellow-400">개인 40% / 기관 60%</span></div>
+              <div class="text-slate-500">개인투자자와 기관투자자의 거래 비중. 기관 비중이 높을수록 주가 변동성이 줄고 안정적.</div>
+            </div>
           </div>
         </div>
       </div>
